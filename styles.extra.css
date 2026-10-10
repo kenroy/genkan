@@ -291,3 +291,58 @@
     border-radius: 0 !important;
     padding: 0 !important;
 }
+
+/* ============================================================
+   Ring notes card
+   ============================================================ */
+.hp-root .card-link {
+    font-size: 12px;
+    color: var(--accent-txt);
+    cursor: pointer;
+}
+
+.hp-root .card-link:hover {
+    text-decoration: underline;
+}
+
+.hp-root .ring-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.hp-root .ring-item {
+    display: block;
+    padding: 10px 6px;
+    margin: 0 -6px;
+    border-bottom: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    transition: background 0.15s;
+}
+
+.hp-root .ring-item:last-child {
+    border-bottom: none;
+}
+
+.hp-root .ring-item:hover {
+    background: var(--surface-2);
+}
+
+.hp-root .ring-when {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-3);
+}
+
+.hp-root .ring-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-line;
+}

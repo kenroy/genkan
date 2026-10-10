@@ -40,6 +40,9 @@ const DEFAULT_SETTINGS = {
   theme: "system", // system | dark | light
   clockFormat: "12h",
   showHero: true,
+  showRingNotes: false, // Pebble Index ring notes card (off unless enabled)
+  ringNotesFile: "Pebble Index.md", // note the ring's app appends timestamped entries to
+  maxRingNotes: 5,
   unsplashKey: "",
   openOnStartup: false,
   quickLinks: DEFAULT_QUICK_LINKS,
@@ -185,6 +188,43 @@ function parseFavourites(text) {
   return out;
 }
 
+// ─── Ring notes (Pebble Index) ────────────────────────────────────────────────
+// The ring's app appends entries to a note under timestamp headings:
+//   ## 2026-10-05 21:55
+//   Take note: ...
+
+const RING_HEADING_RE = /^#{1,6}\s+(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2}))?\s*$/;
+const ANY_HEADING_RE = /^#{1,6}\s/;
+
+function parseRingNotes(markdown) {
+  const lines = (markdown || "").split("\n");
+  const entries = [];
+  let cur = null;
+  lines.forEach((line, i) => {
+    const m = line.match(RING_HEADING_RE);
+    if (m) {
+      const hasTime = m[4] !== undefined;
+      cur = {
+        line: i,
+        hasTime,
+        when: new Date(+m[1], +m[2] - 1, +m[3], hasTime ? +m[4] : 0, hasTime ? +m[5] : 0),
+        body: [],
+      };
+      entries.push(cur);
+    } else if (ANY_HEADING_RE.test(line)) {
+      cur = null; // some other section — not ring content
+    } else if (cur) {
+      cur.body.push(line);
+    }
+  });
+  entries.forEach((e) => (e.text = e.body.join("\n").trim()));
+  // Newest first; entries that share a timestamp keep "later in the file = newer"
+  return entries
+    .filter((e) => e.text)
+    .reverse()
+    .sort((a, b) => b.when - a.when);
+}
+
 class FavouritePicker extends FuzzySuggestModal {
   constructor(app, plugin) {
     super(app);
@@ -276,6 +316,16 @@ const TEMPLATE = `
     </aside>
 
     <main class="col col-center">
+      <div class="card hidden" id="ring-card">
+        <div class="card-header">
+          <span class="card-label">Ring Notes</span>
+          <div class="card-header-right">
+            <span class="badge" id="ring-count">0</span>
+            <a href="#" class="card-link" id="ring-open" title="Open the notes file">Open</a>
+          </div>
+        </div>
+        <div id="ring-body"></div>
+      </div>
       <div class="card" id="clips-card">
         <div class="card-header">
           <span class="card-label">Web Clips</span>
@@ -363,6 +413,9 @@ class HomepageView extends ItemView {
   get favPath() {
     return this.plugin.favPath;
   }
+  get ringPath() {
+    return normalizePath(this.settings.ringNotesFile || DEFAULT_SETTINGS.ringNotesFile);
+  }
   // Run fn after ms; later calls with the same key replace the pending one
   later(key, ms, fn) {
     clearTimeout(this.timers[key]);
@@ -437,6 +490,7 @@ class HomepageView extends ItemView {
     this.renderCalendar();
     this.renderLinks();
     this.renderFavourites();
+    this.renderRingNotes();
     this.loadTasks();
     this.loadNote();
     this.renderClips();
@@ -451,6 +505,7 @@ class HomepageView extends ItemView {
     if (path === this.tasksPath) this.later("tasks", 150, () => this.loadTasks());
     else if (path === this.notePath) this.later("note", 150, () => this.loadNote());
     else if (path === this.favPath) this.later("favs", 150, () => this.renderFavourites());
+    else if (path === this.ringPath) this.later("ring", 150, () => this.renderRingNotes());
     else this.scheduleLists();
   }
 
@@ -873,6 +928,12 @@ class HomepageView extends ItemView {
         new FavouritePicker(this.app, this.plugin).open();
         return;
       }
+      const ring = e.target.closest("[data-ring-line]");
+      if (ring) {
+        e.preventDefault();
+        this.openRingNote(Number(ring.dataset.ringLine), e);
+        return;
+      }
       const fav = e.target.closest("[data-fav]");
       if (fav) {
         e.preventDefault();
@@ -908,6 +969,71 @@ class HomepageView extends ItemView {
     if (a.startsWith("open:")) return this.openFile(normalizePath(a.slice(5)), evt);
     if (/^(https?|obsidian):\/\//.test(a)) return window.open(a);
     new Notice(`Unknown quick link action: ${a}`);
+  }
+
+  // ── Ring notes ──
+
+  formatRingWhen(e) {
+    const d = e.when;
+    const now = new Date();
+    const dayDiff = Math.round(
+      (new Date(now.getFullYear(), now.getMonth(), now.getDate()) -
+        new Date(d.getFullYear(), d.getMonth(), d.getDate())) /
+        86_400_000,
+    );
+    const day =
+      dayDiff === 0
+        ? "Today"
+        : dayDiff === 1
+          ? "Yesterday"
+          : fmtDate(d, { month: "short", day: "numeric", year: d.getFullYear() === now.getFullYear() ? undefined : "numeric" });
+    if (!e.hasTime) return day;
+    const time = d.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: this.settings.clockFormat === "12h",
+    });
+    return `${day} · ${time}`;
+  }
+
+  async renderRingNotes() {
+    const card = this.$("ring-card");
+    const enabled = !!this.settings.showRingNotes;
+    card.classList.toggle("hidden", !enabled);
+    if (!enabled) return;
+
+    const path = this.ringPath;
+    const body = this.$("ring-body");
+    this.$("ring-open").dataset.open = path;
+
+    const f = this.app.vault.getAbstractFileByPath(path);
+    if (!(f instanceof TFile)) {
+      this.$("ring-count").textContent = "0";
+      body.innerHTML = `<div class="empty-state">No ring notes yet. Looking for “${esc(path)}”.</div>`;
+      return;
+    }
+    const entries = parseRingNotes(await this.app.vault.read(f));
+    this.$("ring-count").textContent = entries.length;
+    if (!entries.length) {
+      body.innerHTML = `<div class="empty-state">No timestamped entries found in “${esc(path)}”.</div>`;
+      return;
+    }
+    body.innerHTML = `<div class="ring-list">${entries
+      .slice(0, this.settings.maxRingNotes)
+      .map(
+        (e) => `<a class="ring-item" href="#" data-ring-line="${e.line}">
+          <span class="ring-when">${esc(this.formatRingWhen(e))}</span>
+          <span class="ring-text">${esc(e.text)}</span></a>`,
+      )
+      .join("")}</div>`;
+  }
+
+  // Open the notes file scrolled to the entry's heading
+  openRingNote(line, evt) {
+    const f = this.app.vault.getAbstractFileByPath(this.ringPath);
+    if (!(f instanceof TFile)) return;
+    const mod = evt ? Keymap.isModEvent(evt) : false;
+    this.app.workspace.getLeaf(mod || "tab").openFile(f, { eState: { line } });
   }
 
   // ── Favourites ──
@@ -1350,6 +1476,18 @@ class HomepageSettingTab extends PluginSettingTab {
     new Setting(containerEl).setName("Content").setHeading();
     text("Max web clips", "", "maxClips", { number: true });
     text("Max recent notes", "", "maxRecent", { number: true });
+
+    new Setting(containerEl)
+      .setName("Pebble ring notes")
+      .setDesc("Show the latest voice notes from your Pebble Index ring (timestamped entries in a note).")
+      .addToggle((t) => t.setValue(s.showRingNotes).onChange((v) => save("showRingNotes", v)));
+    text(
+      "Ring notes file",
+      "The note the ring's app appends to, with entries under headings like “## 2026-10-05 21:55”.",
+      "ringNotesFile",
+      { placeholder: "Pebble Index.md" },
+    );
+    text("Max ring notes", "", "maxRingNotes", { number: true });
 
     new Setting(containerEl)
       .setName("Photo of the day")
