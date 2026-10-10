@@ -1505,3 +1505,59 @@
     padding: 0 4px;
     font-size: 12px;
 }
+
+/* ============================================================
+   Form controls: beat Obsidian's (especially mobile) default input styling
+   ============================================================ */
+
+/* Quick note is borderless inside its card: no rounded corner (which clipped the
+   first character on iOS) and no native focus ring */
+.hp-root #quick-note,
+.hp-root #quick-note:focus,
+.hp-root #quick-note:focus-visible,
+.hp-root #quick-note:active {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 4px 2px !important;
+}
+
+/* Show focus on the card instead of the field */
+.hp-root #note-card {
+    transition: border-color 0.2s;
+}
+
+.hp-root #note-card:focus-within {
+    border-color: var(--accent);
+}
+
+/* Task and search inputs keep their own border/radius; stop the platform adding more */
+.hp-root .task-input,
+.hp-root #search-input {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.hp-root .task-input {
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 10px 14px !important;
+}
+
+.hp-root .task-input:focus {
+    border-color: var(--accent) !important;
+}
+
+.hp-root #search-input,
+.hp-root #search-input:focus {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+}
