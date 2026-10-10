@@ -10,6 +10,7 @@ const {
   Notice,
   Platform,
   Keymap,
+  MarkdownView,
   FuzzySuggestModal,
   normalizePath,
   requestUrl,
@@ -1822,18 +1823,25 @@ module.exports = class HomepagePlugin extends Plugin {
       callback: () => new FavouritePicker(this.app, this).open(),
     });
     this.registerEvent(
-      this.app.workspace.on("file-menu", (menu, file) => {
-        if (!(file instanceof TFile) || file.extension !== "md" || this.isDataFile(file)) return;
-        // The menu is built synchronously, so read the cached set
-        const fav = this.favPaths.has(file.path);
-        menu.addItem((item) =>
-          item
-            .setTitle(fav ? "Remove from homepage favourites" : "Add to homepage favourites")
-            .setIcon("star")
-            .onClick(() => this.toggleFavourite(file)),
-        );
+      this.app.workspace.on("file-menu", (menu, file) => this.addFavouriteMenuItem(menu, file)),
+    );
+    this.registerEvent(
+      this.app.workspace.on("editor-menu", (menu, editor, view) =>
+        this.addFavouriteMenuItem(menu, view?.file),
+      ),
+    );
+
+    this.stars = new Map();
+    this.registerEvent(this.app.workspace.on("active-leaf-change", (leaf) => this.decorateLeaf(leaf)));
+    this.registerEvent(
+      this.app.workspace.on("file-open", () => {
+        this.app.workspace.iterateAllLeaves((l) => this.decorateLeaf(l));
+        this.updateStars();
       }),
     );
+    this.app.workspace.onLayoutReady(() => {
+      this.app.workspace.iterateAllLeaves((l) => this.decorateLeaf(l));
+    });
 
     this.app.workspace.onLayoutReady(() => {
       if (
@@ -1843,6 +1851,51 @@ module.exports = class HomepagePlugin extends Plugin {
         this.activateView();
       }
     });
+  }
+
+  // Add/remove entry for Obsidian's own menus (tab, ⋮ menu, editor right-click)
+  addFavouriteMenuItem(menu, file) {
+    if (!(file instanceof TFile) || file.extension !== "md" || this.isDataFile(file)) return;
+    // The menu is built synchronously, so read the cached set
+    const fav = this.favPaths.has(file.path);
+    menu.addItem((item) =>
+      item
+        .setTitle(fav ? "Remove from homepage favourites" : "Add to homepage favourites")
+        .setIcon("star")
+        .onClick(() => this.toggleFavourite(file)),
+    );
+  }
+
+  // A ★ button in each note's header: toggles the favourite, lit when it is one
+  decorateLeaf(leaf) {
+    const view = leaf?.view;
+    if (!(view instanceof MarkdownView) || this.stars.has(view)) return;
+    const el = view.addAction("star", "Add or remove from homepage favourites", () => {
+      if (view.file && !this.isDataFile(view.file)) this.toggleFavourite(view.file);
+    });
+    el.addClass("hp-fav-star");
+    this.stars.set(view, el);
+    this.updateStars();
+  }
+
+  updateStars() {
+    for (const [view, el] of this.stars ?? []) {
+      if (!view.containerEl?.isConnected) {
+        el.remove();
+        this.stars.delete(view);
+        continue;
+      }
+      const f = view.file;
+      const on = !!f && this.favPaths.has(f.path);
+      el.toggleClass("is-active", on);
+      el.setAttribute("aria-label", on ? "Remove from homepage favourites" : "Add to homepage favourites");
+    }
+  }
+
+  onunload() {
+    for (const el of this.stars?.values() ?? []) el.remove();
+    this.stars?.clear();
+    clearTimeout(this.favCacheTimer);
   }
 
   async loadSettings() {
@@ -1874,6 +1927,7 @@ module.exports = class HomepagePlugin extends Plugin {
   async refreshFavCache() {
     const favs = await this.readFavourites();
     this.favPaths = new Set(favs.map((f) => this.favouriteFile(f)?.path).filter(Boolean));
+    this.updateStars();
   }
 
   scheduleFavCache() {
