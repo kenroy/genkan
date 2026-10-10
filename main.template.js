@@ -492,9 +492,19 @@ class HomepageView extends ItemView {
     const dn = this.app.internalPlugins?.getPluginById?.("daily-notes")?.instance?.options ?? {};
     const pn = this.app.plugins?.plugins?.["periodic-notes"]?.settings?.daily;
     const periodic = pn?.enabled ? pn : null;
+    let folder = this.settings.dailyNotesFolder || periodic?.folder || dn.folder || "";
+    // An auto-detected folder that doesn't exist (stale core setting) would make
+    // clicks create notes in a bogus place — fall back to the vault root instead
+    if (
+      !this.settings.dailyNotesFolder &&
+      folder &&
+      !this.app.vault.getAbstractFileByPath(normalizePath(folder))
+    ) {
+      folder = "";
+    }
     return {
       format: periodic?.format || dn.format || "YYYY-MM-DD",
-      folder: this.settings.dailyNotesFolder || periodic?.folder || dn.folder || "",
+      folder,
       template: periodic?.template || dn.template || "",
     };
   }
