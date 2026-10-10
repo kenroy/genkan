@@ -1,0 +1,132 @@
+
+/* ============================================================
+   Plugin-only additions
+   ============================================================ */
+
+/* Fill the Obsidian view and scroll inside it */
+.hp-view.view-content,
+.hp-view {
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.hp-root {
+    position: relative;
+    height: 100%;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    container-type: inline-size;
+    container-name: hp;
+    -webkit-overflow-scrolling: touch;
+}
+
+.hp-root .bg-glow {
+    position: absolute;
+    right: 0;
+    width: min(700px, 100%);
+}
+
+/* Undo Obsidian's default control chrome so the dashboard's own styles apply */
+.hp-root button,
+.hp-root input,
+.hp-root textarea {
+    height: auto;
+    min-height: 0;
+    box-shadow: none;
+    font-family: var(--font);
+}
+
+.hp-root a {
+    text-decoration: none;
+}
+
+.hp-root input[type="search"] {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Daily note exists */
+.hp-root .cal-day {
+    position: relative;
+}
+
+.hp-root .cal-day.has-note::after {
+    content: "";
+    position: absolute;
+    bottom: 12%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--accent-txt);
+}
+
+.hp-root .cal-day.today.has-note::after {
+    background: #fff;
+}
+
+/* Tablet: put Tasks + Quick Note under the other columns instead of hiding them */
+@container hp (max-width: 1100px) {
+    .hp-root .col-right {
+        display: flex;
+        grid-column: 1 / -1;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .hp-root .col-right .card {
+        flex: 1 1 280px;
+    }
+}
+
+/* Phone / narrow pane: single column, tasks + note first */
+@container hp (max-width: 768px) {
+    .hp-root .col-left,
+    .hp-root .col-right {
+        display: flex;
+    }
+
+    .hp-root .col-right {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        order: -1;
+    }
+
+    .hp-root .col-right .card {
+        flex: none;
+    }
+
+    /* 16px stops iOS zooming into focused fields */
+    .hp-root .task-input,
+    .hp-root #quick-note,
+    .hp-root #search-input {
+        font-size: 16px;
+    }
+
+    .hp-root #app {
+        padding: 12px;
+    }
+
+    .hp-root .cal-grid {
+        max-width: 340px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Larger tap targets on touch devices */
+.is-mobile .hp-root .task-check {
+    min-width: 22px;
+    min-height: 22px;
+}
+
+.is-mobile .hp-root .task-del {
+    opacity: 1;
+    padding: 8px;
+}
+
+.is-mobile .hp-root .cal-day {
+    min-height: 34px;
+}

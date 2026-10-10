@@ -1,0 +1,9 @@
+{
+  "id": "homepage-dashboard",
+  "name": "Homepage Dashboard",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "A dashboard homepage with clock, calendar, web clips, recent notes, tasks and a quick note. Works on desktop and mobile.",
+  "author": "Kenroy Harrison",
+  "isDesktopOnly": false
+}

@@ -1,0 +1,1315 @@
+"use strict";
+
+const obsidian = require("obsidian");
+const {
+  Plugin,
+  ItemView,
+  PluginSettingTab,
+  Setting,
+  TFile,
+  Notice,
+  Platform,
+  Keymap,
+  normalizePath,
+  requestUrl,
+  moment,
+} = obsidian;
+
+const VIEW_TYPE = "homepage-dashboard-view";
+
+/*__ICONS__*/
+
+/*__QUOTES__*/
+
+const DEFAULT_QUICK_LINKS = [
+  { icon: "📝", label: "New Note", action: "command:file-explorer:new-file" },
+  { icon: "📅", label: "Today's Note", action: "daily" },
+  { icon: "🔍", label: "Search Vault", action: "command:global-search:open" },
+  { icon: "🕸️", label: "Graph View", action: "command:graph:open" },
+  { icon: "🎲", label: "Random Note", action: "random" },
+];
+
+const DEFAULT_SETTINGS = {
+  userName: "",
+  clipsFolder: "Clippings",
+  dailyNotesFolder: "", // blank = use the Daily Notes / Periodic Notes setting
+  dataFolder: "homepage/data", // where Tasks.md and Quick Note.md live
+  maxClips: 12,
+  maxRecent: 8,
+  theme: "system", // system | dark | light
+  clockFormat: "12h",
+  showHero: true,
+  unsplashKey: "",
+  openOnStartup: false,
+  quickLinks: DEFAULT_QUICK_LINKS,
+};
+
+const HERO_TOPICS = "nature,landscape,mountains,forest,ocean,wilderness";
+
+// ─── Utilities ────────────────────────────────────────────────────────────────
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function newId() {
+  return `t${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function joinPath(folder, name) {
+  const f = (folder || "").replace(/^\/+|\/+$/g, "");
+  return normalizePath(f ? `${f}/${name}` : name);
+}
+
+function getDomain(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}
+
+function fmtDate(d, opts) {
+  return d.toLocaleDateString(
+    "en-US",
+    opts ?? { month: "short", day: "numeric", year: "numeric" },
+  );
+}
+
+function dateFromFilename(title) {
+  const m = title.match(/(\d{4}-\d{2}-\d{2})/);
+  if (!m) return null;
+  const d = new Date(`${m[1]}T00:00:00`);
+  return isNaN(d.getTime()) ? null : fmtDate(d);
+}
+
+// Frontmatter values may be strings, arrays or Dates — reduce to one string
+function fmString(v) {
+  if (Array.isArray(v)) v = v[0];
+  if (v == null) return "";
+  return String(v);
+}
+
+function formatClipDate(str) {
+  if (!str) return "";
+  const d = new Date(str.length === 10 ? `${str}T00:00:00` : str);
+  if (isNaN(d.getTime())) return str;
+  return fmtDate(d, { month: "long", day: "numeric", year: "numeric" });
+}
+
+// ─── Tasks.md format ──────────────────────────────────────────────────────────
+//   - [ ] text ➕ 2026-10-10 ^block-id
+// Compatible with the Obsidian Tasks plugin; the ^id is a native block id.
+
+const TASK_RE =
+  /^(\s*)[-*+] \[([ xX])\]\s+(.*?)(?:\s+➕ (\d{4}-\d{2}-\d{2}))?(?:\s+\^([A-Za-z0-9-]+))?\s*$/;
+
+function parseTasks(markdown) {
+  const tasks = [];
+  for (const line of (markdown || "").split("\n")) {
+    const m = line.match(TASK_RE);
+    if (!m || !m[3]) continue;
+    tasks.push({
+      id: m[5] || null,
+      text: m[3],
+      done: m[2] !== " ",
+    });
+  }
+  return tasks;
+}
+
+// First line after any YAML frontmatter
+function bodyStart(text) {
+  if (text.startsWith("---\n")) {
+    const end = text.indexOf("\n---", 3);
+    if (end !== -1) {
+      const nl = text.indexOf("\n", end + 1);
+      return nl === -1 ? text.length : nl + 1;
+    }
+  }
+  return 0;
+}
+
+function mapTaskLines(text, fn) {
+  return text
+    .split("\n")
+    .map((line) => {
+      const m = line.match(TASK_RE);
+      return m && m[3] ? fn(line, m) : line;
+    })
+    .filter((line) => line !== null)
+    .join("\n");
+}
+
+// ─── View ─────────────────────────────────────────────────────────────────────
+
+const TEMPLATE = `
+<div class="bg-glow"></div>
+<div id="app">
+  <header class="header">
+    <div class="header-top">
+      <p class="greeting" id="greeting">Hello</p>
+      <div class="header-controls">
+        <button class="icon-btn" id="page-refresh" title="Refresh" aria-label="Refresh"></button>
+        <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme"></button>
+        <button class="icon-btn" id="settings-btn" title="Settings" aria-label="Open settings"></button>
+      </div>
+    </div>
+    <div class="clock-wrap">
+      <div class="clock" id="clock">
+        <span id="clock-main">12:00</span><span id="clock-sec">:00</span>
+        <span id="clock-ampm">AM</span>
+      </div>
+      <div class="clock-date" id="clock-date"></div>
+    </div>
+    <div class="search-container">
+      <form class="search-wrap" id="search-form" role="search" autocomplete="off">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="search" id="search-input" placeholder="Search your vault…" spellcheck="false" aria-label="Search your vault" />
+        <kbd class="search-kbd" id="search-kbd">/</kbd>
+      </form>
+      <div id="search-results" class="search-results hidden" role="listbox" aria-label="Search results"></div>
+    </div>
+  </header>
+
+  <div id="hero" class="hero" role="img" aria-label="Photo of the day">
+    <img id="hero-img" class="hero-img" alt="Photo of the day" />
+    <div class="hero-overlay" aria-hidden="true"></div>
+    <div class="hero-footer">
+      <span id="hero-credit" class="hero-credit"></span>
+      <button class="icon-btn" id="hero-refresh" title="Load a new photo" aria-label="Load new photo"></button>
+    </div>
+  </div>
+
+  <div id="quote-bar" class="quote-bar">
+    <blockquote class="quote-content">
+      <p id="quote-text" class="quote-text"></p>
+      <footer id="quote-author" class="quote-author"></footer>
+    </blockquote>
+  </div>
+
+  <div class="grid">
+    <aside class="col col-left">
+      <div class="card" id="calendar-card">
+        <div class="card-header">
+          <span class="card-label">Calendar</span>
+          <div class="cal-nav">
+            <button class="cal-btn" id="cal-prev" title="Previous month" aria-label="Previous month">&#8249;</button>
+            <span id="cal-month-label"></span>
+            <button class="cal-btn" id="cal-next" title="Next month" aria-label="Next month">&#8250;</button>
+          </div>
+        </div>
+        <div class="cal-grid" id="cal-grid" role="grid" aria-label="Calendar"></div>
+        <button class="today-btn" id="cal-today">Today</button>
+      </div>
+      <div class="card" id="links-card">
+        <div class="card-header"><span class="card-label">Quick Links</span></div>
+        <nav id="quick-links" aria-label="Quick links"></nav>
+      </div>
+    </aside>
+
+    <main class="col col-center">
+      <div class="card" id="clips-card">
+        <div class="card-header">
+          <span class="card-label">Web Clips</span>
+          <div class="card-header-right">
+            <span class="badge" id="clips-count">0</span>
+            <button class="icon-btn sm" id="refresh-clips" title="Refresh clips" aria-label="Refresh web clips"></button>
+          </div>
+        </div>
+        <div id="clips-body"></div>
+      </div>
+      <div class="card" id="recent-card">
+        <div class="card-header">
+          <span class="card-label">Recent Notes</span>
+          <div class="card-header-right">
+            <span class="badge" id="recent-count">0</span>
+            <button class="icon-btn sm" id="refresh-recent" title="Refresh recent notes" aria-label="Refresh recent notes"></button>
+          </div>
+        </div>
+        <div id="recent-body"></div>
+      </div>
+    </main>
+
+    <aside class="col col-right">
+      <div class="card" id="tasks-card">
+        <div class="card-header">
+          <span class="card-label">Tasks</span>
+          <span class="tasks-stats" id="tasks-stats" aria-live="polite">0 / 0</span>
+        </div>
+        <input type="text" class="task-input" id="task-input" placeholder="Add a task and press Enter…" aria-label="New task" />
+        <div class="tab-row" role="tablist" aria-label="Filter tasks">
+          <button class="tab active" data-filter="all" role="tab" aria-selected="true">All</button>
+          <button class="tab" data-filter="active" role="tab" aria-selected="false">Active</button>
+          <button class="tab" data-filter="done" role="tab" aria-selected="false">Done</button>
+        </div>
+        <div id="tasks-list" role="list"></div>
+        <button class="clear-btn" id="clear-done">Clear completed</button>
+      </div>
+      <div class="card" id="note-card">
+        <div class="card-header">
+          <span class="card-label">Quick Note</span>
+          <span class="autosave-dot" id="autosave-dot" title="Saved" aria-label="Saved"></span>
+        </div>
+        <textarea id="quick-note" placeholder="Jot something down…" spellcheck="true" aria-label="Quick note"></textarea>
+      </div>
+    </aside>
+  </div>
+</div>`;
+
+class HomepageView extends ItemView {
+  constructor(leaf, plugin) {
+    super(leaf);
+    this.plugin = plugin;
+    this.tasks = [];
+    this.taskFilter = "all";
+    this.calYear = new Date().getFullYear();
+    this.calMonth = new Date().getMonth();
+    this.searchToken = 0;
+    this.noteDirty = false;
+    this.fixingIds = false;
+    this.timers = {};
+  }
+
+  getViewType() {
+    return VIEW_TYPE;
+  }
+  getDisplayText() {
+    return "Homepage";
+  }
+  getIcon() {
+    return "home";
+  }
+
+  get settings() {
+    return this.plugin.settings;
+  }
+  $(id) {
+    return this.root.querySelector(`#${id}`);
+  }
+  get tasksPath() {
+    return joinPath(this.settings.dataFolder, "Tasks.md");
+  }
+  get notePath() {
+    return joinPath(this.settings.dataFolder, "Quick Note.md");
+  }
+  // Run fn after ms; later calls with the same key replace the pending one
+  later(key, ms, fn) {
+    clearTimeout(this.timers[key]);
+    this.timers[key] = setTimeout(fn, ms);
+  }
+
+  async onOpen() {
+    this.contentEl.addClass("hp-view");
+    this.root = this.contentEl.createDiv({ cls: "hp-root" });
+    this.root.innerHTML = TEMPLATE;
+    if (Platform.isMobile) this.$("search-kbd").classList.add("hidden");
+
+    this.$("settings-btn").innerHTML = ICONS.settings;
+    this.$("page-refresh").innerHTML = ICONS.refresh;
+    this.$("refresh-clips").innerHTML = ICONS.refresh;
+    this.$("refresh-recent").innerHTML = ICONS.refresh;
+    this.$("hero-refresh").innerHTML = ICONS.refresh;
+
+    this.$("settings-btn").addEventListener("click", () => {
+      this.app.setting.open();
+      this.app.setting.openTabById(this.plugin.manifest.id);
+    });
+    this.$("page-refresh").addEventListener("click", () => this.refreshAll(true));
+    this.$("refresh-clips").addEventListener("click", () => this.renderClips());
+    this.$("refresh-recent").addEventListener("click", () => this.renderRecent());
+    this.$("hero-refresh").addEventListener("click", () => this.loadHero(true));
+
+    this.initTheme();
+    this.initCalendar();
+    this.initTasks();
+    this.initNote();
+    this.initLinks();
+    this.initSearch();
+
+    // Live updates: Obsidian Sync writes land here as vault events
+    const v = this.app.vault;
+    const onFile = (f) => this.onFileChange(f);
+    this.registerEvent(v.on("modify", onFile));
+    this.registerEvent(v.on("create", onFile));
+    this.registerEvent(v.on("delete", onFile));
+    this.registerEvent(v.on("rename", onFile));
+    this.registerEvent(
+      this.app.metadataCache.on("resolved", () => this.scheduleLists()),
+    );
+    this.registerEvent(
+      this.app.metadataCache.on("changed", () => this.scheduleLists()),
+    );
+    this.registerEvent(this.app.workspace.on("css-change", () => this.applyTheme()));
+
+    this.registerInterval(window.setInterval(() => this.tickClock(), 1000));
+    // Day rollover: refresh date-dependent content every 5 minutes
+    this.registerInterval(
+      window.setInterval(() => {
+        this.renderCalendar();
+        this.loadHero(false);
+        this.loadQuote();
+      }, 5 * 60 * 1000),
+    );
+
+    this.refreshAll(false);
+  }
+
+  async onClose() {
+    Object.values(this.timers).forEach(clearTimeout);
+    this.searchToken++;
+  }
+
+  // Re-render everything (also called after settings change)
+  refreshAll(force) {
+    this.tickClock(true);
+    this.applyTheme();
+    this.renderCalendar();
+    this.renderLinks();
+    this.loadTasks();
+    this.loadNote();
+    this.renderClips();
+    this.renderRecent();
+    this.$("hero").classList.toggle("hidden", !this.settings.showHero);
+    if (this.settings.showHero) this.loadHero(false);
+    this.loadQuote();
+  }
+
+  onFileChange(f) {
+    const path = f.path;
+    if (path === this.tasksPath) this.later("tasks", 150, () => this.loadTasks());
+    else if (path === this.notePath) this.later("note", 150, () => this.loadNote());
+    else this.scheduleLists();
+  }
+
+  scheduleLists() {
+    this.later("lists", 1500, () => {
+      this.renderClips();
+      this.renderRecent();
+      this.renderCalendar();
+    });
+  }
+
+  // ── Files ──
+
+  async ensureFile(path, initial = "") {
+    const vault = this.app.vault;
+    let f = vault.getAbstractFileByPath(path);
+    if (f instanceof TFile) return f;
+    const dir = path.split("/").slice(0, -1).join("/");
+    if (dir && !vault.getAbstractFileByPath(dir)) {
+      try {
+        await vault.adapter.mkdir(dir);
+      } catch {
+        /* may already exist */
+      }
+    }
+    try {
+      return await vault.create(path, initial);
+    } catch (err) {
+      // Created by Sync or another view between our check and create
+      f = vault.getAbstractFileByPath(path);
+      if (f instanceof TFile) return f;
+      throw err;
+    }
+  }
+
+  openFile(path, evt) {
+    const f = this.app.vault.getAbstractFileByPath(path);
+    if (!(f instanceof TFile)) {
+      new Notice(`Note not found: ${path}`);
+      return;
+    }
+    const mod = evt ? Keymap.isModEvent(evt) : false;
+    this.app.workspace.getLeaf(mod || "tab").openFile(f);
+  }
+
+  // ── Theme ──
+
+  applyTheme() {
+    const t = this.settings.theme;
+    const dark =
+      t === "system" ? document.body.classList.contains("theme-dark") : t === "dark";
+    this.root.setAttribute("data-theme", dark ? "dark" : "light");
+    const btn = this.$("theme-toggle");
+    btn.innerHTML = t === "system" ? ICONS.monitor : dark ? ICONS.moon : ICONS.sun;
+    const label = t === "system" ? `System (${dark ? "Dark" : "Light"})` : dark ? "Dark" : "Light";
+    btn.title = `Appearance: ${label} — click to change`;
+  }
+
+  initTheme() {
+    const cycle = { system: "dark", dark: "light", light: "system" };
+    this.$("theme-toggle").addEventListener("click", async () => {
+      this.settings.theme = cycle[this.settings.theme] ?? "system";
+      await this.plugin.saveSettings();
+      this.applyTheme();
+    });
+  }
+
+  // ── Clock ──
+
+  tickClock(force) {
+    const now = new Date();
+    const h = now.getHours();
+    const pad = (n) => String(n).padStart(2, "0");
+
+    const phrase =
+      h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : h < 21 ? "Good evening" : "Good night";
+    const name = this.settings.userName;
+    this.$("greeting").innerHTML = name
+      ? `${phrase}, <span class="gname">${esc(name)}</span>`
+      : phrase;
+
+    const main = this.$("clock-main");
+    const ampm = this.$("clock-ampm");
+    if (this.settings.clockFormat === "12h") {
+      main.textContent = `${h % 12 || 12}:${pad(now.getMinutes())}`;
+      ampm.textContent = h < 12 ? "AM" : "PM";
+      ampm.classList.remove("hidden");
+    } else {
+      main.textContent = `${pad(h)}:${pad(now.getMinutes())}`;
+      ampm.classList.add("hidden");
+    }
+    this.$("clock-sec").textContent = `:${pad(now.getSeconds())}`;
+
+    if (force || now.getSeconds() === 0 || !this.$("clock-date").textContent) {
+      this.$("clock-date").textContent = fmtDate(now, {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    }
+  }
+
+  // ── Calendar ──
+
+  dailyNoteConfig() {
+    const dn = this.app.internalPlugins?.getPluginById?.("daily-notes")?.instance?.options ?? {};
+    const pn = this.app.plugins?.plugins?.["periodic-notes"]?.settings?.daily;
+    const periodic = pn?.enabled ? pn : null;
+    return {
+      format: periodic?.format || dn.format || "YYYY-MM-DD",
+      folder: this.settings.dailyNotesFolder || periodic?.folder || dn.folder || "",
+      template: periodic?.template || dn.template || "",
+    };
+  }
+
+  dailyPath(date) {
+    const { format, folder } = this.dailyNoteConfig();
+    return joinPath(folder, `${moment(date).format(format)}.md`);
+  }
+
+  async openDailyNote(date, evt) {
+    const path = this.dailyPath(date);
+    let f = this.app.vault.getAbstractFileByPath(path);
+    if (!(f instanceof TFile)) {
+      let content = "";
+      const { template } = this.dailyNoteConfig();
+      if (template) {
+        const tf = this.app.vault.getAbstractFileByPath(normalizePath(`${template.replace(/\.md$/, "")}.md`));
+        if (tf instanceof TFile) content = await this.app.vault.cachedRead(tf);
+      }
+      try {
+        f = await this.ensureFile(path, content);
+      } catch (err) {
+        new Notice(`Could not create daily note: ${err.message}`);
+        return;
+      }
+    }
+    this.app.workspace.getLeaf((evt && Keymap.isModEvent(evt)) || "tab").openFile(f);
+  }
+
+  initCalendar() {
+    this.$("cal-prev").addEventListener("click", () => {
+      if (--this.calMonth < 0) {
+        this.calMonth = 11;
+        this.calYear--;
+      }
+      this.renderCalendar();
+    });
+    this.$("cal-next").addEventListener("click", () => {
+      if (++this.calMonth > 11) {
+        this.calMonth = 0;
+        this.calYear++;
+      }
+      this.renderCalendar();
+    });
+    this.$("cal-today").addEventListener("click", () => {
+      const now = new Date();
+      this.calYear = now.getFullYear();
+      this.calMonth = now.getMonth();
+      this.renderCalendar();
+    });
+  }
+
+  renderCalendar() {
+    const year = this.calYear;
+    const month = this.calMonth;
+    const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    this.$("cal-month-label").textContent = `${MONTHS[month]} ${year}`;
+
+    const grid = this.$("cal-grid");
+    grid.innerHTML = "";
+    ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].forEach((label) => {
+      const cell = document.createElement("div");
+      cell.className = "cal-dow";
+      cell.textContent = label;
+      grid.appendChild(cell);
+    });
+
+    const today = new Date();
+    const first = new Date(year, month, 1).getDay();
+    const days = new Date(year, month + 1, 0).getDate();
+    const prevDays = new Date(year, month, 0).getDate();
+
+    const filler = (n) => {
+      const cell = document.createElement("div");
+      cell.className = "cal-day other-month";
+      cell.textContent = n;
+      grid.appendChild(cell);
+    };
+    for (let i = first - 1; i >= 0; i--) filler(prevDays - i);
+
+    for (let d = 1; d <= days; d++) {
+      const cell = document.createElement("div");
+      cell.className = "cal-day";
+      const date = new Date(year, month, d);
+      if (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+        cell.classList.add("today");
+      }
+      if (this.app.vault.getAbstractFileByPath(this.dailyPath(date))) {
+        cell.classList.add("has-note");
+      }
+      cell.textContent = d;
+      cell.addEventListener("click", (e) => this.openDailyNote(date, e));
+      grid.appendChild(cell);
+    }
+
+    const filled = first + days;
+    const remaining = filled % 7 === 0 ? 0 : 7 - (filled % 7);
+    for (let d = 1; d <= remaining; d++) filler(d);
+  }
+
+  // ── Tasks ──
+
+  initTasks() {
+    this.$("task-input").addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      const val = e.currentTarget.value.replace(/\s*\n\s*/g, " ").trim();
+      if (!val) return;
+      e.currentTarget.value = "";
+      this.addTask(val);
+    });
+
+    this.root.querySelectorAll(".tab[data-filter]").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        this.taskFilter = tab.dataset.filter;
+        this.root.querySelectorAll(".tab[data-filter]").forEach((t) => {
+          t.classList.toggle("active", t === tab);
+          t.setAttribute("aria-selected", String(t === tab));
+        });
+        this.renderTasks();
+      });
+    });
+
+    this.$("clear-done").addEventListener("click", () =>
+      this.mutateTasks((text) =>
+        mapTaskLines(text, (line, m) => (m[2] !== " " ? null : line)),
+      ),
+    );
+  }
+
+  // Read-modify-write on the file itself, so edits made on another device (or
+  // by hand in Obsidian) are never overwritten by a stale in-memory list.
+  async mutateTasks(fn) {
+    try {
+      const file = await this.ensureFile(this.tasksPath);
+      await this.app.vault.process(file, fn);
+    } catch (err) {
+      new Notice(`Could not update tasks: ${err.message}`);
+    }
+    await this.loadTasks();
+  }
+
+  addTask(text) {
+    const line = `- [ ] ${text} ➕ ${moment().format("YYYY-MM-DD")} ^${newId()}`;
+    return this.mutateTasks((t) => {
+      const i = bodyStart(t);
+      const lead = i === t.length && t && !t.endsWith("\n") ? "\n" : "";
+      return `${t.slice(0, i)}${lead}${line}\n${t.slice(i)}`;
+    });
+  }
+
+  toggleTask(id) {
+    return this.mutateTasks((text) =>
+      mapTaskLines(text, (line, m) =>
+        m[5] === id
+          ? line.replace(/\[([ xX])\]/, m[2] === " " ? "[x]" : "[ ]")
+          : line,
+      ),
+    );
+  }
+
+  deleteTask(id) {
+    return this.mutateTasks((text) =>
+      mapTaskLines(text, (line, m) => (m[5] === id ? null : line)),
+    );
+  }
+
+  async loadTasks() {
+    const f = this.app.vault.getAbstractFileByPath(this.tasksPath);
+    if (!(f instanceof TFile)) {
+      this.tasks = [];
+      this.renderTasks();
+      return;
+    }
+    const text = await this.app.vault.read(f);
+    this.tasks = parseTasks(text);
+    this.renderTasks();
+
+    // Tasks typed by hand in Obsidian have no ^id yet — add one so they can be toggled
+    if (this.tasks.some((t) => !t.id) && !this.fixingIds) {
+      this.fixingIds = true;
+      try {
+        await this.app.vault.process(f, (t) =>
+          mapTaskLines(t, (line, m) => (m[5] ? line : `${line.trimEnd()} ^${newId()}`)),
+        );
+      } finally {
+        this.fixingIds = false;
+      }
+    }
+  }
+
+  renderTasks() {
+    const tasks = this.tasks.filter((t) => t.id);
+    const done = tasks.filter((t) => t.done).length;
+    this.$("tasks-stats").textContent = `${done} / ${tasks.length}`;
+
+    const filtered =
+      this.taskFilter === "active"
+        ? tasks.filter((t) => !t.done)
+        : this.taskFilter === "done"
+          ? tasks.filter((t) => t.done)
+          : tasks;
+
+    const list = this.$("tasks-list");
+    if (!filtered.length) {
+      const msg =
+        this.taskFilter === "done"
+          ? "No completed tasks yet."
+          : this.taskFilter === "active"
+            ? "Nothing left to do!"
+            : "No tasks yet — add one above.";
+      list.innerHTML = `<div class="empty-state">${msg}</div>`;
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    for (const task of filtered) {
+      const item = document.createElement("div");
+      item.className = `task-item${task.done ? " done" : ""}`;
+      item.setAttribute("role", "listitem");
+
+      const check = document.createElement("button");
+      check.className = `task-check${task.done ? " checked" : ""}`;
+      check.setAttribute("aria-label", task.done ? "Mark incomplete" : "Mark complete");
+      check.innerHTML = task.done ? ICONS.check : "";
+      check.addEventListener("click", () => this.toggleTask(task.id));
+
+      const text = document.createElement("span");
+      text.className = "task-text";
+      text.textContent = task.text;
+
+      const del = document.createElement("button");
+      del.className = "task-del";
+      del.title = "Delete";
+      del.setAttribute("aria-label", `Delete: ${task.text}`);
+      del.innerHTML = ICONS.trash;
+      del.addEventListener("click", () => this.deleteTask(task.id));
+
+      item.append(check, text, del);
+      frag.appendChild(item);
+    }
+    list.innerHTML = "";
+    list.appendChild(frag);
+  }
+
+  // ── Quick Note ──
+
+  initNote() {
+    const textarea = this.$("quick-note");
+    textarea.addEventListener("input", () => {
+      this.noteDirty = true;
+      this.$("autosave-dot").className = "autosave-dot unsaved";
+      this.later("noteSave", 800, () => this.saveNote());
+    });
+    // Flush on blur so switching tabs right after typing never loses text
+    textarea.addEventListener("blur", () => {
+      if (this.noteDirty) this.saveNote();
+    });
+    this.$("autosave-dot").className = "autosave-dot saved";
+  }
+
+  async saveNote() {
+    clearTimeout(this.timers.noteSave);
+    const textarea = this.$("quick-note");
+    const value = textarea.value;
+    try {
+      const file = await this.ensureFile(this.notePath);
+      await this.app.vault.modify(file, value);
+      if (textarea.value === value) {
+        this.noteDirty = false;
+        this.$("autosave-dot").className = "autosave-dot saved";
+      }
+    } catch (err) {
+      new Notice(`Could not save quick note: ${err.message}`);
+    }
+  }
+
+  async loadNote() {
+    // Never replace text the user is in the middle of editing
+    if (this.noteDirty) return;
+    const f = this.app.vault.getAbstractFileByPath(this.notePath);
+    const text = f instanceof TFile ? await this.app.vault.read(f) : "";
+    const textarea = this.$("quick-note");
+    if (!this.noteDirty && textarea.value !== text) textarea.value = text;
+  }
+
+  // ── Quick Links ──
+
+  renderLinks() {
+    const nav = this.$("quick-links");
+    const links = this.settings.quickLinks ?? [];
+    if (!links.length) {
+      nav.innerHTML = '<span class="empty-state">No quick links configured.</span>';
+      return;
+    }
+    nav.innerHTML = links
+      .map(
+        (l, i) => `<a href="#" class="quick-link" data-ql="${i}">
+      <span class="ql-icon">${esc(l.icon ?? "")}</span><span>${esc(l.label)}</span></a>`,
+      )
+      .join("");
+  }
+
+  initLinks() {
+    // One delegated handler covers quick links, clip cards, notes and search results
+    this.root.addEventListener("click", (e) => {
+      const el = e.target.closest("[data-ql], [data-open]");
+      if (!el) return;
+      e.preventDefault();
+      if (el.dataset.open != null) {
+        this.openFile(el.dataset.open, e);
+        return;
+      }
+      const link = this.settings.quickLinks?.[Number(el.dataset.ql)];
+      if (link) this.runAction(link.action, e);
+    });
+  }
+
+  async runAction(action, evt) {
+    const a = (action || "").trim();
+    if (a === "daily") return this.openDailyNote(new Date(), evt);
+    if (a === "random") {
+      const files = this.app.vault.getMarkdownFiles();
+      if (!files.length) return;
+      const f = files[Math.floor(Math.random() * files.length)];
+      return this.openFile(f.path, evt);
+    }
+    if (a.startsWith("command:")) {
+      const id = a.slice(8);
+      if (!this.app.commands.executeCommandById(id)) new Notice(`Command not found: ${id}`);
+      return;
+    }
+    if (a.startsWith("open:")) return this.openFile(normalizePath(a.slice(5)), evt);
+    if (/^(https?|obsidian):\/\//.test(a)) return window.open(a);
+    new Notice(`Unknown quick link action: ${a}`);
+  }
+
+  // ── Web Clips & Recent Notes ──
+
+  isDataFile(f) {
+    const dir = (this.settings.dataFolder || "").replace(/^\/+|\/+$/g, "");
+    return !!dir && f.path.startsWith(`${dir}/`);
+  }
+
+  renderClips() {
+    const folder = (this.settings.clipsFolder || "").replace(/^\/+|\/+$/g, "");
+    const body = this.$("clips-body");
+    const clips = this.app.vault
+      .getMarkdownFiles()
+      .filter((f) => folder && f.path.startsWith(`${folder}/`))
+      .map((f) => {
+        const fm = this.app.metadataCache.getFileCache(f)?.frontmatter ?? {};
+        return {
+          path: f.path,
+          title: fmString(fm.title) || f.basename,
+          source: fmString(fm.source || fm.url),
+          date: fmString(fm.clipped || fm.created || fm.date),
+          mtime: f.stat.mtime,
+        };
+      })
+      .sort((a, b) => {
+        const ta = a.date ? new Date(a.date).getTime() || a.mtime : a.mtime;
+        const tb = b.date ? new Date(b.date).getTime() || b.mtime : b.mtime;
+        return tb - ta;
+      })
+      .slice(0, this.settings.maxClips);
+
+    this.$("clips-count").textContent = clips.length;
+    if (!clips.length) {
+      body.innerHTML = `<div class="empty-state">No clips found in “${esc(folder || "(no folder set)")}”.</div>`;
+      return;
+    }
+    body.innerHTML = `<div class="clips-grid">${clips
+      .map((c) => {
+        const domain = c.source ? getDomain(c.source) : "";
+        const fav = domain
+          ? `<img class="clip-favicon" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32" alt="" onerror="this.style.display='none'">`
+          : "";
+        return `<a class="clip-card" href="#" data-open="${esc(c.path)}">
+        <div class="clip-header">${fav}<span class="clip-domain">${esc(domain)}</span></div>
+        <div class="clip-title">${esc(c.title)}</div>
+        <div class="clip-date">${esc(formatClipDate(c.date))}</div></a>`;
+      })
+      .join("")}</div>`;
+  }
+
+  renderRecent() {
+    const body = this.$("recent-body");
+    const notes = this.app.vault
+      .getMarkdownFiles()
+      .filter((f) => !this.isDataFile(f))
+      .sort((a, b) => b.stat.mtime - a.stat.mtime)
+      .slice(0, this.settings.maxRecent);
+
+    this.$("recent-count").textContent = notes.length;
+    if (!notes.length) {
+      body.innerHTML = '<div class="empty-state">No notes found.</div>';
+      return;
+    }
+    body.innerHTML = `<div class="notes-list">${notes
+      .map((f) => {
+        const date = dateFromFilename(f.basename) ?? fmtDate(new Date(f.stat.mtime));
+        const folder = f.parent && f.parent.path !== "/" ? f.parent.path : "";
+        return `<a class="note-item" href="#" data-open="${esc(f.path)}">
+        <span class="note-icon">📄</span>
+        <div class="note-info">
+          <div class="note-title-row"><span class="note-title">${esc(f.basename)}</span>
+          <span class="note-date">${esc(date)}</span></div>
+          ${folder ? `<span class="note-path">${esc(folder)}</span>` : ""}
+        </div></a>`;
+      })
+      .join("")}</div>`;
+  }
+
+  // ── Search ──
+
+  initSearch() {
+    const input = this.$("search-input");
+    const form = this.$("search-form");
+    const kbd = this.$("search-kbd");
+    const results = this.$("search-results");
+
+    input.addEventListener("focus", () => (kbd.style.display = "none"));
+    input.addEventListener("blur", () => {
+      if (!input.value) kbd.style.display = "";
+    });
+    input.addEventListener("input", () => {
+      const q = input.value.trim();
+      if (!q) return this.closeSearch();
+      this.later("search", 300, () => this.runSearch(q));
+    });
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const q = input.value.trim();
+      if (q) this.runSearch(q);
+    });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        this.closeSearch();
+        input.blur();
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        results.querySelector(".search-result-item")?.focus();
+      }
+    });
+    results.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        this.closeSearch();
+        input.focus();
+        return;
+      }
+      const items = [...results.querySelectorAll(".search-result-item")];
+      const idx = items.indexOf(document.activeElement);
+      if (e.key === "ArrowDown" && idx < items.length - 1) {
+        e.preventDefault();
+        items[idx + 1].focus();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        idx > 0 ? items[idx - 1].focus() : input.focus();
+      } else if (e.key === "Enter" && idx >= 0) {
+        e.preventDefault();
+        this.openFile(items[idx].dataset.open, e);
+        this.closeSearch();
+      }
+    });
+    this.root.addEventListener("click", (e) => {
+      if (!e.target.closest(".search-container")) this.closeSearch();
+      else if (e.target.closest(".search-result-item")) this.closeSearch();
+    });
+    // "/" focuses search when focus is inside this view but not in a field
+    this.root.addEventListener("keydown", (e) => {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey) return;
+      const t = e.target;
+      if (t.tagName === "INPUT" || t.tagName === "TEXTAREA") return;
+      e.preventDefault();
+      input.focus();
+    });
+  }
+
+  closeSearch() {
+    this.searchToken++;
+    clearTimeout(this.timers.search);
+    const results = this.$("search-results");
+    results.classList.add("hidden");
+    results.innerHTML = "";
+  }
+
+  async runSearch(query) {
+    const token = ++this.searchToken;
+    const results = this.$("search-results");
+    results.classList.remove("hidden");
+    results.innerHTML = `<div class="search-status">↻ Searching…</div>`;
+
+    const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+    const files = this.app.vault
+      .getMarkdownFiles()
+      .filter((f) => !this.isDataFile(f))
+      .sort((a, b) => b.stat.mtime - a.stat.mtime)
+      .slice(0, 4000);
+
+    const hits = [];
+    const LIMIT = 15;
+    for (let i = 0; i < files.length && hits.length < LIMIT; i += 30) {
+      const chunk = files.slice(i, i + 30);
+      const texts = await Promise.all(
+        chunk.map((f) => this.app.vault.cachedRead(f).catch(() => "")),
+      );
+      if (token !== this.searchToken) return; // superseded or closed
+      chunk.forEach((f, j) => {
+        if (hits.length >= LIMIT) return;
+        const text = texts[j];
+        const lower = text.toLowerCase();
+        const hay = `${f.path.toLowerCase()}\n${lower}`;
+        if (!words.every((w) => hay.includes(w))) return;
+        const titleHit = words.every((w) => f.path.toLowerCase().includes(w));
+        const at = lower.indexOf(words[0]);
+        let snippet = "";
+        if (at >= 0) {
+          const s = Math.max(0, at - 40);
+          const raw = text.slice(s, at + words[0].length + 80).replace(/\s+/g, " ");
+          const rel = at - s;
+          snippet =
+            esc(raw.slice(0, rel)) +
+            `<mark>${esc(raw.slice(rel, rel + words[0].length))}</mark>` +
+            esc(raw.slice(rel + words[0].length));
+        }
+        hits.push({ f, snippet, titleHit });
+      });
+      await new Promise((r) => setTimeout(r, 0)); // keep the UI responsive
+    }
+    if (token !== this.searchToken) return;
+
+    if (!hits.length) {
+      results.innerHTML = `<div class="search-status">No results for “${esc(query)}”</div>`;
+      return;
+    }
+    hits.sort((a, b) => Number(b.titleHit) - Number(a.titleHit));
+    results.innerHTML = hits
+      .map(({ f, snippet }) => {
+        const folder = f.parent && f.parent.path !== "/" ? f.parent.path : "";
+        return `<a class="search-result-item" href="#" data-open="${esc(f.path)}" tabindex="0">
+        <span class="search-result-icon">📄</span>
+        <div class="search-result-body">
+          <div class="search-result-title">${esc(f.basename)}</div>
+          ${folder ? `<div class="search-result-path">${esc(folder)}</div>` : ""}
+          ${snippet ? `<div class="search-result-snippet">${snippet}</div>` : ""}
+        </div></a>`;
+      })
+      .join("");
+  }
+
+  // ── Hero photo & quote ──
+
+  cacheGet(key) {
+    try {
+      return JSON.parse(window.localStorage.getItem(`hp-${this.app.vault.getName()}-${key}`));
+    } catch {
+      return null;
+    }
+  }
+  cacheSet(key, value) {
+    try {
+      window.localStorage.setItem(`hp-${this.app.vault.getName()}-${key}`, JSON.stringify(value));
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
+  async loadHero(forceNew) {
+    const today = new Date().toISOString().slice(0, 10);
+    if (!forceNew) {
+      const cached = this.cacheGet("hero");
+      if (cached?.date === today) return this.displayHero(cached);
+    }
+    const key = this.settings.unsplashKey;
+    if (key) {
+      try {
+        const res = await requestUrl({
+          url: `https://api.unsplash.com/photos/random?query=${HERO_TOPICS}&orientation=landscape&client_id=${encodeURIComponent(key)}`,
+        });
+        const data = res.json;
+        const photo = {
+          date: today,
+          src: data.urls.regular,
+          alt: data.alt_description || data.description || "Nature photo",
+          photographer: data.user.name,
+          photographerUrl: `${data.user.links.html}?utm_source=obsidian_homepage&utm_medium=referral`,
+          photoUrl: `${data.links.html}?utm_source=obsidian_homepage&utm_medium=referral`,
+        };
+        this.cacheSet("hero", photo);
+        return this.displayHero(photo);
+      } catch {
+        /* fall through to Picsum */
+      }
+    }
+    const photo = {
+      date: today,
+      src: `https://picsum.photos/seed/${today}/1600/500`,
+      alt: "Landscape photo of the day",
+      photographer: null,
+      photoUrl: "https://picsum.photos",
+    };
+    this.cacheSet("hero", photo);
+    this.displayHero(photo);
+  }
+
+  displayHero(photo) {
+    const hero = this.$("hero");
+    const img = this.$("hero-img");
+    const credit = this.$("hero-credit");
+    img.alt = photo.alt || "Photo of the day";
+    img.classList.remove("visible");
+    img.onload = () => {
+      img.classList.add("visible");
+      hero.classList.add("loaded");
+    };
+    img.onerror = () => {
+      hero.classList.add("loaded");
+      credit.textContent = "";
+    };
+    img.src = photo.src;
+    credit.innerHTML = photo.photographer
+      ? `Photo by <a href="${esc(photo.photographerUrl)}">${esc(photo.photographer)}</a> on <a href="${esc(photo.photoUrl)}">Unsplash</a>`
+      : `Photo from <a href="${esc(photo.photoUrl)}">Picsum Photos</a>`;
+  }
+
+  fallbackQuote() {
+    const now = new Date();
+    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86_400_000);
+    return QUOTES[dayOfYear % QUOTES.length];
+  }
+
+  displayQuote({ q, a }) {
+    this.$("quote-text").textContent = q;
+    this.$("quote-author").textContent = `— ${a}`;
+  }
+
+  async loadQuote() {
+    const today = new Date().toISOString().slice(0, 10);
+    const cached = this.cacheGet("quote");
+    if (cached?.date === today) return this.displayQuote(cached);
+
+    this.displayQuote(this.fallbackQuote());
+    try {
+      const res = await requestUrl({ url: "https://zenquotes.io/api/today" });
+      const d = res.json?.[0];
+      if (d?.q) {
+        const quote = { date: today, q: d.q, a: d.a };
+        this.cacheSet("quote", quote);
+        return this.displayQuote(quote);
+      }
+    } catch {
+      /* use the built-in quote */
+    }
+    this.cacheSet("quote", { date: today, ...this.fallbackQuote() });
+  }
+}
+
+// ─── Settings tab ─────────────────────────────────────────────────────────────
+
+const quickLinksToText = (links) =>
+  (links ?? []).map((l) => `${l.icon ?? ""} | ${l.label} | ${l.action}`).join("\n");
+
+function textToQuickLinks(text) {
+  return text
+    .split("\n")
+    .map((line) => line.split("|").map((s) => s.trim()))
+    .filter((p) => p.length >= 3 && p[1] && p[2])
+    .map(([icon, label, ...rest]) => ({ icon, label, action: rest.join("|") }));
+}
+
+class HomepageSettingTab extends PluginSettingTab {
+  constructor(app, plugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
+
+  display() {
+    const { containerEl } = this;
+    const s = this.plugin.settings;
+    containerEl.empty();
+
+    const save = async (key, value) => {
+      s[key] = value;
+      await this.plugin.saveSettings();
+      this.plugin.refreshViews();
+    };
+    const text = (name, desc, key, opts = {}) =>
+      new Setting(containerEl)
+        .setName(name)
+        .setDesc(desc)
+        .addText((t) => {
+          t.setPlaceholder(opts.placeholder ?? "")
+            .setValue(String(s[key] ?? ""))
+            .onChange((v) => save(key, opts.number ? Math.max(1, Number(v) || 1) : v.trim()));
+          if (opts.password) t.inputEl.type = "password";
+        });
+
+    text("Your name", "Shown in the greeting.", "userName", { placeholder: "e.g. Alex" });
+
+    new Setting(containerEl)
+      .setName("Open on startup")
+      .setDesc("Open the homepage when Obsidian starts.")
+      .addToggle((t) => t.setValue(s.openOnStartup).onChange((v) => save("openOnStartup", v)));
+
+    new Setting(containerEl)
+      .setName("Appearance")
+      .setDesc("System follows Obsidian's light/dark theme.")
+      .addDropdown((d) =>
+        d
+          .addOptions({ system: "System", dark: "Dark", light: "Light" })
+          .setValue(s.theme)
+          .onChange((v) => save("theme", v)),
+      );
+
+    new Setting(containerEl)
+      .setName("Clock format")
+      .addDropdown((d) =>
+        d
+          .addOptions({ "12h": "12-hour (AM/PM)", "24h": "24-hour" })
+          .setValue(s.clockFormat)
+          .onChange((v) => save("clockFormat", v)),
+      );
+
+    new Setting(containerEl)
+      .setName("Folders")
+      .setHeading();
+    text("Web Clipper folder", "Where the Web Clipper saves notes.", "clipsFolder", {
+      placeholder: "Clippings",
+    });
+    text(
+      "Daily notes folder",
+      "Leave blank to use your Daily Notes / Periodic Notes settings.",
+      "dailyNotesFolder",
+    );
+    text(
+      "Data folder",
+      "Tasks.md and Quick Note.md are stored here, so Obsidian Sync shares them across devices.",
+      "dataFolder",
+      { placeholder: "homepage/data" },
+    );
+
+    new Setting(containerEl).setName("Content").setHeading();
+    text("Max web clips", "", "maxClips", { number: true });
+    text("Max recent notes", "", "maxRecent", { number: true });
+
+    new Setting(containerEl)
+      .setName("Photo of the day")
+      .addToggle((t) => t.setValue(s.showHero).onChange((v) => save("showHero", v)));
+    text(
+      "Unsplash access key",
+      "Optional — enables nature photos with attribution. Without it a landscape photo from Picsum is used.",
+      "unsplashKey",
+      { password: true },
+    );
+
+    new Setting(containerEl)
+      .setName("Quick links")
+      .setDesc(
+        "One per line: icon | label | action. Actions: command:<command id>, open:<note path>, daily, random, or an https:// URL.",
+      )
+      .addTextArea((t) => {
+        t.setValue(quickLinksToText(s.quickLinks)).onChange((v) =>
+          save("quickLinks", textToQuickLinks(v)),
+        );
+        t.inputEl.rows = 7;
+        t.inputEl.style.width = "100%";
+      });
+  }
+}
+
+// ─── Plugin ───────────────────────────────────────────────────────────────────
+
+module.exports = class HomepagePlugin extends Plugin {
+  async onload() {
+    await this.loadSettings();
+    this.registerView(VIEW_TYPE, (leaf) => new HomepageView(leaf, this));
+    this.addRibbonIcon("home", "Open homepage", () => this.activateView());
+    this.addCommand({
+      id: "open-homepage",
+      name: "Open homepage",
+      callback: () => this.activateView(),
+    });
+    this.addSettingTab(new HomepageSettingTab(this.app, this));
+
+    this.app.workspace.onLayoutReady(() => {
+      if (
+        this.settings.openOnStartup &&
+        !this.app.workspace.getLeavesOfType(VIEW_TYPE).length
+      ) {
+        this.activateView();
+      }
+    });
+  }
+
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
+
+  async saveSettings() {
+    await this.saveData(this.settings);
+  }
+
+  async activateView() {
+    const { workspace } = this.app;
+    let leaf = workspace.getLeavesOfType(VIEW_TYPE)[0];
+    if (!leaf) {
+      leaf = workspace.getLeaf("tab");
+      await leaf.setViewState({ type: VIEW_TYPE, active: true });
+    }
+    workspace.revealLeaf(leaf);
+  }
+
+  refreshViews() {
+    for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE)) {
+      leaf.view.refreshAll?.(false);
+    }
+  }
+};
