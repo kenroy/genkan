@@ -1400,3 +1400,108 @@
 .is-mobile .hp-root .cal-day {
     min-height: 34px;
 }
+
+/* ============================================================
+   Favourites strip
+   ============================================================ */
+.hp-root .favs-card {
+    margin-bottom: 16px;
+    padding: 14px 20px 16px;
+}
+
+.hp-root .favs-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.hp-root .fav-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 260px;
+    padding: 6px 8px 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+    transition:
+        border-color 0.15s,
+        background 0.15s;
+}
+
+.hp-root .fav-chip:hover,
+.hp-root .fav-chip:focus-visible {
+    border-color: var(--accent);
+    background: var(--accent-lo);
+    outline: none;
+}
+
+.hp-root .fav-star {
+    color: var(--warning);
+    font-size: 12px;
+}
+
+.hp-root .fav-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hp-root .fav-chip.missing {
+    opacity: 0.55;
+    border-style: dashed;
+}
+
+.hp-root .fav-x {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: var(--text-3);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.hp-root .fav-chip:hover .fav-x,
+.hp-root .fav-chip:focus-within .fav-x {
+    opacity: 1;
+}
+
+.hp-root .fav-x:hover {
+    background: var(--border-hi);
+    color: var(--danger);
+}
+
+.is-mobile .hp-root .fav-x {
+    opacity: 0.7;
+}
+
+.hp-root .fav-add {
+    padding: 6px 12px;
+    border: 1px dashed var(--border-hi);
+    border-radius: 99px;
+    background: none;
+    color: var(--text-2);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.hp-root .fav-add:hover {
+    border-color: var(--accent);
+    color: var(--accent-txt);
+}
+
+.hp-root .fav-hint {
+    padding: 0 4px;
+    font-size: 12px;
+}

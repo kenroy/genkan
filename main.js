@@ -10,6 +10,7 @@ const {
   Notice,
   Platform,
   Keymap,
+  FuzzySuggestModal,
   normalizePath,
   requestUrl,
   moment,
@@ -414,6 +415,63 @@ function mapTaskLines(text, fn) {
 
 // ─── View ─────────────────────────────────────────────────────────────────────
 
+// Create a file (and its folders) if missing; tolerate a racing create from Sync
+async function ensureFileIn(app, path, initial = "") {
+  const vault = app.vault;
+  let f = vault.getAbstractFileByPath(path);
+  if (f instanceof TFile) return f;
+  const dir = path.split("/").slice(0, -1).join("/");
+  if (dir && !vault.getAbstractFileByPath(dir)) {
+    try {
+      await vault.adapter.mkdir(dir);
+    } catch {
+      /* may already exist */
+    }
+  }
+  try {
+    return await vault.create(path, initial);
+  } catch (err) {
+    f = vault.getAbstractFileByPath(path);
+    if (f instanceof TFile) return f;
+    throw err;
+  }
+}
+
+// ─── Favourites.md format ─────────────────────────────────────────────────────
+//   - [[Note name]]            (optionally [[Note#Heading|Label]])
+// Plain wikilinks, so Obsidian keeps them correct when notes are renamed.
+
+const FAV_RE = /^\s*[-*+]\s*\[\[([^\]|]+?)(?:\|([^\]]*))?\]\]/;
+
+function parseFavourites(text) {
+  const out = [];
+  for (const line of (text || "").split("\n")) {
+    const m = line.match(FAV_RE);
+    if (m) out.push({ target: m[1].trim(), alias: (m[2] || "").trim() });
+  }
+  return out;
+}
+
+class FavouritePicker extends FuzzySuggestModal {
+  constructor(app, plugin) {
+    super(app);
+    this.plugin = plugin;
+    this.setPlaceholder("Add a note to your homepage favourites…");
+  }
+  getItems() {
+    return this.app.vault
+      .getMarkdownFiles()
+      .filter((f) => !this.plugin.isDataFile(f))
+      .sort((a, b) => b.stat.mtime - a.stat.mtime);
+  }
+  getItemText(f) {
+    return f.path.replace(/\.md$/, "");
+  }
+  onChooseItem(f) {
+    this.plugin.addFavourite(f);
+  }
+}
+
 const TEMPLATE = `
 <div class="bg-glow"></div>
 <div id="app">
@@ -457,6 +515,11 @@ const TEMPLATE = `
       <p id="quote-text" class="quote-text"></p>
       <footer id="quote-author" class="quote-author"></footer>
     </blockquote>
+  </div>
+
+  <div class="card favs-card" id="favs-card">
+    <div class="card-header"><span class="card-label">Favourites</span></div>
+    <div id="favs-list" class="favs-list"></div>
   </div>
 
   <div class="grid">
@@ -564,6 +627,9 @@ class HomepageView extends ItemView {
   get notePath() {
     return joinPath(this.settings.dataFolder, "Quick Note.md");
   }
+  get favPath() {
+    return this.plugin.favPath;
+  }
   // Run fn after ms; later calls with the same key replace the pending one
   later(key, ms, fn) {
     clearTimeout(this.timers[key]);
@@ -637,6 +703,7 @@ class HomepageView extends ItemView {
     this.applyTheme();
     this.renderCalendar();
     this.renderLinks();
+    this.renderFavourites();
     this.loadTasks();
     this.loadNote();
     this.renderClips();
@@ -650,11 +717,13 @@ class HomepageView extends ItemView {
     const path = f.path;
     if (path === this.tasksPath) this.later("tasks", 150, () => this.loadTasks());
     else if (path === this.notePath) this.later("note", 150, () => this.loadNote());
+    else if (path === this.favPath) this.later("favs", 150, () => this.renderFavourites());
     else this.scheduleLists();
   }
 
   scheduleLists() {
     this.later("lists", 1500, () => {
+      this.renderFavourites();
       this.renderClips();
       this.renderRecent();
       this.renderCalendar();
@@ -663,26 +732,8 @@ class HomepageView extends ItemView {
 
   // ── Files ──
 
-  async ensureFile(path, initial = "") {
-    const vault = this.app.vault;
-    let f = vault.getAbstractFileByPath(path);
-    if (f instanceof TFile) return f;
-    const dir = path.split("/").slice(0, -1).join("/");
-    if (dir && !vault.getAbstractFileByPath(dir)) {
-      try {
-        await vault.adapter.mkdir(dir);
-      } catch {
-        /* may already exist */
-      }
-    }
-    try {
-      return await vault.create(path, initial);
-    } catch (err) {
-      // Created by Sync or another view between our check and create
-      f = vault.getAbstractFileByPath(path);
-      if (f instanceof TFile) return f;
-      throw err;
-    }
+  ensureFile(path, initial = "") {
+    return ensureFileIn(this.app, path, initial);
   }
 
   openFile(path, evt) {
@@ -1077,6 +1128,24 @@ class HomepageView extends ItemView {
   initLinks() {
     // One delegated handler covers quick links, clip cards, notes and search results
     this.root.addEventListener("click", (e) => {
+      const rm = e.target.closest("[data-fav-remove]");
+      if (rm) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.plugin.removeFavourite(rm.dataset.favRemove);
+        return;
+      }
+      if (e.target.closest("#fav-add")) {
+        e.preventDefault();
+        new FavouritePicker(this.app, this.plugin).open();
+        return;
+      }
+      const fav = e.target.closest("[data-fav]");
+      if (fav) {
+        e.preventDefault();
+        this.app.workspace.openLinkText(fav.dataset.fav, "", Keymap.isModEvent(e) || "tab");
+        return;
+      }
       const el = e.target.closest("[data-ql], [data-open]");
       if (!el) return;
       e.preventDefault();
@@ -1106,6 +1175,38 @@ class HomepageView extends ItemView {
     if (a.startsWith("open:")) return this.openFile(normalizePath(a.slice(5)), evt);
     if (/^(https?|obsidian):\/\//.test(a)) return window.open(a);
     new Notice(`Unknown quick link action: ${a}`);
+  }
+
+  // ── Favourites ──
+
+  async renderFavourites() {
+    const list = this.$("favs-list");
+    const favs = await this.plugin.readFavourites();
+    const chips = favs
+      .map((f) => {
+        const file = this.app.metadataCache.getFirstLinkpathDest(f.target.split("#")[0], "");
+        const label = f.alias || (file ? file.basename : f.target);
+        const tip = file ? file.path : "Not found — click to create";
+        return `<span class="fav-chip${file ? "" : " missing"}" data-fav="${esc(f.target)}" title="${esc(tip)}" role="button" tabindex="0">
+          <span class="fav-star">★</span><span class="fav-name">${esc(label)}</span>
+          <button class="fav-x" data-fav-remove="${esc(f.target)}" title="Remove from favourites" aria-label="Remove ${esc(label)} from favourites">×</button></span>`;
+      })
+      .join("");
+    list.innerHTML =
+      chips +
+      `<button class="fav-add" id="fav-add" title="Add a favourite">+ Add</button>` +
+      (favs.length
+        ? ""
+        : `<span class="empty-state fav-hint">Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”.</span>`);
+    // Keyboard: Enter/Space activate a chip
+    list.querySelectorAll(".fav-chip").forEach((chip) =>
+      chip.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          chip.click();
+        }
+      }),
+    );
   }
 
   // ── Web Clips & Recent Notes ──
@@ -1556,6 +1657,46 @@ module.exports = class HomepagePlugin extends Plugin {
     });
     this.addSettingTab(new HomepageSettingTab(this.app, this));
 
+    this.favPaths = new Set();
+    const onVault = (f) => {
+      if (f.path === this.favPath) this.scheduleFavCache();
+    };
+    this.registerEvent(this.app.vault.on("modify", onVault));
+    this.registerEvent(this.app.vault.on("create", onVault));
+    this.registerEvent(this.app.vault.on("delete", onVault));
+    this.registerEvent(this.app.vault.on("rename", onVault));
+    this.registerEvent(this.app.metadataCache.on("resolved", () => this.scheduleFavCache()));
+    this.app.workspace.onLayoutReady(() => this.refreshFavCache());
+
+    this.addCommand({
+      id: "toggle-favourite",
+      name: "Add or remove current note from homepage favourites",
+      checkCallback: (checking) => {
+        const f = this.app.workspace.getActiveFile();
+        if (!f || f.extension !== "md" || this.isDataFile(f)) return false;
+        if (!checking) this.toggleFavourite(f);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "add-favourite",
+      name: "Add a note to homepage favourites…",
+      callback: () => new FavouritePicker(this.app, this).open(),
+    });
+    this.registerEvent(
+      this.app.workspace.on("file-menu", (menu, file) => {
+        if (!(file instanceof TFile) || file.extension !== "md" || this.isDataFile(file)) return;
+        // The menu is built synchronously, so read the cached set
+        const fav = this.favPaths.has(file.path);
+        menu.addItem((item) =>
+          item
+            .setTitle(fav ? "Remove from homepage favourites" : "Add to homepage favourites")
+            .setIcon("star")
+            .onClick(() => this.toggleFavourite(file)),
+        );
+      }),
+    );
+
     this.app.workspace.onLayoutReady(() => {
       if (
         this.settings.openOnStartup &&
@@ -1568,6 +1709,83 @@ module.exports = class HomepagePlugin extends Plugin {
 
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
+
+  // ── Favourites (stored in <dataFolder>/Favourites.md) ──
+
+  get favPath() {
+    return joinPath(this.settings.dataFolder, "Favourites.md");
+  }
+
+  isDataFile(f) {
+    const dir = (this.settings.dataFolder || "").replace(/^\/+|\/+$/g, "");
+    return !!dir && f.path.startsWith(`${dir}/`);
+  }
+
+  async readFavourites() {
+    const f = this.app.vault.getAbstractFileByPath(this.favPath);
+    if (!(f instanceof TFile)) return [];
+    return parseFavourites(await this.app.vault.read(f));
+  }
+
+  favouriteFile(fav) {
+    return this.app.metadataCache.getFirstLinkpathDest(fav.target.split("#")[0], "");
+  }
+
+  // Cached set of favourite file paths, for the synchronous right-click menu
+  async refreshFavCache() {
+    const favs = await this.readFavourites();
+    this.favPaths = new Set(favs.map((f) => this.favouriteFile(f)?.path).filter(Boolean));
+  }
+
+  scheduleFavCache() {
+    clearTimeout(this.favCacheTimer);
+    this.favCacheTimer = setTimeout(() => this.refreshFavCache(), 300);
+  }
+
+  async isFavourite(file) {
+    return (await this.readFavourites()).some((f) => this.favouriteFile(f)?.path === file.path);
+  }
+
+  async addFavourite(file) {
+    try {
+      if (await this.isFavourite(file)) {
+        new Notice(`${file.basename} is already a favourite`);
+        return;
+      }
+      const link = this.app.metadataCache.fileToLinktext(file, "", true);
+      const f = await ensureFileIn(this.app, this.favPath);
+      await this.app.vault.process(f, (t) => `${t}${t && !t.endsWith("\n") ? "\n" : ""}- [[${link}]]\n`);
+      new Notice(`Added ${file.basename} to favourites`);
+    } catch (err) {
+      new Notice(`Could not add favourite: ${err.message}`);
+    }
+  }
+
+  async removeFavourite(target) {
+    const f = this.app.vault.getAbstractFileByPath(this.favPath);
+    if (!(f instanceof TFile)) return;
+    let removed = false;
+    await this.app.vault.process(f, (text) =>
+      text
+        .split("\n")
+        .filter((line) => {
+          const m = !removed && line.match(FAV_RE);
+          if (m && m[1].trim() === target) {
+            removed = true;
+            return false;
+          }
+          return true;
+        })
+        .join("\n"),
+    );
+  }
+
+  async toggleFavourite(file) {
+    if (!(await this.isFavourite(file))) return this.addFavourite(file);
+    const fav = (await this.readFavourites()).find((x) => this.favouriteFile(x)?.path === file.path);
+    await this.removeFavourite(fav.target);
+    new Notice(`Removed ${file.basename} from favourites`);
   }
 
   async saveSettings() {
