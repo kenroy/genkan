@@ -1,0 +1,67 @@
+HOMEPAGE DASHBOARD for Obsidian  (v0.1.0)
+=========================================
+
+A dashboard homepage: clock, calendar, favourites, tasks, quick note,
+web clips, recent notes and search. Works on Mac, Windows, iPhone and iPad.
+Needs Obsidian 1.4.0 or newer.
+
+INSTALL (Mac / Windows)
+-----------------------
+1. Quit Obsidian, or leave it open and reload afterwards.
+2. Open your vault folder in Finder / File Explorer.
+   The .obsidian folder is hidden:
+     Mac:     press Cmd+Shift+.  in Finder to show hidden files
+     Windows: View > Show > Hidden items
+3. Unzip this package. You get a folder called  homepage-dashboard.
+4. Put that whole folder inside:   <your vault>/.obsidian/plugins/
+   (create the "plugins" folder if it doesn't exist).
+   You should end up with:
+     <your vault>/.obsidian/plugins/homepage-dashboard/main.js
+     <your vault>/.obsidian/plugins/homepage-dashboard/styles.css
+     <your vault>/.obsidian/plugins/homepage-dashboard/manifest.json
+5. In Obsidian: Settings > Community plugins.
+   Turn off Restricted mode if it's on, then click the reload icon,
+   then switch ON "Homepage Dashboard".
+6. Open it with the home icon in the left ribbon, or press Cmd/Ctrl+P and
+   run "Homepage Dashboard: Open homepage".
+
+INSTALL (iPhone / iPad)
+-----------------------
+The plugins folder is hidden on iOS, so the easy ways are:
+  - Install it on your Mac/PC first and use Obsidian Sync (Settings > Sync >
+    turn on "Installed community plugins"), or
+  - Put the vault in iCloud Drive and copy the folder in using the Files app
+    (Files > iCloud Drive > Obsidian > <vault> > .obsidian > plugins).
+Then open Obsidian on the device, go to Settings > Community plugins and
+switch ON "Homepage Dashboard".
+
+FIRST-TIME SETUP
+----------------
+Settings > Homepage Dashboard. The defaults work, but you will want to set:
+  - Your name           shown in the greeting
+  - Web Clipper folder  default "Clippings"
+  - Daily notes folder  leave blank to use your Daily Notes settings
+Optional: an Unsplash key for nature photos (free at unsplash.com/developers),
+Pebble ring notes (off by default), and your own Quick Links.
+
+WHERE YOUR DATA LIVES
+---------------------
+Tasks, the quick note and favourites are plain notes in your vault, in the
+folder  homepage/data/  (Tasks.md, Quick Note.md, Favourites.md). They sync
+with your vault and you can edit them by hand. Deleting the plugin does not
+delete them.
+
+ADDING FAVOURITES
+-----------------
+Click "+ Add" on the dashboard, or click the star in any note's header.
+
+UPDATING
+--------
+Replace the three files in the plugin folder with the new ones and reload
+Obsidian (Settings > Community plugins > reload, or quit and reopen).
+
+TROUBLESHOOTING
+---------------
+- Plugin not listed: check the folder is named exactly  homepage-dashboard
+  and sits directly inside  .obsidian/plugins/  (not nested a level deeper).
+- Looks wrong after an update: quit Obsidian completely and reopen it.
