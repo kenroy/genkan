@@ -304,6 +304,52 @@ const DEFAULT_QUICK_LINKS = [
   { icon: "🎲", label: "Random Note", action: "random" },
 ];
 
+// ─── Locale ───────────────────────────────────────────────────────────────────
+// Dates, times and the first day of the week follow the device's locale.
+// Spelling is British unless the locale is American ("favourites" -> "favorites").
+
+let LOCALE = "en-US";
+let US_SPELLING = false; // an unknown or invalid locale keeps British spelling
+try {
+  const l = (typeof navigator !== "undefined" && navigator.language) || "";
+  if (l) {
+    new Intl.DateTimeFormat(l);
+    LOCALE = l;
+    US_SPELLING = /^en-(US|PR|GU|VI|AS|MP)\b/i.test(l);
+  }
+} catch {
+  // keep the defaults
+}
+
+// Source strings are written in British spelling; this converts them for American locales
+function S(text) {
+  return US_SPELLING ? text.replace(/favourite/g, "favorite").replace(/Favourite/g, "Favorite") : text;
+}
+
+function locale12h() {
+  return !!new Intl.DateTimeFormat(LOCALE, { hour: "numeric" }).resolvedOptions().hour12;
+}
+
+// Regions whose week starts on Sunday, for engines without Intl.Locale week info
+const SUNDAY_REGIONS = new Set(["US", "CA", "MX", "BR", "JP", "IL", "KR", "PH", "TW", "TH", "ZA", "IN", "PR", "SG", "HK"]);
+
+// 0 = Sunday ... 6 = Saturday
+function localeWeekStart() {
+  try {
+    const loc = new Intl.Locale(LOCALE);
+    const info = typeof loc.getWeekInfo === "function" ? loc.getWeekInfo() : loc.weekInfo;
+    if (info && info.firstDay) return info.firstDay % 7;
+    const region = loc.maximize().region;
+    return SUNDAY_REGIONS.has(region) ? 0 : 1;
+  } catch {
+    return 0;
+  }
+}
+
+function fmtNum(n) {
+  return Number(n).toLocaleString(LOCALE);
+}
+
 const DEFAULT_SETTINGS = {
   userName: "",
   clipsFolder: "Clippings",
@@ -312,7 +358,8 @@ const DEFAULT_SETTINGS = {
   maxClips: 12,
   maxRecent: 8,
   theme: "system", // system | dark | light
-  clockFormat: "12h",
+  clockFormat: locale12h() ? "12h" : "24h", // new installs follow the device locale
+  weekStart: "auto", // auto | 0 (Sunday) | 1 (Monday) | 6 (Saturday)
   clockFont: "default", // see CLOCK_FONTS
   clockFontCustom: "", // font name(s) typed in settings when clockFont is "custom"
   showHero: true,
@@ -353,7 +400,7 @@ function getDomain(url) {
 
 function fmtDate(d, opts) {
   return d.toLocaleDateString(
-    "en-US",
+    LOCALE,
     opts ?? { month: "short", day: "numeric", year: "numeric" },
   );
 }
@@ -652,7 +699,7 @@ class FavouritePicker extends FuzzySuggestModal {
   constructor(app, plugin) {
     super(app);
     this.plugin = plugin;
-    this.setPlaceholder("Add a note to your homepage favourites…");
+    this.setPlaceholder(S("Add a note to your homepage favourites…"));
   }
   getItems() {
     return this.app.vault
@@ -751,7 +798,7 @@ function buildDashboard() {
   const favs = h(
     "div",
     { cls: "card favs-card", id: "favs-card" },
-    h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: "Favourites" })),
+    h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: S("Favourites") })),
     h("div", { cls: "favs-list", id: "favs-list" }),
   );
 
@@ -1187,20 +1234,21 @@ class HomepageView extends ItemView {
   renderCalendar() {
     const year = this.calYear;
     const month = this.calMonth;
-    const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    this.$("cal-month-label").textContent = `${MONTHS[month]} ${year}`;
+    this.$("cal-month-label").textContent = fmtDate(new Date(year, month, 1), { month: "long", year: "numeric" });
 
+    const ws = this.settings.weekStart === "auto" ? localeWeekStart() : Number(this.settings.weekStart);
     const grid = this.$("cal-grid");
     grid.empty();
-    ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].forEach((label) => {
+    for (let i = 0; i < 7; i++) {
       const cell = document.createElement("div");
       cell.className = "cal-dow";
-      cell.textContent = label;
+      // 1 Jan 2023 was a Sunday
+      cell.textContent = fmtDate(new Date(2023, 0, 1 + ((ws + i) % 7)), { weekday: "short" }).slice(0, 2);
       grid.appendChild(cell);
-    });
+    }
 
     const today = new Date();
-    const first = new Date(year, month, 1).getDay();
+    const first = (new Date(year, month, 1).getDay() - ws + 7) % 7;
     const days = new Date(year, month + 1, 0).getDate();
     const prevDays = new Date(year, month, 0).getDate();
 
@@ -1325,7 +1373,7 @@ class HomepageView extends ItemView {
   renderTasks() {
     const tasks = this.tasks.filter((t) => t.id);
     const done = tasks.filter((t) => t.done).length;
-    this.$("tasks-stats").textContent = `${done} / ${tasks.length}`;
+    this.$("tasks-stats").textContent = `${fmtNum(done)} / ${fmtNum(tasks.length)}`;
 
     const filtered =
       this.taskFilter === "active"
@@ -1509,7 +1557,7 @@ class HomepageView extends ItemView {
           ? "Yesterday"
           : fmtDate(d, { month: "short", day: "numeric", year: d.getFullYear() === now.getFullYear() ? undefined : "numeric" });
     if (!e.hasTime) return day;
-    const time = d.toLocaleTimeString("en-US", {
+    const time = d.toLocaleTimeString(LOCALE, {
       hour: "numeric",
       minute: "2-digit",
       hour12: this.settings.clockFormat === "12h",
@@ -1627,19 +1675,19 @@ class HomepageView extends ItemView {
           h("button", {
             cls: "fav-x",
             "data-fav-remove": f.target,
-            title: "Remove from favourites",
-            "aria-label": `Remove ${label} from favourites`,
+            title: S("Remove from favourites"),
+            "aria-label": S(`Remove ${label} from favourites`),
             text: "×",
           }),
         ),
       );
     }
-    list.append(h("button", { cls: "fav-add", id: "fav-add", title: "Add a favourite", text: "+ Add" }));
+    list.append(h("button", { cls: "fav-add", id: "fav-add", title: S("Add a favourite"), text: "+ Add" }));
     if (!favs.length) {
       list.append(
         h("span", {
           cls: "hp-empty fav-hint",
-          text: "Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”.",
+          text: S("Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”."),
         }),
       );
     }
@@ -1699,7 +1747,7 @@ class HomepageView extends ItemView {
       })
       .slice(0, this.settings.maxClips);
 
-    this.$("clips-count").textContent = clips.length;
+    this.$("clips-count").textContent = fmtNum(clips.length);
     if (!clips.length) {
       this.showEmpty(body, `No clips found in “${folder || "(no folder set)"}”.`);
       return;
@@ -1739,7 +1787,7 @@ class HomepageView extends ItemView {
       .sort((a, b) => b.stat.mtime - a.stat.mtime)
       .slice(0, this.settings.maxRecent);
 
-    this.$("recent-count").textContent = notes.length;
+    this.$("recent-count").textContent = fmtNum(notes.length);
     if (!notes.length) {
       this.showEmpty(body, "No notes found.");
       return;
@@ -2116,6 +2164,16 @@ class HomepageSettingTab extends PluginSettingTab {
           .onChange((v) => save("clockFormat", v)),
       );
 
+    new Setting(containerEl)
+      .setName("First day of the week")
+      .setDesc("Automatic follows your device's region.")
+      .addDropdown((d) =>
+        d
+          .addOptions({ auto: "Automatic", "0": "Sunday", "1": "Monday", "6": "Saturday" })
+          .setValue(String(s.weekStart))
+          .onChange((v) => save("weekStart", v)),
+      );
+
     const customFont = text(
       "Custom clock font",
       "The name of a font installed on this device, such as Courier New or Avenir Next. A device without it uses the dashboard font.",
@@ -2266,7 +2324,7 @@ module.exports = class HomepagePlugin extends Plugin {
 
     this.addCommand({
       id: "toggle-favourite",
-      name: "Add or remove current note from homepage favourites",
+      name: S("Add or remove current note from homepage favourites"),
       checkCallback: (checking) => {
         const f = this.app.workspace.getActiveFile();
         if (!f || f.extension !== "md" || this.isDataFile(f)) return false;
@@ -2276,7 +2334,7 @@ module.exports = class HomepagePlugin extends Plugin {
     });
     this.addCommand({
       id: "add-favourite",
-      name: "Add a note to homepage favourites…",
+      name: S("Add a note to homepage favourites…"),
       callback: () => new FavouritePicker(this.app, this).open(),
     });
     this.registerEvent(
@@ -2317,7 +2375,7 @@ module.exports = class HomepagePlugin extends Plugin {
     const fav = this.favPaths.has(file.path);
     menu.addItem((item) =>
       item
-        .setTitle(fav ? "Remove from homepage favourites" : "Add to homepage favourites")
+        .setTitle(S(fav ? "Remove from homepage favourites" : "Add to homepage favourites"))
         .setIcon("star")
         .onClick(() => this.toggleFavourite(file)),
     );
@@ -2327,7 +2385,7 @@ module.exports = class HomepagePlugin extends Plugin {
   decorateLeaf(leaf) {
     const view = leaf?.view;
     if (!(view instanceof MarkdownView) || this.stars.has(view)) return;
-    const el = view.addAction("star", "Add or remove from homepage favourites", () => {
+    const el = view.addAction("star", S("Add or remove from homepage favourites"), () => {
       if (view.file && !this.isDataFile(view.file)) this.toggleFavourite(view.file);
     });
     el.addClass("hp-fav-star");
@@ -2345,7 +2403,7 @@ module.exports = class HomepagePlugin extends Plugin {
       const f = view.file;
       const on = !!f && this.favPaths.has(f.path);
       el.toggleClass("is-active", on);
-      el.setAttribute("aria-label", on ? "Remove from homepage favourites" : "Add to homepage favourites");
+      el.setAttribute("aria-label", S(on ? "Remove from homepage favourites" : "Add to homepage favourites"));
     }
   }
 
@@ -2405,15 +2463,15 @@ module.exports = class HomepagePlugin extends Plugin {
   async addFavourite(file) {
     try {
       if (await this.isFavourite(file)) {
-        new Notice(`${file.basename} is already a favourite`);
+        new Notice(S(`${file.basename} is already a favourite`));
         return;
       }
       const link = this.app.metadataCache.fileToLinktext(file, "", true);
       const f = await ensureFileIn(this.app, this.favPath);
       await this.app.vault.process(f, (t) => `${t}${t && !t.endsWith("\n") ? "\n" : ""}- [[${link}]]\n`);
-      new Notice(`Added ${file.basename} to favourites`);
+      new Notice(S(`Added ${file.basename} to favourites`));
     } catch (err) {
-      new Notice(`Could not add favourite: ${err.message}`);
+      new Notice(S(`Could not add favourite: ${err.message}`));
     }
   }
 
@@ -2440,7 +2498,7 @@ module.exports = class HomepagePlugin extends Plugin {
     if (!(await this.isFavourite(file))) return this.addFavourite(file);
     const fav = (await this.readFavourites()).find((x) => this.favouriteFile(x)?.path === file.path);
     await this.removeFavourite(fav.target);
-    new Notice(`Removed ${file.basename} from favourites`);
+    new Notice(S(`Removed ${file.basename} from favourites`));
   }
 
   async saveSettings() {
