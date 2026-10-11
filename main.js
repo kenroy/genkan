@@ -17,7 +17,7 @@ const {
   moment,
 } = obsidian;
 
-const VIEW_TYPE = "homepage-dashboard-view";
+const VIEW_TYPE = "genkan-view";
 
 const ICONS = {
   moon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`,
@@ -302,7 +302,7 @@ const DEFAULT_SETTINGS = {
   userName: "",
   clipsFolder: "Clippings",
   dailyNotesFolder: "", // blank = use the Daily Notes / Periodic Notes setting
-  dataFolder: "homepage/data", // where Tasks.md and Quick Note.md live
+  dataFolder: "genkan/data", // where Tasks.md and Quick Note.md live
   maxClips: 12,
   maxRecent: 8,
   theme: "system", // system | dark | light
@@ -1738,7 +1738,7 @@ class HomepageSettingTab extends PluginSettingTab {
       "Data folder",
       "Tasks.md and Quick Note.md are stored here, so Obsidian Sync shares them across devices.",
       "dataFolder",
-      { placeholder: "homepage/data" },
+      { placeholder: "genkan/data" },
     );
 
     new Setting(containerEl).setName("Content").setHeading();

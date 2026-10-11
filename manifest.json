@@ -1,6 +1,6 @@
 {
-  "id": "homepage-dashboard",
-  "name": "Homepage Dashboard",
+  "id": "genkan",
+  "name": "Genkan",
   "version": "0.1.1",
   "minAppVersion": "1.4.0",
   "description": "A dashboard homepage with clock, calendar, web clips, recent notes, tasks and a quick note. Works on desktop and mobile.",

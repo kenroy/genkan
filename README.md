@@ -1,10 +1,10 @@
-# Homepage Dashboard (Obsidian plugin)
+# Genkan (Obsidian plugin)
 
 The Obsidian Homepage dashboard as a real plugin: clock, calendar, web clips, recent notes, tasks, quick note, vault search and quick links. It runs on **desktop, iPhone and iPad**, and needs no REST API, ports, API keys or Surfing.
 
 It reads and writes your vault directly, so Obsidian Sync handles the rest:
 
-| File (in the data folder, default `homepage/data/`) | Used for |
+| File (in the data folder, default `genkan/data/`) | Used for |
 |---|---|
 | `Tasks.md` | Tasks, as an Obsidian Tasks-style checklist: `- [ ] Buy milk ➕ 2026-10-10 ^id` |
 | `Quick Note.md` | The quick note text |
@@ -13,9 +13,9 @@ These are the same files the web version wrote, so existing data carries over. E
 
 ## Install
 
-1. In your vault, create `.obsidian/plugins/homepage-dashboard/`.
+1. In your vault, create `.obsidian/plugins/genkan/`.
 2. Copy `manifest.json`, `main.js` and `styles.css` into it.
-3. In Obsidian: Settings → Community plugins → reload, then enable **Homepage Dashboard**.
+3. In Obsidian: Settings → Community plugins → reload, then enable **Genkan**.
 4. Open it from the ribbon icon (home), or the command **Open homepage**.
 
 ### Other devices (including iPhone / iPad)
@@ -28,7 +28,7 @@ Install the plugin in each vault. Settings and data are per vault, so there are 
 
 ## Settings
 
-Settings → Homepage Dashboard: name, open on startup, appearance (follows Obsidian's theme by default), clock format, Web Clipper / daily notes / data folders, item counts, photo of the day (optional Unsplash key), and quick links.
+Settings → Genkan: name, open on startup, appearance (follows Obsidian's theme by default), clock format, Web Clipper / daily notes / data folders, item counts, photo of the day (optional Unsplash key), and quick links.
 
 Quick links are one per line: `icon | label | action`, where action is `command:<command id>`, `open:<note path>`, `daily`, `random` or an `https://` URL.
 
