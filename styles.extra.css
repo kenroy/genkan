@@ -506,3 +506,15 @@
 .genkan-wide-input {
     width: 100%;
 }
+
+/* Credit line under the daily quote (required by ZenQuotes' free API) */
+.hp-root .quote-credit {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-3);
+}
+
+.hp-root .quote-credit a {
+    color: var(--text-2);
+    text-decoration: underline;
+}

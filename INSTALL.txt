@@ -46,6 +46,14 @@ Optional: an Unsplash key for nature photos (free at unsplash.com/developers),
 Pebble ring notes (off by default; choose whether the ring saves to one main
 note, a note you pick, or a separate file per note), and your own Quick Links.
 
+NETWORK USE (all optional, all in the settings)
+-----------------------------------------------
+Genkan sends none of your notes anywhere. It makes these requests, each of which
+can be switched off: a daily quote from ZenQuotes ("Daily quote"), a photo from
+Picsum or, if you add a free key, Unsplash ("Photo of the day"), and small site
+icons for web clips from Google's favicon service ("Site icons on web clips").
+Details are in README.md.
+
 WHERE YOUR DATA LIVES
 ---------------------
 Tasks, the quick note and favourites are plain notes in your vault, in the

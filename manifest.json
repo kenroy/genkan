@@ -3,7 +3,8 @@
   "name": "Genkan",
   "version": "0.1.1",
   "minAppVersion": "1.4.0",
-  "description": "A dashboard homepage with clock, calendar, web clips, recent notes, tasks and a quick note. Works on desktop and mobile.",
+  "description": "Show a dashboard homepage with a clock, calendar, favourites, tasks, quick note, web clips and recent notes, plus optional Pebble ring voice notes. Works on desktop and mobile.",
   "author": "Kenroy Harrison",
+  "authorUrl": "https://github.com/kenroy",
   "isDesktopOnly": false
 }

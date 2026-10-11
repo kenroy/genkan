@@ -22,6 +22,7 @@ const {
 const VIEW_TYPE = "genkan-view";
 const RING_MAIN_NOTE = "Pebble Index.md"; // the ring app's "one main note" target
 
+// Icons for the dashboard (fixed SVG source, parsed once at runtime).
 const ICONS = {
   moon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`,
   sun: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
@@ -32,6 +33,7 @@ const ICONS = {
   monitor: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`,
 };
 
+// Built-in daily quotes, used when the ZenQuotes request is off or fails.
 const QUOTES = [
   {
     q: "The only way to do great work is to love what you do.",
@@ -311,6 +313,8 @@ const DEFAULT_SETTINGS = {
   theme: "system", // system | dark | light
   clockFormat: "12h",
   showHero: true,
+  showQuote: true, // daily quote from ZenQuotes (one request a day)
+  showFavicons: true, // site icons on web clips (Google's favicon service)
   showRingNotes: false, // Pebble Index ring notes card (off unless enabled)
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
   // "files" = a separate file per note in a folder
@@ -708,6 +712,13 @@ function buildDashboard() {
       h("p", { cls: "quote-text", id: "quote-text" }),
       h("footer", { cls: "quote-author", id: "quote-author" }),
     ),
+    // ZenQuotes' free API requires a visible credit linking back to zenquotes.io
+    h(
+      "div",
+      { cls: "quote-credit hidden", id: "quote-credit" },
+      "Inspirational quotes provided by ",
+      h("a", { href: "https://zenquotes.io/", text: "ZenQuotes API" }),
+    ),
   );
 
   const favs = h(
@@ -938,7 +949,7 @@ class HomepageView extends ItemView {
         this.renderCalendar();
         this.loadHero(false);
         this.loadQuote();
-      }, 5 * 60 * 1000),
+      }, 5 * 60 * 1000), // both loaders return early when switched off in settings
     );
 
     this.refreshAll(false);
@@ -1661,7 +1672,7 @@ class HomepageView extends ItemView {
     for (const c of clips) {
       const domain = c.source ? getDomain(c.source) : "";
       const header = h("div", { cls: "clip-header" });
-      if (domain) {
+      if (domain && this.settings.showFavicons) {
         const icon = h("img", {
           cls: "clip-favicon",
           src: `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`,
@@ -1876,6 +1887,7 @@ class HomepageView extends ItemView {
   }
 
   async loadHero(forceNew) {
+    if (!this.settings.showHero) return; // hidden: no photo, no network request
     const today = new Date().toISOString().slice(0, 10);
     if (!forceNew) {
       const cached = this.cacheGet("hero");
@@ -1893,8 +1905,8 @@ class HomepageView extends ItemView {
           src: data.urls.regular,
           alt: data.alt_description || data.description || "Nature photo",
           photographer: data.user.name,
-          photographerUrl: `${data.user.links.html}?utm_source=obsidian_homepage&utm_medium=referral`,
-          photoUrl: `${data.links.html}?utm_source=obsidian_homepage&utm_medium=referral`,
+          photographerUrl: `${data.user.links.html}?utm_source=genkan&utm_medium=referral`,
+          photoUrl: `${data.links.html}?utm_source=genkan&utm_medium=referral`,
         };
         this.cacheSet("hero", photo);
         return this.displayHero(photo);
@@ -1947,29 +1959,35 @@ class HomepageView extends ItemView {
     return QUOTES[dayOfYear % QUOTES.length];
   }
 
-  displayQuote({ q, a }) {
+  displayQuote({ q, a, src }) {
     this.$("quote-text").textContent = q;
     this.$("quote-author").textContent = `— ${a}`;
+    this.$("quote-credit").classList.toggle("hidden", src !== "zenquotes");
   }
 
   async loadQuote() {
+    const bar = this.$("quote-bar");
+    bar.classList.toggle("hidden", !this.settings.showQuote);
+    if (!this.settings.showQuote) return; // no quote, no network request
+
     const today = new Date().toISOString().slice(0, 10);
     const cached = this.cacheGet("quote");
-    if (cached?.date === today) return this.displayQuote(cached);
+    // Quotes cached before the source was recorded have no credit info: fetch those again once
+    if (cached?.date === today && cached.src) return this.displayQuote(cached);
 
-    this.displayQuote(this.fallbackQuote());
+    this.displayQuote({ ...this.fallbackQuote(), src: "builtin" });
     try {
       const res = await requestUrl({ url: "https://zenquotes.io/api/today" });
       const d = res.json?.[0];
       if (d?.q) {
-        const quote = { date: today, q: d.q, a: d.a };
+        const quote = { date: today, q: d.q, a: d.a, src: "zenquotes" };
         this.cacheSet("quote", quote);
         return this.displayQuote(quote);
       }
     } catch {
       /* use the built-in quote */
     }
-    this.cacheSet("quote", { date: today, ...this.fallbackQuote() });
+    this.cacheSet("quote", { date: today, ...this.fallbackQuote(), src: "builtin" });
   }
 }
 
@@ -2108,13 +2126,22 @@ class HomepageSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Photo of the day")
+      .setDesc("Shows a landscape photo from Picsum, or from Unsplash if you add a key below. Off means no photo is requested.")
       .addToggle((t) => t.setValue(s.showHero).onChange((v) => save("showHero", v)));
     text(
       "Unsplash access key",
-      "Optional — enables nature photos with attribution. Without it a landscape photo from Picsum is used.",
+      "Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault.",
       "unsplashKey",
       { password: true },
     );
+    new Setting(containerEl)
+      .setName("Daily quote")
+      .setDesc("Shows a quote from ZenQuotes, fetched once a day. Off means no quote is requested.")
+      .addToggle((t) => t.setValue(s.showQuote).onChange((v) => save("showQuote", v)));
+    new Setting(containerEl)
+      .setName("Site icons on web clips")
+      .setDesc("Uses Google's favicon service, which receives the domain of each clipped page. Off means no icon requests.")
+      .addToggle((t) => t.setValue(s.showFavicons).onChange((v) => save("showFavicons", v)));
 
     new Setting(containerEl)
       .setName("Quick links")
