@@ -1543,11 +1543,15 @@ class HomepageView extends ItemView {
       if (!e.target.closest(".search-container")) this.closeSearch();
       else if (e.target.closest(".search-result-item")) this.closeSearch();
     });
-    // "/" focuses search when focus is inside this view but not in a field
-    this.root.addEventListener("keydown", (e) => {
-      if (e.key !== "/" || e.metaKey || e.ctrlKey) return;
+    // "/" focuses search while this view is the active tab, unless you are typing somewhere
+    this.registerDomEvent(document, "keydown", (e) => {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey || e.isComposing) return;
+      if (this.app.workspace.getActiveViewOfType(HomepageView) !== this) return;
       const t = e.target;
-      if (t.tagName === "INPUT" || t.tagName === "TEXTAREA") return;
+      if (t instanceof HTMLElement) {
+        if (t.closest("input, textarea, select, [contenteditable='true']")) return;
+        if (t.closest(".modal-container, .menu, .suggestion-container")) return;
+      }
       e.preventDefault();
       input.focus();
     });
