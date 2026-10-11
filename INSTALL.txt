@@ -43,7 +43,8 @@ Settings > Genkan. The defaults work, but you will want to set:
   - Web Clipper folder  default "Clippings"
   - Daily notes folder  leave blank to use your Daily Notes settings
 Optional: an Unsplash key for nature photos (free at unsplash.com/developers),
-Pebble ring notes (off by default), and your own Quick Links.
+Pebble ring notes (off by default; choose whether the ring saves to one main
+note, a note you pick, or a separate file per note), and your own Quick Links.
 
 WHERE YOUR DATA LIVES
 ---------------------

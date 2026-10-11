@@ -12,12 +12,15 @@ const {
   Keymap,
   MarkdownView,
   FuzzySuggestModal,
+  AbstractInputSuggest,
+  TFolder,
   normalizePath,
   requestUrl,
   moment,
 } = obsidian;
 
 const VIEW_TYPE = "genkan-view";
+const RING_MAIN_NOTE = "Pebble Index.md"; // the ring app's "one main note" target
 
 const ICONS = {
   moon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`,
@@ -309,7 +312,11 @@ const DEFAULT_SETTINGS = {
   clockFormat: "12h",
   showHero: true,
   showRingNotes: false, // Pebble Index ring notes card (off unless enabled)
-  ringNotesFile: "Pebble Index.md", // note the ring's app appends timestamped entries to
+  // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
+  // "files" = a separate file per note in a folder
+  ringMode: "main",
+  ringNotesFile: "Pebble Index.md", // used in "chosen" mode
+  ringNotesFolder: "Pebble Index", // used in "files" mode (the Pebble app's default folder)
   maxRingNotes: 5,
   unsplashKey: "",
   openOnStartup: false,
@@ -492,6 +499,94 @@ function parseRingNotes(markdown) {
     .reverse()
     .sort((a, b) => b.when - a.when);
 }
+
+// ── "A separate file for each note" mode ──
+// One file per voice note. Pebble's exact file format isn't documented, so be
+// tolerant: timestamp from frontmatter, else the file name, else creation time.
+
+const RING_FM_KEYS = ["created", "date", "timestamp", "time", "datetime", "recorded", "recorded_at", "created_at", "createdat"];
+const RING_NAME_RES = [
+  // 2026-10-11 0021 / 2026-10-11 002130 — the style the Pebble app uses (date, then HHmm)
+  /(\d{4})-(\d{2})-(\d{2})[ T_-]+(\d{2})(\d{2})(\d{2})?(?!\d)/,
+  // 2026-10-11 09-15 / 2026-10-11T09:15:30 / 2026-10-11_09.15 / 2026-10-11 (date only)
+  /(\d{4})-(\d{2})-(\d{2})(?:[ T_.-]+(\d{1,2})[.:h-](\d{2})(?:[.:-](\d{2}))?)?/,
+  // 20261011-0915 / 20261011_091530
+  /(\d{4})(\d{2})(\d{2})[ T_-](\d{2})(\d{2})(\d{2})?/,
+];
+
+function ringDate(y, mo, d, h, mi, sec) {
+  if (mo < 1 || mo > 12 || d < 1 || d > 31 || y < 2000 || y > 2100) return null;
+  const hasTime = h !== undefined && h <= 23 && mi <= 59;
+  return {
+    hasTime,
+    when: new Date(y, mo - 1, d, hasTime ? h : 0, hasTime ? mi : 0, hasTime && sec ? sec : 0),
+  };
+}
+
+function ringDateFromString(str) {
+  for (const re of RING_NAME_RES) {
+    const m = String(str).match(re);
+    if (!m) continue;
+    const r = ringDate(+m[1], +m[2], +m[3], m[4] === undefined ? undefined : +m[4], m[5] === undefined ? undefined : +m[5], m[6] === undefined ? 0 : +m[6]);
+    if (r) return r;
+  }
+  return null;
+}
+
+function ringFileTimestamp(file, frontmatter) {
+  const fm = {};
+  for (const [k, v] of Object.entries(frontmatter || {})) fm[k.toLowerCase()] = v;
+  for (const key of RING_FM_KEYS) {
+    if (fm[key] == null) continue;
+    const r = ringDateFromString(fmString(fm[key]));
+    if (r) return r;
+    const d = new Date(fmString(fm[key]));
+    if (!isNaN(d.getTime())) return { when: d, hasTime: true };
+  }
+  const fromName = ringDateFromString(file.basename);
+  if (fromName) return fromName;
+  return { when: new Date(file.stat.ctime), hasTime: true };
+}
+
+// The note's text: body without frontmatter, minus a leading heading that is just a timestamp
+function ringFileText(raw) {
+  const body = (raw || "").replace(/^---\r?\n[\s\S]*?\r?\n---[ \t]*\r?\n?/, "");
+  const lines = body.split("\n");
+  while (lines.length && !lines[0].trim()) lines.shift();
+  if (lines.length && /^#{1,6}\s/.test(lines[0])) {
+    const title = lines[0].replace(/^#{1,6}\s+/, "").trim();
+    if (/^\d{4}-\d{2}-\d{2}([ T_.-]+\d{1,2}[.:h-]\d{2}([.:-]\d{2})?)?$/.test(title)) lines.shift();
+    else lines[0] = title;
+  }
+  return lines.join("\n").trim();
+}
+
+// Autocomplete for the note / folder fields in settings (Obsidian 1.4.10+)
+const PathSuggest = AbstractInputSuggest
+  ? class extends AbstractInputSuggest {
+      constructor(app, inputEl, kind) {
+        super(app, inputEl);
+        this.kind = kind;
+        this.field = inputEl;
+      }
+      getSuggestions(query) {
+        const q = (query || "").toLowerCase();
+        const items =
+          this.kind === "folder"
+            ? this.app.vault.getAllLoadedFiles().filter((f) => f instanceof TFolder && f.path !== "/")
+            : this.app.vault.getMarkdownFiles();
+        return items.filter((f) => f.path.toLowerCase().includes(q)).slice(0, 50);
+      }
+      renderSuggestion(item, el) {
+        el.setText(item.path);
+      }
+      selectSuggestion(item) {
+        this.field.value = item.path;
+        this.field.dispatchEvent(new Event("input"));
+        this.close();
+      }
+    }
+  : null;
 
 class FavouritePicker extends FuzzySuggestModal {
   constructor(app, plugin) {
@@ -681,8 +776,23 @@ class HomepageView extends ItemView {
   get favPath() {
     return this.plugin.favPath;
   }
+  get ringMode() {
+    const m = this.settings.ringMode;
+    return m === "chosen" || m === "files" ? m : "main";
+  }
+  // The note read in "main" / "chosen" mode
   get ringPath() {
-    return normalizePath(this.settings.ringNotesFile || DEFAULT_SETTINGS.ringNotesFile);
+    if (this.ringMode !== "chosen") return RING_MAIN_NOTE;
+    const p = normalizePath(this.settings.ringNotesFile || RING_MAIN_NOTE);
+    return /\.md$/i.test(p) ? p : `${p}.md`;
+  }
+  // The folder read in "files" mode
+  get ringFolder() {
+    return (this.settings.ringNotesFolder || "").replace(/^\/+|\/+$/g, "");
+  }
+  isRingFile(path) {
+    if (this.ringMode === "files") return !!this.ringFolder && path.startsWith(`${this.ringFolder}/`);
+    return path === this.ringPath;
   }
   // Run fn after ms; later calls with the same key replace the pending one
   later(key, ms, fn) {
@@ -773,12 +883,13 @@ class HomepageView extends ItemView {
     if (path === this.tasksPath) this.later("tasks", 150, () => this.loadTasks());
     else if (path === this.notePath) this.later("note", 150, () => this.loadNote());
     else if (path === this.favPath) this.later("favs", 150, () => this.renderFavourites());
-    else if (path === this.ringPath) this.later("ring", 150, () => this.renderRingNotes());
+    else if (this.isRingFile(path)) this.later("ring", 150, () => this.renderRingNotes());
     else this.scheduleLists();
   }
 
   scheduleLists() {
     this.later("lists", 1500, () => {
+      if (this.ringMode === "files") this.renderRingNotes(); // frontmatter may have changed
       this.renderFavourites();
       this.renderClips();
       this.renderRecent();
@@ -1199,7 +1310,7 @@ class HomepageView extends ItemView {
       const ring = e.target.closest("[data-ring-line]");
       if (ring) {
         e.preventDefault();
-        this.openRingNote(Number(ring.dataset.ringLine), e);
+        this.openRingNote(ring.dataset.ringPath, Number(ring.dataset.ringLine), e);
         return;
       }
       const fav = e.target.closest("[data-fav]");
@@ -1270,38 +1381,79 @@ class HomepageView extends ItemView {
     card.classList.toggle("hidden", !enabled);
     if (!enabled) return;
 
-    const path = this.ringPath;
     const body = this.$("ring-body");
-    this.$("ring-open").dataset.open = path;
+    const count = this.$("ring-count");
+    const openLink = this.$("ring-open");
+    const max = this.settings.maxRingNotes;
+    let entries;
+    let total;
 
-    const f = this.app.vault.getAbstractFileByPath(path);
-    if (!(f instanceof TFile)) {
-      this.$("ring-count").textContent = "0";
-      body.innerHTML = `<div class="hp-empty">No ring notes yet. Looking for “${esc(path)}”.</div>`;
-      return;
+    if (this.ringMode === "files") {
+      // A separate file per note: newest first by timestamp, then read only the ones shown
+      openLink.classList.add("hidden");
+      const folder = this.ringFolder;
+      if (!folder) {
+        count.textContent = "0";
+        body.innerHTML = `<div class="hp-empty">Choose the folder your ring saves notes to in Genkan's settings.</div>`;
+        return;
+      }
+      const stamped = this.app.vault
+        .getMarkdownFiles()
+        .filter((f) => f.path.startsWith(`${folder}/`) && !this.isDataFile(f))
+        .map((f) => ({ f, ...ringFileTimestamp(f, this.app.metadataCache.getFileCache(f)?.frontmatter) }))
+        .sort((a, b) => b.when - a.when);
+      total = stamped.length;
+      if (!total) {
+        count.textContent = "0";
+        body.innerHTML = `<div class="hp-empty">No notes found in “${esc(folder)}”.</div>`;
+        return;
+      }
+      entries = await Promise.all(
+        stamped.slice(0, max).map(async ({ f, when, hasTime }) => ({
+          when,
+          hasTime,
+          path: f.path,
+          line: 0,
+          text: ringFileText(await this.app.vault.cachedRead(f).catch(() => "")) || f.basename,
+        })),
+      );
+    } else {
+      // One note with timestamped entries appended under headings
+      const path = this.ringPath;
+      openLink.classList.remove("hidden");
+      openLink.dataset.open = path;
+      const f = this.app.vault.getAbstractFileByPath(path);
+      if (!(f instanceof TFile)) {
+        count.textContent = "0";
+        body.innerHTML = `<div class="hp-empty">No ring notes yet. Looking for “${esc(path)}”.</div>`;
+        return;
+      }
+      const parsed = parseRingNotes(await this.app.vault.read(f));
+      total = parsed.length;
+      if (!total) {
+        count.textContent = "0";
+        body.innerHTML = `<div class="hp-empty">No timestamped entries found in “${esc(path)}”.</div>`;
+        return;
+      }
+      entries = parsed.slice(0, max).map((e) => ({ ...e, path }));
     }
-    const entries = parseRingNotes(await this.app.vault.read(f));
-    this.$("ring-count").textContent = entries.length;
-    if (!entries.length) {
-      body.innerHTML = `<div class="hp-empty">No timestamped entries found in “${esc(path)}”.</div>`;
-      return;
-    }
+
+    count.textContent = total;
     body.innerHTML = `<div class="ring-list">${entries
-      .slice(0, this.settings.maxRingNotes)
       .map(
-        (e) => `<a class="ring-item" href="#" data-ring-line="${e.line}">
+        (e) => `<a class="ring-item" href="#" data-ring-path="${esc(e.path)}" data-ring-line="${e.line}">
           <span class="ring-when">${esc(this.formatRingWhen(e))}</span>
           <span class="ring-text">${esc(e.text)}</span></a>`,
       )
       .join("")}</div>`;
   }
 
-  // Open the notes file scrolled to the entry's heading
-  openRingNote(line, evt) {
-    const f = this.app.vault.getAbstractFileByPath(this.ringPath);
+  // Open the note (scrolled to the entry's heading when it's one of many in a note)
+  openRingNote(path, line, evt) {
+    const f = this.app.vault.getAbstractFileByPath(path);
     if (!(f instanceof TFile)) return;
     const mod = evt ? Keymap.isModEvent(evt) : false;
-    this.app.workspace.getLeaf(mod || "tab").openFile(f, { eState: { line } });
+    this.app.workspace.getLeaf(mod || "tab").openFile(f, line ? { eState: { line } } : undefined);
   }
 
   // ── Favourites ──
@@ -1695,6 +1847,7 @@ class HomepageSettingTab extends PluginSettingTab {
             .setValue(String(s[key] ?? ""))
             .onChange((v) => save(key, opts.number ? Math.max(1, Number(v) || 1) : v.trim()));
           if (opts.password) t.inputEl.type = "password";
+          if (opts.suggest && PathSuggest) new PathSuggest(this.app, t.inputEl, opts.suggest);
         });
 
     text("Your name", "Shown in the greeting.", "userName", { placeholder: "e.g. Alex" });
@@ -1747,14 +1900,46 @@ class HomepageSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Pebble ring notes")
-      .setDesc("Show the latest voice notes from your Pebble Index ring (timestamped entries in a note).")
+      .setDesc("Show the latest voice notes from your Pebble Index ring.")
       .addToggle((t) => t.setValue(s.showRingNotes).onChange((v) => save("showRingNotes", v)));
-    text(
-      "Ring notes file",
-      "The note the ring's app appends to, with entries under headings like “## 2026-10-05 21:55”.",
+
+    // These mirror the three Obsidian choices in the Pebble app
+    const noteSetting = text(
+      "Ring note",
+      "The note the ring adds your voice notes to, with entries under headings like “## 2026-10-05 21:55”.",
       "ringNotesFile",
-      { placeholder: "Pebble Index.md" },
+      { placeholder: "Pebble Index.md", suggest: "file" },
     );
+    const folderSetting = text(
+      "Ring notes folder",
+      "The folder the ring saves each voice note into, one file per note.",
+      "ringNotesFolder",
+      { placeholder: "Pebble Index", suggest: "folder" },
+    );
+    const showRingFields = () => {
+      noteSetting.settingEl.style.display = s.ringMode === "chosen" ? "" : "none";
+      folderSetting.settingEl.style.display = s.ringMode === "files" ? "" : "none";
+    };
+    const modeSetting = new Setting(containerEl)
+      .setName("Where does the ring save notes?")
+      .setDesc("Match the Obsidian setting in the Pebble app.")
+      .addDropdown((d) =>
+        d
+          .addOptions({
+            main: "One main note (Pebble Index.md)",
+            chosen: "An existing note I choose",
+            files: "A separate file for each note",
+          })
+          .setValue(["chosen", "files"].includes(s.ringMode) ? s.ringMode : "main")
+          .onChange(async (v) => {
+            s.ringMode = v;
+            await save("ringMode", v);
+            showRingFields();
+          }),
+      );
+    // Keep the mode picker above the field it controls
+    containerEl.insertBefore(modeSetting.settingEl, noteSetting.settingEl);
+    showRingFields();
     text("Max ring notes", "", "maxRingNotes", { number: true });
 
     new Setting(containerEl)
@@ -1899,7 +2084,13 @@ module.exports = class HomepagePlugin extends Plugin {
   }
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const saved = await this.loadData();
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, saved);
+    // Before ring modes existed, a custom note path meant "a note I choose"
+    if (!saved?.ringMode) {
+      const custom = saved?.ringNotesFile && saved.ringNotesFile !== RING_MAIN_NOTE;
+      this.settings.ringMode = custom ? "chosen" : "main";
+    }
   }
 
   // ── Favourites (stored in <dataFolder>/Favourites.md) ──

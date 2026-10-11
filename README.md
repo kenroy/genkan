@@ -32,6 +32,18 @@ Settings → Genkan: name, open on startup, appearance (follows Obsidian's theme
 
 Quick links are one per line: `icon | label | action`, where action is `command:<command id>`, `open:<note path>`, `daily`, `random` or an `https://` URL.
 
+## Pebble ring notes
+
+An optional **Ring Notes** card shows the latest voice notes from a Pebble Index ring. Turn it on in Settings → Genkan → **Pebble ring notes**, then pick **Where does the ring save notes?** to match the Obsidian setting in the Pebble app:
+
+| Pebble app setting | Genkan setting | What Genkan reads |
+|---|---|---|
+| One main note | One main note | `Pebble Index.md`. Entries appended under headings like `## 2026-10-05 21:55` |
+| An existing note | An existing note I choose | The note you pick (autocomplete). Same heading format; other sections in the note are ignored |
+| A separate file for each note | A separate file for each note | Every note in the folder you pick (default `Pebble Index`, the Pebble app's default; use whatever subfolder you chose in the app). Each file's time comes from its frontmatter (`created: 2026-10-11T00:21`, also `date`, `timestamp`, …), else its file name (`2026-10-11 0021`, `2026-10-11 09-15`, `20261011_091530`, …), else when it was created |
+
+Newest first; click an entry to open it (single-note modes scroll to the entry). The card updates live as the ring saves notes. "How many to show" is **Max ring notes**.
+
 ## Layout
 
 Wide panes show three columns. Narrower panes (tablet, split view) move Tasks and Quick Note underneath, and phone-width panes use a single column with Tasks and Quick Note first.
