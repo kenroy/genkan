@@ -790,6 +790,16 @@ class HomepageView extends ItemView {
     this.$("refresh-clips").addEventListener("click", () => this.renderClips());
     this.$("refresh-recent").addEventListener("click", () => this.renderRecent());
     this.$("hero-refresh").addEventListener("click", () => this.loadHero(true));
+    // The cards already update live, so a refresh changes nothing you can see: spin the icon instead
+    for (const id of ["page-refresh", "refresh-clips", "refresh-recent", "hero-refresh"]) {
+      const btn = this.$(id);
+      btn.addEventListener("click", () => {
+        btn.classList.remove("spinning");
+        void btn.offsetWidth; // restart the animation on a quick second click
+        btn.classList.add("spinning");
+        window.setTimeout(() => btn.classList.remove("spinning"), 700);
+      });
+    }
 
     this.initTheme();
     this.initCalendar();

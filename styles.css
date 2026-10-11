@@ -1872,3 +1872,20 @@
   appearance: none;
   display: none;
 }
+
+/* Refresh buttons: a quick spin so a click is visibly acknowledged */
+@keyframes genkan-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hp-root .icon-btn.spinning svg {
+  animation: genkan-spin 0.7s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hp-root .icon-btn.spinning svg {
+    animation: none;
+  }
+}
