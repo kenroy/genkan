@@ -38,7 +38,8 @@
     --accent-lo: rgba(124, 58, 237, 0.1);
     --text: #0d0d1a;
     --text-2: #5a5a7a;
-    --text-3: #9090b0;
+    --text-3: #666688;
+    --accent-txt: #6d28d9;
 }
 .hp-root *,
 .hp-root *::before,
@@ -47,8 +48,8 @@
     margin: 0;
     padding: 0;
 }
-.hp-root .hidden {
-    display: none !important;
+#genkan-root .hidden {
+    display: none;
 }
 .hp-root {
     font-family: var(--font);
@@ -1103,8 +1104,8 @@
     background: linear-gradient(
         to bottom,
         rgba(0, 0, 0, 0.04) 0%,
-        rgba(0, 0, 0, 0.12) 50%,
-        rgba(0, 0, 0, 0.52) 100%
+        rgba(0, 0, 0, 0.2) 50%,
+        rgba(0, 0, 0, 0.62) 100%
     );
     pointer-events: none;
 }
@@ -1121,14 +1122,14 @@
 }
 .hp-root .hero-credit {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.7);
+    color: #fff;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .hp-root .hero-credit a {
-    color: rgba(255, 255, 255, 0.9);
+    color: #fff;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.15s;
@@ -1138,7 +1139,7 @@
     text-decoration: underline;
 }
 .hp-root .hero .icon-btn {
-    color: rgba(255, 255, 255, 0.75);
+    color: #fff;
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
@@ -1274,9 +1275,9 @@
    ============================================================ */
 
 /* Fill the Obsidian view and scroll inside it */
-.hp-view.view-content,
-.hp-view {
-    padding: 0 !important;
+/* Beats Obsidian's .workspace-leaf-content .view-content padding */
+.workspace-leaf-content[data-type="genkan-view"] .view-content.hp-view {
+    padding: 0;
     overflow: hidden;
 }
 
@@ -1518,18 +1519,18 @@
 
 /* Quick note is borderless inside its card: no rounded corner (which clipped the
    first character on iOS) and no native focus ring */
-.hp-root #quick-note,
-.hp-root #quick-note:focus,
-.hp-root #quick-note:focus-visible,
-.hp-root #quick-note:active {
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    outline: none !important;
-    padding: 4px 2px !important;
+#genkan-root #quick-note,
+#genkan-root #quick-note:focus,
+#genkan-root #quick-note:focus-visible,
+#genkan-root #quick-note:active {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    outline: none;
+    padding: 4px 2px;
 }
 
 /* Show focus on the card instead of the field */
@@ -1542,30 +1543,30 @@
 }
 
 /* Task and search inputs keep their own border/radius; stop the platform adding more */
-.hp-root .task-input,
-.hp-root #search-input {
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    box-shadow: none !important;
-    outline: none !important;
+#genkan-root .task-input,
+#genkan-root #search-input {
+    -webkit-appearance: none;
+    appearance: none;
+    box-shadow: none;
+    outline: none;
 }
 
-.hp-root .task-input {
-    border: 1px solid var(--border) !important;
-    border-radius: var(--radius-sm) !important;
-    padding: 10px 14px !important;
+#genkan-root .task-input {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
 }
 
-.hp-root .task-input:focus {
-    border-color: var(--accent) !important;
+#genkan-root .task-input:focus {
+    border-color: var(--accent);
 }
 
-.hp-root #search-input,
-.hp-root #search-input:focus {
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
+#genkan-root #search-input,
+#genkan-root #search-input:focus {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
 }
 
 /* ============================================================
@@ -1627,42 +1628,42 @@
    Small buttons: keep their intended size against Obsidian's
    (mobile) button padding / minimum sizes
    ============================================================ */
-.hp-root .task-check,
-.hp-root .task-del,
-.hp-root .icon-btn,
-.hp-root .cal-btn,
-.hp-root .fav-x {
-    box-sizing: border-box !important;
-    padding: 0 !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
+#genkan-root .task-check,
+#genkan-root .task-del,
+#genkan-root .icon-btn,
+#genkan-root .cal-btn,
+#genkan-root .fav-x {
+    box-sizing: border-box;
+    padding: 0;
+    min-width: 0;
+    min-height: 0;
     position: relative;
 }
 
-.hp-root .task-check {
-    width: 20px !important;
-    height: 20px !important;
+#genkan-root .task-check {
+    width: 20px;
+    height: 20px;
 }
 
-.hp-root .task-del {
-    width: 24px !important;
-    height: 24px !important;
+#genkan-root .task-del {
+    width: 24px;
+    height: 24px;
 }
 
-.hp-root .icon-btn {
-    width: 36px !important;
-    height: 36px !important;
+#genkan-root .icon-btn {
+    width: 36px;
+    height: 36px;
 }
 
-.hp-root .icon-btn.sm,
-.hp-root .cal-btn {
-    width: 28px !important;
-    height: 28px !important;
+#genkan-root .icon-btn.sm,
+#genkan-root .cal-btn {
+    width: 28px;
+    height: 28px;
 }
 
-.hp-root .fav-x {
-    width: 18px !important;
-    height: 18px !important;
+#genkan-root .fav-x {
+    width: 18px;
+    height: 18px;
 }
 
 .hp-root .task-check svg,
@@ -1680,29 +1681,29 @@
 }
 
 /* Text buttons: reset height/min-size, keep their own padding */
-.hp-root .tab,
-.hp-root .today-btn,
-.hp-root .clear-btn,
-.hp-root .fav-add {
-    height: auto !important;
-    min-height: 0 !important;
-    min-width: 0 !important;
+#genkan-root .tab,
+#genkan-root .today-btn,
+#genkan-root .clear-btn,
+#genkan-root .fav-add {
+    height: auto;
+    min-height: 0;
+    min-width: 0;
 }
 
-.hp-root .tab {
-    padding: 4px 12px !important;
+#genkan-root .tab {
+    padding: 4px 12px;
 }
 
-.hp-root .today-btn {
-    padding: 6px !important;
+#genkan-root .today-btn {
+    padding: 6px;
 }
 
-.hp-root .clear-btn {
-    padding: 4px 0 !important;
+#genkan-root .clear-btn {
+    padding: 4px 0;
 }
 
-.hp-root .fav-add {
-    padding: 6px 12px !important;
+#genkan-root .fav-add {
+    padding: 6px 12px;
 }
 
 /* ★ favourite button in note headers */
@@ -1721,10 +1722,10 @@
    controls for touch.
    ============================================================ */
 @container hp (max-width: 768px) {
-    .hp-root #cal-grid {
-        width: min(100%, 380px) !important;
-        max-width: none !important;
-        margin: 4px auto 0 !important;
+    #genkan-root #cal-grid {
+        width: min(100%, 380px);
+        max-width: none;
+        margin: 4px auto 0;
         gap: 4px;
     }
 
@@ -1747,14 +1748,14 @@
         bottom: 9%;
     }
 
-    .hp-root #calendar-card .cal-btn {
-        width: 36px !important;
-        height: 36px !important;
+    #genkan-root #calendar-card .cal-btn {
+        width: 36px;
+        height: 36px;
         font-size: 20px;
     }
 
-    .hp-root #calendar-card .today-btn {
-        padding: 10px !important;
+    #genkan-root #calendar-card .today-btn {
+        padding: 10px;
         font-size: 13px;
     }
 }
@@ -1769,8 +1770,9 @@
 }
 
 /* Settings tab (outside the dashboard, so not scoped under .hp-root) */
-.genkan-hidden {
-    display: none !important;
+/* Beats Obsidian's .setting-item { display: flex } */
+.setting-item.genkan-hidden {
+    display: none;
 }
 
 .genkan-wide-input {
@@ -1803,11 +1805,11 @@
 }
 
 .hp-root[data-clock-font="monospace"] .clock-wrap {
-    font-family: var(--font-monospace, ui-monospace, Menlo, Consolas, monospace);
+    font-family: var(--font-monospace, Menlo, Consolas, "Courier New", monospace);
 }
 
 .hp-root[data-clock-font="serif"] .clock-wrap {
-    font-family: ui-serif, Georgia, "Times New Roman", serif;
+    font-family: Georgia, "Times New Roman", serif;
 }
 
 /* An unset variable makes this declaration invalid, so the clock keeps the default font */

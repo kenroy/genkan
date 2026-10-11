@@ -926,7 +926,8 @@ class HomepageView extends ItemView {
 
   async onOpen() {
     this.contentEl.addClass("hp-view");
-    this.root = this.contentEl.createDiv({ cls: "hp-root" });
+    // The id lets our control resets win over Obsidian's button/input styles without !important
+    this.root = this.contentEl.createDiv({ cls: "hp-root", attr: { id: "genkan-root" } });
     this.root.append(...buildDashboard());
     if (Platform.isMobile) this.$("search-kbd").classList.add("hidden");
 

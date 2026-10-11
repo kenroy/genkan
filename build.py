@@ -37,6 +37,7 @@ def split_top(s):
 
 def scope_selector(sel):
     sel = sel.strip()
+    if sel.startswith("#genkan-root"): return sel  # already scoped (higher specificity on purpose)
     if sel in (":root", "body", "html"): return ".hp-root"
     if sel.startswith("[data-theme"): return ".hp-root" + sel
     if sel.startswith(":root"): return ".hp-root" + sel[5:]

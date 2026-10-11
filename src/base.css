@@ -37,7 +37,8 @@
         --accent-lo: rgba(124, 58, 237, 0.1);
         --text: #0d0d1a;
         --text-2: #5a5a7a;
-        --text-3: #9090b0;
+        --text-3: #666688;
+        --accent-txt: #6d28d9;
     }
 }
 
@@ -63,7 +64,8 @@
     --accent-lo: rgba(124, 58, 237, 0.1);
     --text: #0d0d1a;
     --text-2: #5a5a7a;
-    --text-3: #9090b0;
+    --text-3: #666688;
+    --accent-txt: #6d28d9;
 }
 
 /* ------------------------------------------------------------
@@ -77,8 +79,8 @@
     padding: 0;
 }
 
-.hidden {
-    display: none !important;
+#genkan-root .hidden {
+    display: none;
 }
 
 body {
@@ -1345,8 +1347,8 @@ body {
     background: linear-gradient(
         to bottom,
         rgba(0, 0, 0, 0.04) 0%,
-        rgba(0, 0, 0, 0.12) 50%,
-        rgba(0, 0, 0, 0.52) 100%
+        rgba(0, 0, 0, 0.2) 50%,
+        rgba(0, 0, 0, 0.62) 100%
     );
     pointer-events: none;
 }
@@ -1365,7 +1367,7 @@ body {
 
 .hero-credit {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.7);
+    color: #fff;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
     white-space: nowrap;
     overflow: hidden;
@@ -1373,7 +1375,7 @@ body {
 }
 
 .hero-credit a {
-    color: rgba(255, 255, 255, 0.9);
+    color: #fff;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.15s;
@@ -1386,7 +1388,7 @@ body {
 
 /* Override .icon-btn styles inside the hero so it always reads on the photo */
 .hero .icon-btn {
-    color: rgba(255, 255, 255, 0.75);
+    color: #fff;
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
