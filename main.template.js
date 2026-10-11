@@ -767,8 +767,10 @@ class HomepageView extends ItemView {
     this.timers[key] = setTimeout(fn, ms);
   }
 
-  async onOpen() {
-    this.contentEl.addClass("hp-view");
+  // Builds the dashboard DOM and wires its elements. Called again when the language changes,
+  // so nothing here may register listeners outside this.root.
+  buildUi() {
+    this.root?.remove();
     // The id lets our control resets win over Obsidian's button/input styles without !important
     this.root = this.contentEl.createDiv({ cls: "hp-root", attr: { id: "genkan-root" } });
     this.root.append(...buildDashboard());
@@ -795,6 +797,32 @@ class HomepageView extends ItemView {
     this.initNote();
     this.initLinks();
     this.initSearch();
+  }
+
+  // Labels are built once, so a language change rebuilds the dashboard in place
+  rebuild() {
+    this.greetKey = null;
+    this.buildUi();
+    this.applyClockFont();
+    this.refreshAll(false);
+  }
+
+  async onOpen() {
+    this.contentEl.addClass("hp-view");
+    this.buildUi();
+
+    // "/" focuses search while this view is the active tab, unless you are typing somewhere
+    this.registerDomEvent(document, "keydown", (e) => {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey || e.isComposing) return;
+      if (this.app.workspace.getActiveViewOfType(HomepageView) !== this) return;
+      const t = e.target;
+      if (t instanceof HTMLElement) {
+        if (t.closest("input, textarea, select, [contenteditable='true']")) return;
+        if (t.closest(".modal-container, .menu, .suggestion-container")) return;
+      }
+      e.preventDefault();
+      this.$("search-input")?.focus();
+    });
 
     // Live updates: Obsidian Sync writes land here as vault events
     const v = this.app.vault;
@@ -1680,18 +1708,6 @@ class HomepageView extends ItemView {
       if (!e.target.closest(".search-container")) this.closeSearch();
       else if (e.target.closest(".search-result-item")) this.closeSearch();
     });
-    // "/" focuses search while this view is the active tab, unless you are typing somewhere
-    this.registerDomEvent(document, "keydown", (e) => {
-      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey || e.isComposing) return;
-      if (this.app.workspace.getActiveViewOfType(HomepageView) !== this) return;
-      const t = e.target;
-      if (t instanceof HTMLElement) {
-        if (t.closest("input, textarea, select, [contenteditable='true']")) return;
-        if (t.closest(".modal-container, .menu, .suggestion-container")) return;
-      }
-      e.preventDefault();
-      input.focus();
-    });
   }
 
   closeSearch() {
@@ -2006,8 +2022,12 @@ class HomepageSettingTab extends PluginSettingTab {
             s.language = v;
             applyLanguage(v);
             await this.plugin.saveSettings();
-            await this.plugin.rebuildViews();
             this.display();
+            try {
+              this.plugin.rebuildViews();
+            } catch (err) {
+              console.error("Genkan: could not rebuild the dashboard", err);
+            }
           }),
       );
 
@@ -2384,12 +2404,9 @@ module.exports = class HomepagePlugin extends Plugin {
     workspace.revealLeaf(leaf);
   }
 
-  // Labels are built once per view, so a language change reopens the dashboard
-  async rebuildViews() {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE);
-    if (!leaves.length) return;
-    leaves.forEach((l) => l.detach());
-    await this.activateView();
+  // Labels are built once per view, so a language change rebuilds each open dashboard
+  rebuildViews() {
+    for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE)) leaf.view.rebuild?.();
   }
 
   refreshViews() {
