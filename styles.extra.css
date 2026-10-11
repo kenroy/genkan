@@ -518,3 +518,34 @@
     color: var(--text-2);
     text-decoration: underline;
 }
+
+/* ============================================================
+   Clock font (the clock and the date under it)
+   Set with [data-clock-font] on the dashboard root; "custom" reads the
+   --clock-font-custom variable and falls back to the dashboard font.
+   ============================================================ */
+.hp-root[data-clock-font="interface"] .clock-wrap {
+    font-family: var(--font-interface, var(--font));
+}
+
+.hp-root[data-clock-font="text"] .clock-wrap {
+    font-family: var(--font-text, var(--font));
+}
+
+.hp-root[data-clock-font="monospace"] .clock-wrap {
+    font-family: var(--font-monospace, ui-monospace, Menlo, Consolas, monospace);
+}
+
+.hp-root[data-clock-font="serif"] .clock-wrap {
+    font-family: ui-serif, Georgia, "Times New Roman", serif;
+}
+
+/* An unset variable makes this declaration invalid, so the clock keeps the default font */
+.hp-root[data-clock-font="custom"] .clock-wrap {
+    font-family: var(--clock-font-custom), var(--font);
+}
+
+/* Monospace digits are wide; the default tight tracking would make them touch */
+.hp-root[data-clock-font="monospace"] #clock-main {
+    letter-spacing: -1px;
+}

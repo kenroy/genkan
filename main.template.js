@@ -43,6 +43,8 @@ const DEFAULT_SETTINGS = {
   maxRecent: 8,
   theme: "system", // system | dark | light
   clockFormat: "12h",
+  clockFont: "default", // see CLOCK_FONTS
+  clockFontCustom: "", // font name(s) typed in settings when clockFont is "custom"
   showHero: true,
   showQuote: true, // daily quote from ZenQuotes (one request a day)
   showFavicons: true, // site icons on web clips (Google's favicon service)
@@ -135,6 +137,29 @@ function setIconSvg(el, name) {
 
 // Only ever link to https URLs returned by remote services
 const safeUrl = (u) => (/^https:\/\//.test(u || "") ? u : "");
+
+// Fonts the clock can use. All come from the device (no web fonts, so no network
+// request); the CSS for each lives in styles.extra.css under [data-clock-font].
+const CLOCK_FONTS = {
+  default: "Dashboard default",
+  interface: "Obsidian interface font",
+  text: "Obsidian text font",
+  monospace: "Obsidian monospace font",
+  serif: "System serif",
+  custom: "Custom (a font installed on this device)",
+};
+
+// Turn what someone typed ("Courier New, Avenir Next") into a safe CSS font-family
+// list. Only plain font names are kept; anything with other characters is dropped.
+function cssFontFamily(input) {
+  const generic = new Set(["serif", "sans-serif", "monospace", "cursive", "fantasy", "system-ui", "ui-serif", "ui-sans-serif", "ui-monospace", "ui-rounded"]);
+  return String(input ?? "")
+    .split(",")
+    .map((n) => n.trim().replace(/^["']+|["']+$/g, "").trim())
+    .filter((n) => /^[\p{L}\p{N} .&+-]{1,60}$/u.test(n))
+    .map((n) => (generic.has(n.toLowerCase()) ? n.toLowerCase() : `"${n}"`))
+    .join(", ");
+}
 
 function formatClipDate(str) {
   if (!str) return "";
@@ -692,7 +717,16 @@ class HomepageView extends ItemView {
   }
 
   // Re-render everything (also called after settings change)
+  applyClockFont() {
+    const mode = Object.keys(CLOCK_FONTS).includes(this.settings.clockFont) ? this.settings.clockFont : "default";
+    this.root.setAttribute("data-clock-font", mode);
+    const family = mode === "custom" ? cssFontFamily(this.settings.clockFontCustom) : "";
+    if (family) this.root.style.setProperty("--clock-font-custom", family);
+    else this.root.style.removeProperty("--clock-font-custom");
+  }
+
   refreshAll(force) {
+    this.applyClockFont();
     this.tickClock(true);
     this.applyTheme();
     this.renderCalendar();
@@ -1788,6 +1822,29 @@ class HomepageSettingTab extends PluginSettingTab {
           .setValue(s.clockFormat)
           .onChange((v) => save("clockFormat", v)),
       );
+
+    const customFont = text(
+      "Custom clock font",
+      "The name of a font installed on this device, such as Courier New or Avenir Next. A device without it uses the dashboard font.",
+      "clockFontCustom",
+      { placeholder: "Font name" },
+    );
+    const showCustomFont = () => customFont.settingEl.toggleClass("genkan-hidden", s.clockFont !== "custom");
+    const fontSetting = new Setting(containerEl)
+      .setName("Clock font")
+      .setDesc("Uses fonts already on your device. Your Obsidian theme's fonts are available too.")
+      .addDropdown((d) =>
+        d
+          .addOptions(CLOCK_FONTS)
+          .setValue(Object.keys(CLOCK_FONTS).includes(s.clockFont) ? s.clockFont : "default")
+          .onChange(async (v) => {
+            s.clockFont = v;
+            await save("clockFont", v);
+            showCustomFont();
+          }),
+      );
+    containerEl.insertBefore(fontSetting.settingEl, customFont.settingEl); // picker above its custom field
+    showCustomFont();
 
     new Setting(containerEl)
       .setName("Folders")

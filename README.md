@@ -88,7 +88,7 @@ Notes:
 
 ## Settings
 
-Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format, Web Clipper, daily notes and data folders, how many clips and recent notes to show, the Pebble ring options, photo of the day and Unsplash key, daily quote, site icons, and quick links.
+Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, the Pebble ring options, photo of the day and Unsplash key, daily quote, site icons, and quick links.
 
 ## Development
 
