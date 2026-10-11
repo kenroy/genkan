@@ -24,6 +24,7 @@ const RING_MAIN_NOTE = "Pebble Index.md"; // the ring app's "one main note" targ
 
 // Icons for the dashboard (fixed SVG source, parsed once at runtime).
 const ICONS = {
+  clear: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
   moon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`,
   sun: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
   settings: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`,
@@ -709,6 +710,7 @@ function buildDashboard() {
         { cls: "search-wrap", id: "search-form", role: "search", autocomplete: "off" },
         iconNode("search"),
         h("input", { type: "search", id: "search-input", placeholder: "Search your vault…", spellcheck: "false", "aria-label": "Search your vault" }),
+        h("button", { type: "button", cls: "search-clear hidden", id: "search-clear", title: "Clear search", "aria-label": "Clear search" }, iconNode("clear")),
         h("kbd", { cls: "search-kbd", id: "search-kbd", text: "/" }),
       ),
       h("div", { cls: "search-results hidden", id: "search-results", role: "listbox", "aria-label": "Search results" }),
@@ -1769,10 +1771,27 @@ class HomepageView extends ItemView {
     input.addEventListener("blur", () => {
       if (!input.value) form.removeClass("kbd-hidden");
     });
+    const clear = this.$("search-clear");
+    const syncClear = () => clear.classList.toggle("hidden", !input.value);
+    // Bring the dropdown back when you return to a box that still has a query
+    const reopen = () => {
+      const q = input.value.trim();
+      if (q && results.classList.contains("hidden")) this.runSearch(q);
+    };
+    input.addEventListener("focus", reopen);
+    input.addEventListener("click", reopen);
     input.addEventListener("input", () => {
+      syncClear();
       const q = input.value.trim();
       if (!q) return this.closeSearch();
       this.later("search", 300, () => this.runSearch(q));
+    });
+    clear.addEventListener("click", () => {
+      input.value = "";
+      syncClear();
+      form.removeClass("kbd-hidden");
+      this.closeSearch();
+      input.focus();
     });
     form.addEventListener("submit", (e) => {
       e.preventDefault();

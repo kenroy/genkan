@@ -1838,3 +1838,37 @@
   background: var(--accent-lo);
   outline-offset: -2px;
 }
+
+/* Clear button inside the search box (shown only when there is text) */
+#genkan-root .search-clear {
+  appearance: none;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  box-sizing: border-box;
+  color: var(--text-2);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+}
+
+#genkan-root .search-clear:not(.hidden) {
+  display: flex;
+}
+
+#genkan-root .search-clear:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+#genkan-root #search-input::-webkit-search-cancel-button {
+  appearance: none;
+  display: none;
+}

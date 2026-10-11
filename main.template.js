@@ -440,6 +440,7 @@ function buildDashboard() {
         { cls: "search-wrap", id: "search-form", role: "search", autocomplete: "off" },
         iconNode("search"),
         h("input", { type: "search", id: "search-input", placeholder: "Search your vault…", spellcheck: "false", "aria-label": "Search your vault" }),
+        h("button", { type: "button", cls: "search-clear hidden", id: "search-clear", title: "Clear search", "aria-label": "Clear search" }, iconNode("clear")),
         h("kbd", { cls: "search-kbd", id: "search-kbd", text: "/" }),
       ),
       h("div", { cls: "search-results hidden", id: "search-results", role: "listbox", "aria-label": "Search results" }),
@@ -1500,10 +1501,27 @@ class HomepageView extends ItemView {
     input.addEventListener("blur", () => {
       if (!input.value) form.removeClass("kbd-hidden");
     });
+    const clear = this.$("search-clear");
+    const syncClear = () => clear.classList.toggle("hidden", !input.value);
+    // Bring the dropdown back when you return to a box that still has a query
+    const reopen = () => {
+      const q = input.value.trim();
+      if (q && results.classList.contains("hidden")) this.runSearch(q);
+    };
+    input.addEventListener("focus", reopen);
+    input.addEventListener("click", reopen);
     input.addEventListener("input", () => {
+      syncClear();
       const q = input.value.trim();
       if (!q) return this.closeSearch();
       this.later("search", 300, () => this.runSearch(q));
+    });
+    clear.addEventListener("click", () => {
+      input.value = "";
+      syncClear();
+      form.removeClass("kbd-hidden");
+      this.closeSearch();
+      input.focus();
     });
     form.addEventListener("submit", (e) => {
       e.preventDefault();
