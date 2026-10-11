@@ -1723,19 +1723,14 @@ class HomepageView extends ItemView {
 
   // ── Hero photo & quote ──
 
+  // Today's photo and quote are cached in the plugin's data file, not browser storage
   cacheGet(key) {
-    try {
-      return JSON.parse(window.localStorage.getItem(`hp-${this.app.vault.getName()}-${key}`));
-    } catch {
-      return null;
-    }
+    return this.plugin.settings.cache?.[key] ?? null;
   }
   cacheSet(key, value) {
-    try {
-      window.localStorage.setItem(`hp-${this.app.vault.getName()}-${key}`, JSON.stringify(value));
-    } catch {
-      /* storage unavailable */
-    }
+    const s = this.plugin.settings;
+    s.cache = { ...(s.cache ?? {}), [key]: value };
+    this.plugin.saveSettings().catch(() => {});
   }
 
   async loadHero(forceNew) {

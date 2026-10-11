@@ -84,6 +84,8 @@ Notes:
 
 - The Unsplash key is optional. It is stored in this plugin's settings file (`.obsidian/plugins/genkan/data.json`) in your vault. If you use Obsidian Sync with plugin settings, the key syncs with it, so keep your vault private.
 - Quotes are credited to ZenQuotes in the interface, as their free API requires: "Inspirational quotes provided by ZenQuotes API". Built-in quotes are used when the request is off or fails.
+- To search, list recent notes, offer the favourites picker and match daily notes, Genkan reads the list of note names and paths in your vault through Obsidian's API. It reads a note's contents only for search snippets, ring notes and web clips, and none of it leaves your device.
+- Today's photo and quote are cached in the plugin's own settings file, not in browser storage.
 - Links you click (photographer credits, the ZenQuotes link, any `https://` quick link) open in your browser.
 
 ## Settings
@@ -103,7 +105,7 @@ python3 build.py
 - `src/base.css` and `styles.extra.css`: the styles. `build.py` scopes `src/base.css` under `.hp-root`, adds `styles.extra.css`, and writes `styles.css`
 - `main.js` and `styles.css` are generated; edit the sources above instead
 
-To release, set `version` in `manifest.json` (and add it to `versions.json`), run the build, then create a GitHub release whose tag matches the version exactly, with `main.js`, `manifest.json` and `styles.css` attached.
+To release, set `version` in `manifest.json` (and add it to `versions.json`), run the build, commit and push, then push a tag that matches the version exactly (for example `git tag 0.1.5 && git push origin 0.1.5`, with no "v"). The `Release` workflow in `.github/workflows/` rebuilds `main.js` and `styles.css`, checks they match what is committed, attests their provenance, and publishes the release with `main.js`, `manifest.json` and `styles.css` attached. To verify a downloaded file: `gh attestation verify main.js --repo kenroy/genkan`.
 
 ## Credits and licence
 
