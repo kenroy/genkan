@@ -1089,7 +1089,7 @@ class HomepageView extends ItemView {
           : this.taskFilter === "active"
             ? "Nothing left to do!"
             : "No tasks yet — add one above.";
-      list.innerHTML = `<div class="empty-state">${msg}</div>`;
+      list.innerHTML = `<div class="hp-empty">${msg}</div>`;
       return;
     }
 
@@ -1170,7 +1170,7 @@ class HomepageView extends ItemView {
     const nav = this.$("quick-links");
     const links = this.settings.quickLinks ?? [];
     if (!links.length) {
-      nav.innerHTML = '<span class="empty-state">No quick links configured.</span>';
+      nav.innerHTML = '<span class="hp-empty">No quick links configured.</span>';
       return;
     }
     nav.innerHTML = links
@@ -1277,13 +1277,13 @@ class HomepageView extends ItemView {
     const f = this.app.vault.getAbstractFileByPath(path);
     if (!(f instanceof TFile)) {
       this.$("ring-count").textContent = "0";
-      body.innerHTML = `<div class="empty-state">No ring notes yet. Looking for “${esc(path)}”.</div>`;
+      body.innerHTML = `<div class="hp-empty">No ring notes yet. Looking for “${esc(path)}”.</div>`;
       return;
     }
     const entries = parseRingNotes(await this.app.vault.read(f));
     this.$("ring-count").textContent = entries.length;
     if (!entries.length) {
-      body.innerHTML = `<div class="empty-state">No timestamped entries found in “${esc(path)}”.</div>`;
+      body.innerHTML = `<div class="hp-empty">No timestamped entries found in “${esc(path)}”.</div>`;
       return;
     }
     body.innerHTML = `<div class="ring-list">${entries
@@ -1324,7 +1324,7 @@ class HomepageView extends ItemView {
       `<button class="fav-add" id="fav-add" title="Add a favourite">+ Add</button>` +
       (favs.length
         ? ""
-        : `<span class="empty-state fav-hint">Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”.</span>`);
+        : `<span class="hp-empty fav-hint">Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”.</span>`);
     // Keyboard: Enter/Space activate a chip
     list.querySelectorAll(".fav-chip").forEach((chip) =>
       chip.addEventListener("keydown", (e) => {
@@ -1368,7 +1368,7 @@ class HomepageView extends ItemView {
 
     this.$("clips-count").textContent = clips.length;
     if (!clips.length) {
-      body.innerHTML = `<div class="empty-state">No clips found in “${esc(folder || "(no folder set)")}”.</div>`;
+      body.innerHTML = `<div class="hp-empty">No clips found in “${esc(folder || "(no folder set)")}”.</div>`;
       return;
     }
     body.innerHTML = `<div class="clips-grid">${clips
@@ -1395,7 +1395,7 @@ class HomepageView extends ItemView {
 
     this.$("recent-count").textContent = notes.length;
     if (!notes.length) {
-      body.innerHTML = '<div class="empty-state">No notes found.</div>';
+      body.innerHTML = '<div class="hp-empty">No notes found.</div>';
       return;
     }
     body.innerHTML = `<div class="notes-list">${notes

@@ -835,14 +835,14 @@
 .hp-root .autosave-dot.unsaved {
     background: var(--warning);
 }
-.hp-root .empty-state {
+.hp-root .hp-empty {
     padding: 24px 0;
     text-align: center;
     color: var(--text-3);
     font-size: 13px;
     transition: color 0.3s;
 }
-.hp-root .empty-state .hint {
+.hp-root .hp-empty .hint {
     font-size: 12px;
     margin-top: 4px;
 }
