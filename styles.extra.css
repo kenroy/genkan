@@ -443,3 +443,48 @@
 .view-action.hp-fav-star.is-active svg {
     fill: currentColor;
 }
+
+/* ============================================================
+   Calendar on phones / narrow panes
+   Explicit width (not auto + auto margins) so the grid can't shrink-wrap on
+   WebViews that size block-level grids by their content; larger cells and
+   controls for touch.
+   ============================================================ */
+@container hp (max-width: 768px) {
+    .hp-root #cal-grid {
+        width: min(100%, 380px) !important;
+        max-width: none !important;
+        margin: 4px auto 0 !important;
+        gap: 4px;
+    }
+
+    .hp-root #cal-grid .cal-day {
+        font-size: 15px;
+    }
+
+    .hp-root #cal-grid .cal-dow {
+        font-size: 11px;
+    }
+
+    .hp-root #cal-grid .cal-day.today {
+        font-weight: 700;
+    }
+
+    .hp-root #cal-grid .cal-day.has-note::after {
+        width: 5px;
+        height: 5px;
+        margin-left: -2.5px;
+        bottom: 9%;
+    }
+
+    .hp-root #calendar-card .cal-btn {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 20px;
+    }
+
+    .hp-root #calendar-card .today-btn {
+        padding: 10px !important;
+        font-size: 13px;
+    }
+}
