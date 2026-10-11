@@ -1,7 +1,7 @@
 {
   "id": "genkan",
   "name": "Genkan",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "minAppVersion": "1.4.0",
   "description": "Show a dashboard homepage with a clock, calendar, favourites, tasks, quick note, web clips and recent notes, plus optional Pebble ring voice notes. Works on desktop and mobile.",
   "author": "Kenroy Harrison",
