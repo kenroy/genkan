@@ -327,14 +327,6 @@ const HERO_TOPICS = "nature,landscape,mountains,forest,ocean,wilderness";
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
-function esc(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
 function newId() {
   return `t${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
 }
@@ -372,6 +364,42 @@ function fmString(v) {
   if (v == null) return "";
   return String(v);
 }
+
+// ─── DOM helpers ──────────────────────────────────────────────────────────────
+// Everything on the dashboard is built with DOM calls, never HTML strings, so note
+// titles, task text and other vault content can't be interpreted as markup.
+
+// h("div", { cls: "card", id: "x" }, child, "text", ...) -> element
+function h(tag, props = {}, ...children) {
+  const { cls, text, ...attr } = props;
+  const classes = typeof cls === "string" ? cls.split(/\s+/).filter(Boolean) : cls;
+  const el = createEl(tag, { cls: classes, text, attr });
+  for (const c of children.flat()) if (c != null && c !== false) el.append(c);
+  return el;
+}
+
+const SEARCH_ICON =
+  '<svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+
+// Icons are fixed SVG source defined in this file; parse once, clone per use
+const iconCache = {};
+function iconNode(name) {
+  if (!iconCache[name]) {
+    const src = name === "search" ? SEARCH_ICON : ICONS[name];
+    // Parsed as HTML so <svg> gets its SVG namespace without needing an xmlns attribute
+    iconCache[name] = new DOMParser().parseFromString(src, "text/html").body.firstElementChild;
+  }
+  return iconCache[name].cloneNode(true);
+}
+
+// Put an icon (or nothing, if name is falsy) inside an element
+function setIconSvg(el, name) {
+  el.empty();
+  if (name) el.append(iconNode(name));
+}
+
+// Only ever link to https URLs returned by remote services
+const safeUrl = (u) => (/^https:\/\//.test(u || "") ? u : "");
 
 function formatClipDate(str) {
   if (!str) return "";
@@ -514,12 +542,12 @@ const RING_NAME_RES = [
   /(\d{4})(\d{2})(\d{2})[ T_-](\d{2})(\d{2})(\d{2})?/,
 ];
 
-function ringDate(y, mo, d, h, mi, sec) {
+function ringDate(y, mo, d, hr, mi, sec) {
   if (mo < 1 || mo > 12 || d < 1 || d > 31 || y < 2000 || y > 2100) return null;
-  const hasTime = h !== undefined && h <= 23 && mi <= 59;
+  const hasTime = hr !== undefined && hr <= 23 && mi <= 59;
   return {
     hasTime,
-    when: new Date(y, mo - 1, d, hasTime ? h : 0, hasTime ? mi : 0, hasTime && sec ? sec : 0),
+    when: new Date(y, mo - 1, d, hasTime ? hr : 0, hasTime ? mi : 0, hasTime && sec ? sec : 0),
   };
 }
 
@@ -608,134 +636,192 @@ class FavouritePicker extends FuzzySuggestModal {
   }
 }
 
-const TEMPLATE = `
-<div class="bg-glow"></div>
-<div id="app">
-  <header class="header">
-    <div class="header-top">
-      <p class="greeting" id="greeting">Hello</p>
-      <div class="header-controls">
-        <button class="icon-btn" id="page-refresh" title="Refresh" aria-label="Refresh"></button>
-        <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme"></button>
-        <button class="icon-btn" id="settings-btn" title="Settings" aria-label="Open settings"></button>
-      </div>
-    </div>
-    <div class="clock-wrap">
-      <div class="clock" id="clock">
-        <span id="clock-main">12:00</span><span id="clock-sec">:00</span>
-        <span id="clock-ampm">AM</span>
-      </div>
-      <div class="clock-date" id="clock-date"></div>
-    </div>
-    <div class="search-container">
-      <form class="search-wrap" id="search-form" role="search" autocomplete="off">
-        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="search" id="search-input" placeholder="Search your vault…" spellcheck="false" aria-label="Search your vault" />
-        <kbd class="search-kbd" id="search-kbd">/</kbd>
-      </form>
-      <div id="search-results" class="search-results hidden" role="listbox" aria-label="Search results"></div>
-    </div>
-  </header>
+// The dashboard markup (ids are how the rest of the code finds things)
+function buildDashboard() {
+  const refreshBtn = (id, title, aria) => h("button", { cls: "icon-btn sm", id, title, "aria-label": aria });
+  const countRow = (countId, ...extra) =>
+    h("div", { cls: "card-header-right" }, h("span", { cls: "badge", id: countId, text: "0" }), ...extra);
 
-  <div id="hero" class="hero" role="img" aria-label="Photo of the day">
-    <img id="hero-img" class="hero-img" alt="Photo of the day" />
-    <div class="hero-overlay" aria-hidden="true"></div>
-    <div class="hero-footer">
-      <span id="hero-credit" class="hero-credit"></span>
-      <button class="icon-btn" id="hero-refresh" title="Load a new photo" aria-label="Load new photo"></button>
-    </div>
-  </div>
+  const header = h(
+    "header",
+    { cls: "header" },
+    h(
+      "div",
+      { cls: "header-top" },
+      h("p", { cls: "greeting", id: "greeting", text: "Hello" }),
+      h(
+        "div",
+        { cls: "header-controls" },
+        h("button", { cls: "icon-btn", id: "page-refresh", title: "Refresh", "aria-label": "Refresh" }),
+        h("button", { cls: "icon-btn", id: "theme-toggle", title: "Toggle theme", "aria-label": "Toggle theme" }),
+        h("button", { cls: "icon-btn", id: "settings-btn", title: "Settings", "aria-label": "Open settings" }),
+      ),
+    ),
+    h(
+      "div",
+      { cls: "clock-wrap" },
+      h(
+        "div",
+        { cls: "clock", id: "clock" },
+        h("span", { id: "clock-main", text: "12:00" }),
+        h("span", { id: "clock-sec", text: ":00" }),
+        " ",
+        h("span", { id: "clock-ampm", text: "AM" }),
+      ),
+      h("div", { cls: "clock-date", id: "clock-date" }),
+    ),
+    h(
+      "div",
+      { cls: "search-container" },
+      h(
+        "form",
+        { cls: "search-wrap", id: "search-form", role: "search", autocomplete: "off" },
+        iconNode("search"),
+        h("input", { type: "search", id: "search-input", placeholder: "Search your vault…", spellcheck: "false", "aria-label": "Search your vault" }),
+        h("kbd", { cls: "search-kbd", id: "search-kbd", text: "/" }),
+      ),
+      h("div", { cls: "search-results hidden", id: "search-results", role: "listbox", "aria-label": "Search results" }),
+    ),
+  );
 
-  <div id="quote-bar" class="quote-bar">
-    <blockquote class="quote-content">
-      <p id="quote-text" class="quote-text"></p>
-      <footer id="quote-author" class="quote-author"></footer>
-    </blockquote>
-  </div>
+  const hero = h(
+    "div",
+    { cls: "hero", id: "hero", role: "img", "aria-label": "Photo of the day" },
+    h("img", { cls: "hero-img", id: "hero-img", alt: "Photo of the day" }),
+    h("div", { cls: "hero-overlay", "aria-hidden": "true" }),
+    h(
+      "div",
+      { cls: "hero-footer" },
+      h("span", { cls: "hero-credit", id: "hero-credit" }),
+      h("button", { cls: "icon-btn", id: "hero-refresh", title: "Load a new photo", "aria-label": "Load new photo" }),
+    ),
+  );
 
-  <div class="card favs-card" id="favs-card">
-    <div class="card-header"><span class="card-label">Favourites</span></div>
-    <div id="favs-list" class="favs-list"></div>
-  </div>
+  const quote = h(
+    "div",
+    { cls: "quote-bar", id: "quote-bar" },
+    h(
+      "blockquote",
+      { cls: "quote-content" },
+      h("p", { cls: "quote-text", id: "quote-text" }),
+      h("footer", { cls: "quote-author", id: "quote-author" }),
+    ),
+  );
 
-  <div class="grid">
-    <aside class="col col-left">
-      <div class="card" id="calendar-card">
-        <div class="card-header">
-          <span class="card-label">Calendar</span>
-          <div class="cal-nav">
-            <button class="cal-btn" id="cal-prev" title="Previous month" aria-label="Previous month">&#8249;</button>
-            <span id="cal-month-label"></span>
-            <button class="cal-btn" id="cal-next" title="Next month" aria-label="Next month">&#8250;</button>
-          </div>
-        </div>
-        <div class="cal-grid" id="cal-grid" role="grid" aria-label="Calendar"></div>
-        <button class="today-btn" id="cal-today">Today</button>
-      </div>
-      <div class="card" id="links-card">
-        <div class="card-header"><span class="card-label">Quick Links</span></div>
-        <nav id="quick-links" aria-label="Quick links"></nav>
-      </div>
-    </aside>
+  const favs = h(
+    "div",
+    { cls: "card favs-card", id: "favs-card" },
+    h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: "Favourites" })),
+    h("div", { cls: "favs-list", id: "favs-list" }),
+  );
 
-    <main class="col col-center">
-      <div class="card hidden" id="ring-card">
-        <div class="card-header">
-          <span class="card-label">Ring Notes</span>
-          <div class="card-header-right">
-            <span class="badge" id="ring-count">0</span>
-            <a href="#" class="card-link" id="ring-open" title="Open the notes file">Open</a>
-          </div>
-        </div>
-        <div id="ring-body"></div>
-      </div>
-      <div class="card" id="clips-card">
-        <div class="card-header">
-          <span class="card-label">Web Clips</span>
-          <div class="card-header-right">
-            <span class="badge" id="clips-count">0</span>
-            <button class="icon-btn sm" id="refresh-clips" title="Refresh clips" aria-label="Refresh web clips"></button>
-          </div>
-        </div>
-        <div id="clips-body"></div>
-      </div>
-      <div class="card" id="recent-card">
-        <div class="card-header">
-          <span class="card-label">Recent Notes</span>
-          <div class="card-header-right">
-            <span class="badge" id="recent-count">0</span>
-            <button class="icon-btn sm" id="refresh-recent" title="Refresh recent notes" aria-label="Refresh recent notes"></button>
-          </div>
-        </div>
-        <div id="recent-body"></div>
-      </div>
-    </main>
+  const left = h(
+    "aside",
+    { cls: "col col-left" },
+    h(
+      "div",
+      { cls: "card", id: "calendar-card" },
+      h(
+        "div",
+        { cls: "card-header" },
+        h("span", { cls: "card-label", text: "Calendar" }),
+        h(
+          "div",
+          { cls: "cal-nav" },
+          h("button", { cls: "cal-btn", id: "cal-prev", title: "Previous month", "aria-label": "Previous month", text: "‹" }),
+          h("span", { id: "cal-month-label" }),
+          h("button", { cls: "cal-btn", id: "cal-next", title: "Next month", "aria-label": "Next month", text: "›" }),
+        ),
+      ),
+      h("div", { cls: "cal-grid", id: "cal-grid", role: "grid", "aria-label": "Calendar" }),
+      h("button", { cls: "today-btn", id: "cal-today", text: "Today" }),
+    ),
+    h(
+      "div",
+      { cls: "card", id: "links-card" },
+      h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: "Quick links" })),
+      h("nav", { id: "quick-links", "aria-label": "Quick links" }),
+    ),
+  );
 
-    <aside class="col col-right">
-      <div class="card" id="tasks-card">
-        <div class="card-header">
-          <span class="card-label">Tasks</span>
-          <span class="tasks-stats" id="tasks-stats" aria-live="polite">0 / 0</span>
-        </div>
-        <input type="text" class="task-input" id="task-input" placeholder="Add a task and press Enter…" aria-label="New task" />
-        <div class="tab-row" role="tablist" aria-label="Filter tasks">
-          <button class="tab active" data-filter="all" role="tab" aria-selected="true">All</button>
-          <button class="tab" data-filter="active" role="tab" aria-selected="false">Active</button>
-          <button class="tab" data-filter="done" role="tab" aria-selected="false">Done</button>
-        </div>
-        <div id="tasks-list" role="list"></div>
-        <button class="clear-btn" id="clear-done">Clear completed</button>
-      </div>
-      <div class="card" id="note-card">
-        <div class="card-header">
-          <span class="card-label">Quick Note</span>
-          <span class="autosave-dot" id="autosave-dot" title="Saved" aria-label="Saved"></span>
-        </div>
-        <textarea id="quick-note" placeholder="Jot something down…" spellcheck="true" aria-label="Quick note"></textarea>
-      </div>
-    </aside>
-  </div>
-</div>`;
+  const center = h(
+    "main",
+    { cls: "col col-center" },
+    h(
+      "div",
+      { cls: "card hidden", id: "ring-card" },
+      h(
+        "div",
+        { cls: "card-header" },
+        h("span", { cls: "card-label", text: "Ring notes" }),
+        countRow("ring-count", h("a", { cls: "card-link", id: "ring-open", href: "#", title: "Open the notes file", text: "Open" })),
+      ),
+      h("div", { id: "ring-body" }),
+    ),
+    h(
+      "div",
+      { cls: "card", id: "clips-card" },
+      h(
+        "div",
+        { cls: "card-header" },
+        h("span", { cls: "card-label", text: "Web clips" }),
+        countRow("clips-count", refreshBtn("refresh-clips", "Refresh clips", "Refresh web clips")),
+      ),
+      h("div", { id: "clips-body" }),
+    ),
+    h(
+      "div",
+      { cls: "card", id: "recent-card" },
+      h(
+        "div",
+        { cls: "card-header" },
+        h("span", { cls: "card-label", text: "Recent notes" }),
+        countRow("recent-count", refreshBtn("refresh-recent", "Refresh recent notes", "Refresh recent notes")),
+      ),
+      h("div", { id: "recent-body" }),
+    ),
+  );
+
+  const tab = (filter, label, active) =>
+    h("button", { cls: active ? "tab active" : "tab", "data-filter": filter, role: "tab", "aria-selected": active ? "true" : "false", text: label });
+  const right = h(
+    "aside",
+    { cls: "col col-right" },
+    h(
+      "div",
+      { cls: "card", id: "tasks-card" },
+      h(
+        "div",
+        { cls: "card-header" },
+        h("span", { cls: "card-label", text: "Tasks" }),
+        h("span", { cls: "tasks-stats", id: "tasks-stats", "aria-live": "polite", text: "0 / 0" }),
+      ),
+      h("input", { type: "text", cls: "task-input", id: "task-input", placeholder: "Add a task and press Enter…", "aria-label": "New task" }),
+      h(
+        "div",
+        { cls: "tab-row", role: "tablist", "aria-label": "Filter tasks" },
+        tab("all", "All", true),
+        tab("active", "Active", false),
+        tab("done", "Done", false),
+      ),
+      h("div", { id: "tasks-list", role: "list" }),
+      h("button", { cls: "clear-btn", id: "clear-done", text: "Clear completed" }),
+    ),
+    h(
+      "div",
+      { cls: "card", id: "note-card" },
+      h(
+        "div",
+        { cls: "card-header" },
+        h("span", { cls: "card-label", text: "Quick note" }),
+        h("span", { cls: "autosave-dot", id: "autosave-dot", title: "Saved", "aria-label": "Saved" }),
+      ),
+      h("textarea", { id: "quick-note", placeholder: "Jot something down…", spellcheck: "true", "aria-label": "Quick note" }),
+    ),
+  );
+
+  return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, hero, quote, favs, h("div", { cls: "grid" }, left, center, right))];
+}
 
 class HomepageView extends ItemView {
   constructor(leaf, plugin) {
@@ -803,14 +889,14 @@ class HomepageView extends ItemView {
   async onOpen() {
     this.contentEl.addClass("hp-view");
     this.root = this.contentEl.createDiv({ cls: "hp-root" });
-    this.root.innerHTML = TEMPLATE;
+    this.root.append(...buildDashboard());
     if (Platform.isMobile) this.$("search-kbd").classList.add("hidden");
 
-    this.$("settings-btn").innerHTML = ICONS.settings;
-    this.$("page-refresh").innerHTML = ICONS.refresh;
-    this.$("refresh-clips").innerHTML = ICONS.refresh;
-    this.$("refresh-recent").innerHTML = ICONS.refresh;
-    this.$("hero-refresh").innerHTML = ICONS.refresh;
+    setIconSvg(this.$("settings-btn"), "settings");
+    setIconSvg(this.$("page-refresh"), "refresh");
+    setIconSvg(this.$("refresh-clips"), "refresh");
+    setIconSvg(this.$("refresh-recent"), "refresh");
+    setIconSvg(this.$("hero-refresh"), "refresh");
 
     this.$("settings-btn").addEventListener("click", () => {
       this.app.setting.open();
@@ -921,7 +1007,7 @@ class HomepageView extends ItemView {
       t === "system" ? document.body.classList.contains("theme-dark") : t === "dark";
     this.root.setAttribute("data-theme", dark ? "dark" : "light");
     const btn = this.$("theme-toggle");
-    btn.innerHTML = t === "system" ? ICONS.monitor : dark ? ICONS.moon : ICONS.sun;
+    setIconSvg(btn, t === "system" ? "monitor" : dark ? "moon" : "sun");
     const label = t === "system" ? `System (${dark ? "Dark" : "Light"})` : dark ? "Dark" : "Light";
     btn.title = `Appearance: ${label} — click to change`;
   }
@@ -939,24 +1025,30 @@ class HomepageView extends ItemView {
 
   tickClock(force) {
     const now = new Date();
-    const h = now.getHours();
+    const hour = now.getHours();
     const pad = (n) => String(n).padStart(2, "0");
 
     const phrase =
-      h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : h < 21 ? "Good evening" : "Good night";
+      hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : hour < 21 ? "Good evening" : "Good night";
     const name = this.settings.userName;
-    this.$("greeting").innerHTML = name
-      ? `${phrase}, <span class="gname">${esc(name)}</span>`
-      : phrase;
+    // Rebuild only when the words change (this runs every second)
+    const greetKey = `${phrase}|${name}`;
+    if (this.greetKey !== greetKey) {
+      this.greetKey = greetKey;
+      const greeting = this.$("greeting");
+      greeting.empty();
+      greeting.append(name ? `${phrase}, ` : phrase);
+      if (name) greeting.append(h("span", { cls: "gname", text: name }));
+    }
 
     const main = this.$("clock-main");
     const ampm = this.$("clock-ampm");
     if (this.settings.clockFormat === "12h") {
-      main.textContent = `${h % 12 || 12}:${pad(now.getMinutes())}`;
-      ampm.textContent = h < 12 ? "AM" : "PM";
+      main.textContent = `${hour % 12 || 12}:${pad(now.getMinutes())}`;
+      ampm.textContent = hour < 12 ? "AM" : "PM";
       ampm.classList.remove("hidden");
     } else {
-      main.textContent = `${pad(h)}:${pad(now.getMinutes())}`;
+      main.textContent = `${pad(hour)}:${pad(now.getMinutes())}`;
       ampm.classList.add("hidden");
     }
     this.$("clock-sec").textContent = `:${pad(now.getSeconds())}`;
@@ -1049,7 +1141,7 @@ class HomepageView extends ItemView {
     this.$("cal-month-label").textContent = `${MONTHS[month]} ${year}`;
 
     const grid = this.$("cal-grid");
-    grid.innerHTML = "";
+    grid.empty();
     ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].forEach((label) => {
       const cell = document.createElement("div");
       cell.className = "cal-dow";
@@ -1200,38 +1292,33 @@ class HomepageView extends ItemView {
           : this.taskFilter === "active"
             ? "Nothing left to do!"
             : "No tasks yet — add one above.";
-      list.innerHTML = `<div class="hp-empty">${msg}</div>`;
+      this.showEmpty(list, msg);
       return;
     }
 
-    const frag = document.createDocumentFragment();
+    list.empty();
     for (const task of filtered) {
-      const item = document.createElement("div");
-      item.className = `task-item${task.done ? " done" : ""}`;
-      item.setAttribute("role", "listitem");
-
-      const check = document.createElement("button");
-      check.className = `task-check${task.done ? " checked" : ""}`;
-      check.setAttribute("aria-label", task.done ? "Mark incomplete" : "Mark complete");
-      check.innerHTML = task.done ? ICONS.check : "";
+      const check = h("button", {
+        cls: task.done ? "task-check checked" : "task-check",
+        "aria-label": task.done ? "Mark incomplete" : "Mark complete",
+      });
+      setIconSvg(check, task.done ? "check" : null);
       check.addEventListener("click", () => this.toggleTask(task.id));
 
-      const text = document.createElement("span");
-      text.className = "task-text";
-      text.textContent = task.text;
-
-      const del = document.createElement("button");
-      del.className = "task-del";
-      del.title = "Delete";
-      del.setAttribute("aria-label", `Delete: ${task.text}`);
-      del.innerHTML = ICONS.trash;
+      const del = h("button", { cls: "task-del", title: "Delete", "aria-label": `Delete: ${task.text}` });
+      setIconSvg(del, "trash");
       del.addEventListener("click", () => this.deleteTask(task.id));
 
-      item.append(check, text, del);
-      frag.appendChild(item);
+      list.append(
+        h(
+          "div",
+          { cls: task.done ? "task-item done" : "task-item", role: "listitem" },
+          check,
+          h("span", { cls: "task-text", text: task.text }),
+          del,
+        ),
+      );
     }
-    list.innerHTML = "";
-    list.appendChild(frag);
   }
 
   // ── Quick Note ──
@@ -1280,16 +1367,21 @@ class HomepageView extends ItemView {
   renderLinks() {
     const nav = this.$("quick-links");
     const links = this.settings.quickLinks ?? [];
+    nav.empty();
     if (!links.length) {
-      nav.innerHTML = '<span class="hp-empty">No quick links configured.</span>';
+      nav.createSpan({ cls: "hp-empty", text: "No quick links configured." });
       return;
     }
-    nav.innerHTML = links
-      .map(
-        (l, i) => `<a href="#" class="quick-link" data-ql="${i}">
-      <span class="ql-icon">${esc(l.icon ?? "")}</span><span>${esc(l.label)}</span></a>`,
-      )
-      .join("");
+    links.forEach((l, i) =>
+      nav.append(
+        h(
+          "a",
+          { cls: "quick-link", href: "#", "data-ql": String(i) },
+          h("span", { cls: "ql-icon", text: l.icon ?? "" }),
+          h("span", { text: l.label }),
+        ),
+      ),
+    );
   }
 
   initLinks() {
@@ -1394,7 +1486,7 @@ class HomepageView extends ItemView {
       const folder = this.ringFolder;
       if (!folder) {
         count.textContent = "0";
-        body.innerHTML = `<div class="hp-empty">Choose the folder your ring saves notes to in Genkan's settings.</div>`;
+        this.showEmpty(body, "Choose the folder your ring saves notes to in Genkan's settings.");
         return;
       }
       const stamped = this.app.vault
@@ -1405,7 +1497,7 @@ class HomepageView extends ItemView {
       total = stamped.length;
       if (!total) {
         count.textContent = "0";
-        body.innerHTML = `<div class="hp-empty">No notes found in “${esc(folder)}”.</div>`;
+        this.showEmpty(body, `No notes found in “${folder}”.`);
         return;
       }
       entries = await Promise.all(
@@ -1425,27 +1517,32 @@ class HomepageView extends ItemView {
       const f = this.app.vault.getAbstractFileByPath(path);
       if (!(f instanceof TFile)) {
         count.textContent = "0";
-        body.innerHTML = `<div class="hp-empty">No ring notes yet. Looking for “${esc(path)}”.</div>`;
+        this.showEmpty(body, `No ring notes yet. Looking for “${path}”.`);
         return;
       }
       const parsed = parseRingNotes(await this.app.vault.read(f));
       total = parsed.length;
       if (!total) {
         count.textContent = "0";
-        body.innerHTML = `<div class="hp-empty">No timestamped entries found in “${esc(path)}”.</div>`;
+        this.showEmpty(body, `No timestamped entries found in “${path}”.`);
         return;
       }
       entries = parsed.slice(0, max).map((e) => ({ ...e, path }));
     }
 
     count.textContent = total;
-    body.innerHTML = `<div class="ring-list">${entries
-      .map(
-        (e) => `<a class="ring-item" href="#" data-ring-path="${esc(e.path)}" data-ring-line="${e.line}">
-          <span class="ring-when">${esc(this.formatRingWhen(e))}</span>
-          <span class="ring-text">${esc(e.text)}</span></a>`,
-      )
-      .join("")}</div>`;
+    body.empty();
+    const list = body.createDiv({ cls: "ring-list" });
+    for (const e of entries) {
+      list.append(
+        h(
+          "a",
+          { cls: "ring-item", href: "#", "data-ring-path": e.path, "data-ring-line": String(e.line) },
+          h("span", { cls: "ring-when", text: this.formatRingWhen(e) }),
+          h("span", { cls: "ring-text", text: e.text }),
+        ),
+      );
+    }
   }
 
   // Open the note (scrolled to the entry's heading when it's one of many in a note)
@@ -1461,22 +1558,41 @@ class HomepageView extends ItemView {
   async renderFavourites() {
     const list = this.$("favs-list");
     const favs = await this.plugin.readFavourites();
-    const chips = favs
-      .map((f) => {
-        const file = this.app.metadataCache.getFirstLinkpathDest(f.target.split("#")[0], "");
-        const label = f.alias || (file ? file.basename : f.target);
-        const tip = file ? file.path : "Not found — click to create";
-        return `<span class="fav-chip${file ? "" : " missing"}" data-fav="${esc(f.target)}" title="${esc(tip)}" role="button" tabindex="0">
-          <span class="fav-star">★</span><span class="fav-name">${esc(label)}</span>
-          <button class="fav-x" data-fav-remove="${esc(f.target)}" title="Remove from favourites" aria-label="Remove ${esc(label)} from favourites">×</button></span>`;
-      })
-      .join("");
-    list.innerHTML =
-      chips +
-      `<button class="fav-add" id="fav-add" title="Add a favourite">+ Add</button>` +
-      (favs.length
-        ? ""
-        : `<span class="hp-empty fav-hint">Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”.</span>`);
+    list.empty();
+    for (const f of favs) {
+      const file = this.app.metadataCache.getFirstLinkpathDest(f.target.split("#")[0], "");
+      const label = f.alias || (file ? file.basename : f.target);
+      list.append(
+        h(
+          "span",
+          {
+            cls: file ? "fav-chip" : "fav-chip missing",
+            "data-fav": f.target,
+            title: file ? file.path : "Not found — click to create",
+            role: "button",
+            tabindex: "0",
+          },
+          h("span", { cls: "fav-star", text: "★" }),
+          h("span", { cls: "fav-name", text: label }),
+          h("button", {
+            cls: "fav-x",
+            "data-fav-remove": f.target,
+            title: "Remove from favourites",
+            "aria-label": `Remove ${label} from favourites`,
+            text: "×",
+          }),
+        ),
+      );
+    }
+    list.append(h("button", { cls: "fav-add", id: "fav-add", title: "Add a favourite", text: "+ Add" }));
+    if (!favs.length) {
+      list.append(
+        h("span", {
+          cls: "hp-empty fav-hint",
+          text: "Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”.",
+        }),
+      );
+    }
     // Keyboard: Enter/Space activate a chip
     list.querySelectorAll(".fav-chip").forEach((chip) =>
       chip.addEventListener("keydown", (e) => {
@@ -1489,6 +1605,12 @@ class HomepageView extends ItemView {
   }
 
   // ── Web Clips & Recent Notes ──
+
+  // Replace an area's contents with a dim one-line message
+  showEmpty(el, text) {
+    el.empty();
+    el.createDiv({ cls: "hp-empty", text });
+  }
 
   isDataFile(f) {
     const dir = (this.settings.dataFolder || "").replace(/^\/+|\/+$/g, "");
@@ -1520,21 +1642,34 @@ class HomepageView extends ItemView {
 
     this.$("clips-count").textContent = clips.length;
     if (!clips.length) {
-      body.innerHTML = `<div class="hp-empty">No clips found in “${esc(folder || "(no folder set)")}”.</div>`;
+      this.showEmpty(body, `No clips found in “${folder || "(no folder set)"}”.`);
       return;
     }
-    body.innerHTML = `<div class="clips-grid">${clips
-      .map((c) => {
-        const domain = c.source ? getDomain(c.source) : "";
-        const fav = domain
-          ? `<img class="clip-favicon" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32" alt="" onerror="this.style.display='none'">`
-          : "";
-        return `<a class="clip-card" href="#" data-open="${esc(c.path)}">
-        <div class="clip-header">${fav}<span class="clip-domain">${esc(domain)}</span></div>
-        <div class="clip-title">${esc(c.title)}</div>
-        <div class="clip-date">${esc(formatClipDate(c.date))}</div></a>`;
-      })
-      .join("")}</div>`;
+    body.empty();
+    const grid = body.createDiv({ cls: "clips-grid" });
+    for (const c of clips) {
+      const domain = c.source ? getDomain(c.source) : "";
+      const header = h("div", { cls: "clip-header" });
+      if (domain) {
+        const icon = h("img", {
+          cls: "clip-favicon",
+          src: `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`,
+          alt: "",
+        });
+        icon.addEventListener("error", () => icon.addClass("hidden"));
+        header.append(icon);
+      }
+      header.append(h("span", { cls: "clip-domain", text: domain }));
+      grid.append(
+        h(
+          "a",
+          { cls: "clip-card", href: "#", "data-open": c.path },
+          header,
+          h("div", { cls: "clip-title", text: c.title }),
+          h("div", { cls: "clip-date", text: formatClipDate(c.date) }),
+        ),
+      );
+    }
   }
 
   renderRecent() {
@@ -1547,22 +1682,22 @@ class HomepageView extends ItemView {
 
     this.$("recent-count").textContent = notes.length;
     if (!notes.length) {
-      body.innerHTML = '<div class="hp-empty">No notes found.</div>';
+      this.showEmpty(body, "No notes found.");
       return;
     }
-    body.innerHTML = `<div class="notes-list">${notes
-      .map((f) => {
-        const date = dateFromFilename(f.basename) ?? fmtDate(new Date(f.stat.mtime));
-        const folder = f.parent && f.parent.path !== "/" ? f.parent.path : "";
-        return `<a class="note-item" href="#" data-open="${esc(f.path)}">
-        <span class="note-icon">📄</span>
-        <div class="note-info">
-          <div class="note-title-row"><span class="note-title">${esc(f.basename)}</span>
-          <span class="note-date">${esc(date)}</span></div>
-          ${folder ? `<span class="note-path">${esc(folder)}</span>` : ""}
-        </div></a>`;
-      })
-      .join("")}</div>`;
+    body.empty();
+    const list = body.createDiv({ cls: "notes-list" });
+    for (const f of notes) {
+      const date = dateFromFilename(f.basename) ?? fmtDate(new Date(f.stat.mtime));
+      const folder = f.parent && f.parent.path !== "/" ? f.parent.path : "";
+      const info = h(
+        "div",
+        { cls: "note-info" },
+        h("div", { cls: "note-title-row" }, h("span", { cls: "note-title", text: f.basename }), h("span", { cls: "note-date", text: date })),
+      );
+      if (folder) info.append(h("span", { cls: "note-path", text: folder }));
+      list.append(h("a", { cls: "note-item", href: "#", "data-open": f.path }, h("span", { cls: "note-icon", text: "📄" }), info));
+    }
   }
 
   // ── Search ──
@@ -1635,14 +1770,15 @@ class HomepageView extends ItemView {
     clearTimeout(this.timers.search);
     const results = this.$("search-results");
     results.classList.add("hidden");
-    results.innerHTML = "";
+    results.empty();
   }
 
   async runSearch(query) {
     const token = ++this.searchToken;
     const results = this.$("search-results");
     results.classList.remove("hidden");
-    results.innerHTML = `<div class="search-status">↻ Searching…</div>`;
+    results.empty();
+    results.createDiv({ cls: "search-status", text: "↻ Searching…" });
 
     const words = query.toLowerCase().split(/\s+/).filter(Boolean);
     const files = this.app.vault
@@ -1667,15 +1803,18 @@ class HomepageView extends ItemView {
         if (!words.every((w) => hay.includes(w))) return;
         const titleHit = words.every((w) => f.path.toLowerCase().includes(w));
         const at = lower.indexOf(words[0]);
-        let snippet = "";
+        let snippet = null;
         if (at >= 0) {
           const s = Math.max(0, at - 40);
           const raw = text.slice(s, at + words[0].length + 80).replace(/\s+/g, " ");
-          const rel = at - s;
-          snippet =
-            esc(raw.slice(0, rel)) +
-            `<mark>${esc(raw.slice(rel, rel + words[0].length))}</mark>` +
-            esc(raw.slice(rel + words[0].length));
+          // Whitespace was just collapsed, so find the match again rather than
+          // reusing its offset in the original text
+          const rel = Math.max(0, raw.toLowerCase().indexOf(words[0]));
+          snippet = {
+            before: raw.slice(0, rel),
+            match: raw.slice(rel, rel + words[0].length),
+            after: raw.slice(rel + words[0].length),
+          };
         }
         hits.push({ f, snippet, titleHit });
       });
@@ -1684,22 +1823,30 @@ class HomepageView extends ItemView {
     if (token !== this.searchToken) return;
 
     if (!hits.length) {
-      results.innerHTML = `<div class="search-status">No results for “${esc(query)}”</div>`;
+      results.empty();
+      results.createDiv({ cls: "search-status", text: `No results for “${query}”` });
       return;
     }
     hits.sort((a, b) => Number(b.titleHit) - Number(a.titleHit));
-    results.innerHTML = hits
-      .map(({ f, snippet }) => {
-        const folder = f.parent && f.parent.path !== "/" ? f.parent.path : "";
-        return `<a class="search-result-item" href="#" data-open="${esc(f.path)}" tabindex="0">
-        <span class="search-result-icon">📄</span>
-        <div class="search-result-body">
-          <div class="search-result-title">${esc(f.basename)}</div>
-          ${folder ? `<div class="search-result-path">${esc(folder)}</div>` : ""}
-          ${snippet ? `<div class="search-result-snippet">${snippet}</div>` : ""}
-        </div></a>`;
-      })
-      .join("");
+    results.empty();
+    for (const { f, snippet } of hits) {
+      const folder = f.parent && f.parent.path !== "/" ? f.parent.path : "";
+      const body = h("div", { cls: "search-result-body" }, h("div", { cls: "search-result-title", text: f.basename }));
+      if (folder) body.append(h("div", { cls: "search-result-path", text: folder }));
+      if (snippet) {
+        body.append(
+          h("div", { cls: "search-result-snippet" }, snippet.before, h("mark", { text: snippet.match }), snippet.after),
+        );
+      }
+      results.append(
+        h(
+          "a",
+          { cls: "search-result-item", href: "#", "data-open": f.path, tabindex: "0" },
+          h("span", { cls: "search-result-icon", text: "📄" }),
+          body,
+        ),
+      );
+    }
   }
 
   // ── Hero photo & quote ──
@@ -1772,9 +1919,17 @@ class HomepageView extends ItemView {
       credit.textContent = "";
     };
     img.src = photo.src;
-    credit.innerHTML = photo.photographer
-      ? `Photo by <a href="${esc(photo.photographerUrl)}">${esc(photo.photographer)}</a> on <a href="${esc(photo.photoUrl)}">Unsplash</a>`
-      : `Photo from <a href="${esc(photo.photoUrl)}">Picsum Photos</a>`;
+    credit.empty();
+    if (photo.photographer) {
+      credit.append(
+        "Photo by ",
+        h("a", { href: safeUrl(photo.photographerUrl), text: photo.photographer }),
+        " on ",
+        h("a", { href: safeUrl(photo.photoUrl), text: "Unsplash" }),
+      );
+    } else {
+      credit.append("Photo from ", h("a", { href: safeUrl(photo.photoUrl), text: "Picsum Photos" }));
+    }
   }
 
   fallbackQuote() {
