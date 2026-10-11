@@ -1,4 +1,4 @@
-HOMEPAGE DASHBOARD for Obsidian  (v0.1.0)
+HOMEPAGE DASHBOARD for Obsidian  (v0.1.1)
 =========================================
 
 A dashboard homepage: clock, calendar, favourites, tasks, quick note,
