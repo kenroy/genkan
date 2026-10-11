@@ -488,3 +488,21 @@
         font-size: 13px;
     }
 }
+
+/* ============================================================
+   Classes used by code instead of inline styles
+   ============================================================ */
+
+/* Hide the "/" shortcut hint while the search box is in use */
+.hp-root .search-wrap.kbd-hidden .search-kbd {
+    display: none;
+}
+
+/* Settings tab (outside the dashboard, so not scoped under .hp-root) */
+.genkan-hidden {
+    display: none !important;
+}
+
+.genkan-wide-input {
+    width: 100%;
+}

@@ -459,12 +459,14 @@ async function ensureFileIn(app, path, initial = "") {
   const vault = app.vault;
   let f = vault.getAbstractFileByPath(path);
   if (f instanceof TFile) return f;
-  const dir = path.split("/").slice(0, -1).join("/");
-  if (dir && !vault.getAbstractFileByPath(dir)) {
+  let folder = "";
+  for (const part of path.split("/").slice(0, -1)) {
+    folder = folder ? `${folder}/${part}` : part;
+    if (vault.getAbstractFileByPath(folder)) continue;
     try {
-      await vault.adapter.mkdir(dir);
+      await vault.createFolder(folder);
     } catch {
-      /* may already exist */
+      /* created by Sync or another view in the meantime */
     }
   }
   try {
@@ -1343,7 +1345,7 @@ class HomepageView extends ItemView {
     const value = textarea.value;
     try {
       const file = await this.ensureFile(this.notePath);
-      await this.app.vault.modify(file, value);
+      await this.app.vault.process(file, () => value);
       if (textarea.value === value) {
         this.noteDirty = false;
         this.$("autosave-dot").className = "autosave-dot saved";
@@ -1506,7 +1508,7 @@ class HomepageView extends ItemView {
           hasTime,
           path: f.path,
           line: 0,
-          text: ringFileText(await this.app.vault.cachedRead(f).catch(() => "")) || f.basename,
+          text: ringFileText(await this.readText(f)) || f.basename,
         })),
       );
     } else {
@@ -1605,6 +1607,15 @@ class HomepageView extends ItemView {
   }
 
   // ── Web Clips & Recent Notes ──
+
+  // Cached read that treats an unreadable file as empty instead of failing the whole list
+  async readText(file) {
+    try {
+      return await this.app.vault.cachedRead(file);
+    } catch {
+      return "";
+    }
+  }
 
   // Replace an area's contents with a dim one-line message
   showEmpty(el, text) {
@@ -1705,12 +1716,12 @@ class HomepageView extends ItemView {
   initSearch() {
     const input = this.$("search-input");
     const form = this.$("search-form");
-    const kbd = this.$("search-kbd");
     const results = this.$("search-results");
 
-    input.addEventListener("focus", () => (kbd.style.display = "none"));
+    // Hide the "/" hint while the box is focused or has text (CSS: .kbd-hidden)
+    input.addEventListener("focus", () => form.addClass("kbd-hidden"));
     input.addEventListener("blur", () => {
-      if (!input.value) kbd.style.display = "";
+      if (!input.value) form.removeClass("kbd-hidden");
     });
     input.addEventListener("input", () => {
       const q = input.value.trim();
@@ -1791,9 +1802,7 @@ class HomepageView extends ItemView {
     const LIMIT = 15;
     for (let i = 0; i < files.length && hits.length < LIMIT; i += 30) {
       const chunk = files.slice(i, i + 30);
-      const texts = await Promise.all(
-        chunk.map((f) => this.app.vault.cachedRead(f).catch(() => "")),
-      );
+      const texts = await Promise.all(chunk.map((f) => this.readText(f)));
       if (token !== this.searchToken) return; // superseded or closed
       chunk.forEach((f, j) => {
         if (hits.length >= LIMIT) return;
@@ -2072,8 +2081,8 @@ class HomepageSettingTab extends PluginSettingTab {
       { placeholder: "Pebble Index", suggest: "folder" },
     );
     const showRingFields = () => {
-      noteSetting.settingEl.style.display = s.ringMode === "chosen" ? "" : "none";
-      folderSetting.settingEl.style.display = s.ringMode === "files" ? "" : "none";
+      noteSetting.settingEl.toggleClass("genkan-hidden", s.ringMode !== "chosen");
+      folderSetting.settingEl.toggleClass("genkan-hidden", s.ringMode !== "files");
     };
     const modeSetting = new Setting(containerEl)
       .setName("Where does the ring save notes?")
@@ -2117,7 +2126,7 @@ class HomepageSettingTab extends PluginSettingTab {
           save("quickLinks", textToQuickLinks(v)),
         );
         t.inputEl.rows = 7;
-        t.inputEl.style.width = "100%";
+        t.inputEl.addClass("genkan-wide-input");
       });
   }
 }
