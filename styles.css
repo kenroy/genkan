@@ -1832,3 +1832,9 @@
   outline: 2px solid var(--accent-txt);
   outline-offset: 2px;
 }
+
+/* Keyboard-selected search result: tinted background and an inset ring (an outer ring is clipped by the list) */
+#genkan-root .search-result-item:focus-visible {
+  background: var(--accent-lo);
+  outline-offset: -2px;
+}
