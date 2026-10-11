@@ -14,6 +14,20 @@ Genkan (玄関) is the entryway of a Japanese home: the place you step in. This 
 
 It reads and writes your vault directly through Obsidian's own API. There is no server, no account and no API key required.
 
+## Screenshots
+
+Dark and light themes (the dashboard follows Obsidian's theme by default):
+
+![Genkan dashboard in the dark theme](docs/screenshots/dashboard-dark.png)
+
+![Genkan dashboard in the light theme](docs/screenshots/dashboard-light.png)
+
+On a phone it becomes a single column with tasks and the quick note first:
+
+<img src="docs/screenshots/dashboard-phone.png" alt="Genkan on a phone" width="390">
+
+The screenshots use sample data.
+
 ## Install
 
 **With BRAT:** install the BRAT plugin, choose "Add beta plugin", and enter `kenroy/genkan`.
