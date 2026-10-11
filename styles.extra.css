@@ -281,7 +281,7 @@
 }
 
 #genkan-root .task-input {
-    border: 1px solid var(--border);
+    border: 1px solid var(--input-border);
     border-radius: var(--radius-sm);
     padding: 10px 14px;
 }
@@ -549,4 +549,12 @@
 /* Monospace digits are wide; the default tight tracking would make them touch */
 .hp-root[data-clock-font="monospace"] #clock-main {
     letter-spacing: -1px;
+}
+
+/* Keyboard focus: one visible ring on every control (WCAG 2.4.7 / 1.4.11) */
+#genkan-root :is(button, a, input, select, textarea, [tabindex]):focus-visible,
+#genkan-root .search-wrap:focus-within,
+#genkan-root #note-card:focus-within {
+  outline: 2px solid var(--accent-txt);
+  outline-offset: 2px;
 }
