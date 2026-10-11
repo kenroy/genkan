@@ -69,13 +69,24 @@ Turn on **Pebble ring notes**, then set **Where does the ring save notes?** to m
 
 Newest first. Click an entry to open it. The card updates live as the ring saves notes, and **Max ring notes** sets how many are shown.
 
+## Languages and regions
+
+Genkan is available in English, French, Spanish, German and Japanese. By default it follows Obsidian's own language setting (Settings → General → Language); the **Language** setting in Genkan overrides it. Other Obsidian languages fall back to English.
+
+- Dates, times, number formatting and the first day of the week follow your device's region as well, so a French device set to Canada gets Canadian French formats. The 12/24-hour clock and the first day of the week can be set explicitly.
+- English spelling follows the region: American on US devices ("favorites"), British elsewhere ("favourites"). The **Spelling** setting overrides it.
+- Daily quotes: the **Quote source** setting chooses between ZenQuotes (English only), the Echoes API (quotes in your language) and a bundled list in each language that works offline. Existing English installs keep ZenQuotes; other languages start on the bundled list.
+- The bundled quotes and proverbs were also written with AI assistance, from memory, so attributions should be checked.
+- The translations were written with AI assistance and have not been reviewed by native speakers. Corrections are welcome as issues or pull requests: the text lives in `src/i18n.js`, keyed by the English wording.
+
 ## Network use and privacy
 
 Genkan does not collect analytics or telemetry, does not require an account, shows no ads, does not download or run code, and never reads files outside your vault. The contents of your notes are never sent anywhere. The only network requests are below, and each can be turned off.
 
 | Service | When | What it receives | How to turn it off |
 |---|---|---|---|
-| [ZenQuotes](https://zenquotes.io/) (`zenquotes.io/api/today`) | Once a day, for the daily quote | Nothing from your vault; the server sees your IP address, as for any web request | Settings → **Daily quote** |
+| [ZenQuotes](https://zenquotes.io/) (`zenquotes.io/api/today`) | Once a day, only when **Quote source** is ZenQuotes | Nothing from your vault; the server sees your IP address, as for any web request | Settings → **Daily quote**, or choose another **Quote source** |
+| [Echoes API](https://echoes.soferity.com/) (`echoes.soferity.com/api/quotes/random`) | Once a day, only when **Quote source** is Echoes | The language code (such as `fr`); nothing from your vault. The server sees your IP address | Settings → **Daily quote**, or choose another **Quote source** |
 | [Unsplash](https://unsplash.com/) (`api.unsplash.com`) | At most once a day (and when you press the photo's refresh button), only if you enter an Unsplash access key | Your access key and fixed nature search terms. The photo itself loads from Unsplash's image servers whenever the dashboard opens, with credit links back to the photographer and Unsplash | Remove the key, or turn off **Photo of the day** |
 | [Picsum Photos](https://picsum.photos/) | Whenever the dashboard opens, for the photo, when you have no Unsplash key | An image address seeded with today's date; nothing from your vault | Settings → **Photo of the day** |
 | Google favicon service (`www.google.com/s2/favicons`) | When web clips are shown | The **domain** (not the full address, title or contents) of each clipped page, to fetch a small site icon | Settings → **Site icons on web clips** |
@@ -83,10 +94,10 @@ Genkan does not collect analytics or telemetry, does not require an account, sho
 Notes:
 
 - The Unsplash key is optional. It is stored in this plugin's settings file (`.obsidian/plugins/genkan/data.json`) in your vault. If you use Obsidian Sync with plugin settings, the key syncs with it, so keep your vault private.
-- Quotes are credited to ZenQuotes in the interface, as their free API requires: "Inspirational quotes provided by ZenQuotes API". Built-in quotes are used when the request is off or fails.
+- Quotes from ZenQuotes are credited in the interface, as their free API requires: "Inspirational quotes provided by ZenQuotes API". Echoes quotes are credited the same way. The bundled quotes make no request. If a request fails, a bundled quote is shown.
 - To search, list recent notes, offer the favourites picker and match daily notes, Genkan reads the list of note names and paths in your vault through Obsidian's API. It reads a note's contents only for search snippets, ring notes and web clips, and none of it leaves your device.
 - Today's photo and quote are cached in the plugin's own settings file, not in browser storage.
-- Links you click (photographer credits, the ZenQuotes link, any `https://` quick link) open in your browser.
+- Links you click (photographer credits, the ZenQuotes and Echoes links, any `https://` quick link) open in your browser.
 
 ## Settings
 
@@ -101,7 +112,7 @@ python3 build.py
 ```
 
 - `main.template.js`: the plugin source
-- `src/icons.js`, `src/quotes.js`: the icon and built-in quote data
+- `src/icons.js`, `src/quotes.js`, `src/i18n.js`: the icon, built-in quote and translation data
 - `src/base.css` and `styles.extra.css`: the styles. `build.py` scopes `src/base.css` under `.hp-root`, adds `styles.extra.css`, and writes `styles.css`
 - `main.js` and `styles.css` are generated; edit the sources above instead
 
@@ -111,6 +122,6 @@ To release, set `version` in `manifest.json` (and add it to `versions.json`), ru
 
 Genkan is released under the [MIT licence](LICENSE).
 
-Quotes by [ZenQuotes](https://zenquotes.io/). Photos from [Unsplash](https://unsplash.com/) and [Picsum Photos](https://picsum.photos/). Site icons from Google's favicon service.
+Quotes by [ZenQuotes](https://zenquotes.io/) and the [Echoes API](https://echoes.soferity.com/). Photos from [Unsplash](https://unsplash.com/) and [Picsum Photos](https://picsum.photos/). Site icons from Google's favicon service.
 
 Genkan is an independent project. It is not affiliated with or endorsed by Obsidian, Pebble or Core Devices. "Pebble" and "Pebble Index" belong to their owners and are used only to describe compatibility.

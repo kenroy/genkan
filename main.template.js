@@ -26,6 +26,8 @@ const RING_MAIN_NOTE = "Pebble Index.md"; // the ring app's "one main note" targ
 
 /*__QUOTES__*/
 
+/*__I18N__*/
+
 const DEFAULT_QUICK_LINKS = [
   { icon: "📝", label: "New Note", action: "command:file-explorer:new-file" },
   { icon: "📅", label: "Today's Note", action: "daily" },
@@ -34,41 +36,91 @@ const DEFAULT_QUICK_LINKS = [
   { icon: "🎲", label: "Random Note", action: "random" },
 ];
 
-// ─── Locale ───────────────────────────────────────────────────────────────────
-// Dates, times and the first day of the week follow the device's locale.
-// Spelling is British unless the locale is American ("favourites" -> "favorites").
+// ─── Language and locale ──────────────────────────────────────────────────────
+// The interface language follows Obsidian's own language setting (or the plugin's Language
+// setting). Dates, times and the first day of the week follow the matching region from the
+// device. English spelling is British unless the region is American ("favourites" -> "favorites").
 
+const LANGUAGES = { en: "English", fr: "Français", es: "Español", de: "Deutsch", ja: "日本語" };
+
+let LANG = "en";
 let LOCALE = "en-US";
 let US_DETECTED = false; // an unknown or invalid locale keeps British spelling
 let spellingChoice = "auto"; // auto | us | uk (the setting)
 
+function obsidianLanguage() {
+  try {
+    if (typeof obsidian.getLanguage === "function") return obsidian.getLanguage();
+  } catch {
+    // older Obsidian
+  }
+  try {
+    return moment.locale();
+  } catch {
+    return "en";
+  }
+}
+
 // Obsidian's Electron shell reports en-US in navigator.language for any English region it has
 // no translation for (Canada, say) and lists the OS preferences after it in navigator.languages.
-function preferredLocale() {
+function deviceLocaleFor(lang) {
+  const list = [...(navigator.languages || []), navigator.language].filter(Boolean);
   const first = navigator.language || "";
-  const rest = (navigator.languages || []).filter((l) => l && l !== first);
-  if (/^en-US$/i.test(first)) {
-    const other = rest.find((l) => /^en-[A-Za-z]{2}$/.test(l) && !/^en-US$/i.test(l));
-    if (other) return other;
+  if (lang === "en") {
+    if (/^en-US$/i.test(first)) {
+      const other = list.find((l) => /^en-[A-Za-z]{2}$/.test(l) && !/^en-US$/i.test(l));
+      if (other) return other;
+    }
+    return list.find((l) => /^en(-|$)/i.test(l)) || "en";
   }
-  return first;
+  return list.find((l) => new RegExp(`^${lang}-`, "i").test(l)) || lang;
 }
 
-try {
-  const l = typeof navigator !== "undefined" ? preferredLocale() : "";
-  if (l) {
+function applyLanguage(choice) {
+  const wanted = !choice || choice === "auto" ? obsidianLanguage() : choice;
+  const base = String(wanted || "en").toLowerCase().split(/[-_]/)[0];
+  LANG = LANGUAGES[base] ? base : "en";
+  LOCALE = "en-US";
+  US_DETECTED = false;
+  try {
+    const l = deviceLocaleFor(LANG);
     new Intl.DateTimeFormat(l);
     LOCALE = l;
-    US_DETECTED = /^en-(US|PR|GU|VI|AS|MP)\b/i.test(l);
+    US_DETECTED = LANG === "en" && /^en-(US|PR|GU|VI|AS|MP)\b/i.test(l);
+  } catch {
+    // keep the defaults
   }
-} catch {
-  // keep the defaults
 }
 
-// Source strings are written in British spelling; this converts them for American English
+// Source strings are written in British English; this converts them for American English
 function S(text) {
   const us = spellingChoice === "us" || (spellingChoice === "auto" && US_DETECTED);
   return us ? text.replace(/favourite/g, "favorite").replace(/Favourite/g, "Favorite") : text;
+}
+
+// Translate a source string. Tables are keyed by the English text; {name} marks a value.
+function T(key, vars) {
+  let out = (LANG !== "en" && I18N[LANG]?.[key]) || I18N.en?.[key] || key;
+  if (vars) out = out.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
+  return LANG === "en" ? S(out) : out;
+}
+
+// Fill {name} slots in a translated sentence with DOM nodes (links), keeping the word order
+function appendTemplate(parent, template, nodes) {
+  for (const part of template.split(/(\{\w+\})/)) {
+    const key = part.slice(1, -1);
+    if (part.startsWith("{") && nodes[key]) parent.append(nodes[key]);
+    else if (part) parent.append(part);
+  }
+}
+
+// AM/PM in the current language ("午前" in Japanese); English keeps AM and PM
+function dayPeriod(date) {
+  if (LANG === "en") return date.getHours() < 12 ? "AM" : "PM";
+  const part = new Intl.DateTimeFormat(LOCALE, { hour: "numeric", hour12: true })
+    .formatToParts(date)
+    .find((p) => p.type === "dayPeriod");
+  return part ? part.value : date.getHours() < 12 ? "AM" : "PM";
 }
 
 function locale12h() {
@@ -103,13 +155,14 @@ const DEFAULT_SETTINGS = {
   maxClips: 12,
   maxRecent: 8,
   theme: "system", // system | dark | light
-  clockFormat: locale12h() ? "12h" : "24h", // new installs follow the device locale
+  language: "auto", // auto (follow Obsidian) | en | fr | es | de | ja
   spelling: "auto", // auto | us | uk
   weekStart: "auto", // auto | 0 (Sunday) | 1 (Monday) | 6 (Saturday)
   clockFont: "default", // see CLOCK_FONTS
   clockFontCustom: "", // font name(s) typed in settings when clockFont is "custom"
   showHero: true,
-  showQuote: true, // daily quote from ZenQuotes (one request a day)
+  showQuote: true, // a daily quote
+  quoteSource: undefined, // zenquotes | echoes | bundled (unset: ZenQuotes in English, else bundled)
   showFavicons: true, // site icons on web clips (Google's favicon service)
   showRingNotes: false, // Pebble Index ring notes card (off unless enabled)
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
@@ -445,7 +498,7 @@ class FavouritePicker extends FuzzySuggestModal {
   constructor(app, plugin) {
     super(app);
     this.plugin = plugin;
-    this.setPlaceholder(S("Add a note to your homepage favourites…"));
+    this.setPlaceholder(T("Add a note to your homepage favourites…"));
   }
   getItems() {
     return this.app.vault
@@ -477,9 +530,9 @@ function buildDashboard() {
       h(
         "div",
         { cls: "header-controls" },
-        h("button", { cls: "icon-btn", id: "page-refresh", title: "Refresh", "aria-label": "Refresh" }),
-        h("button", { cls: "icon-btn", id: "theme-toggle", title: "Toggle theme", "aria-label": "Toggle theme" }),
-        h("button", { cls: "icon-btn", id: "settings-btn", title: "Settings", "aria-label": "Open settings" }),
+        h("button", { cls: "icon-btn", id: "page-refresh", title: T("Refresh"), "aria-label": T("Refresh") }),
+        h("button", { cls: "icon-btn", id: "theme-toggle", title: T("Toggle theme"), "aria-label": T("Toggle theme") }),
+        h("button", { cls: "icon-btn", id: "settings-btn", title: T("Settings"), "aria-label": T("Open settings") }),
       ),
     ),
     h(
@@ -502,24 +555,24 @@ function buildDashboard() {
         "form",
         { cls: "search-wrap", id: "search-form", role: "search", autocomplete: "off" },
         iconNode("search"),
-        h("input", { type: "search", id: "search-input", placeholder: "Search your vault…", spellcheck: "false", "aria-label": "Search your vault" }),
-        h("button", { type: "button", cls: "search-clear hidden", id: "search-clear", title: "Clear search", "aria-label": "Clear search" }, iconNode("clear")),
+        h("input", { type: "search", id: "search-input", placeholder: T("Search your vault…"), spellcheck: "false", "aria-label": T("Search your vault") }),
+        h("button", { type: "button", cls: "search-clear hidden", id: "search-clear", title: T("Clear search"), "aria-label": T("Clear search") }, iconNode("clear")),
         h("kbd", { cls: "search-kbd", id: "search-kbd", text: "/" }),
       ),
-      h("div", { cls: "search-results hidden", id: "search-results", role: "listbox", "aria-label": "Search results" }),
+      h("div", { cls: "search-results hidden", id: "search-results", role: "listbox", "aria-label": T("Search results") }),
     ),
   );
 
   const hero = h(
     "div",
-    { cls: "hero", id: "hero", role: "img", "aria-label": "Photo of the day" },
-    h("img", { cls: "hero-img", id: "hero-img", alt: "Photo of the day" }),
+    { cls: "hero", id: "hero", role: "img", "aria-label": T("Photo of the day") },
+    h("img", { cls: "hero-img", id: "hero-img", alt: T("Photo of the day") }),
     h("div", { cls: "hero-overlay", "aria-hidden": "true" }),
     h(
       "div",
       { cls: "hero-footer" },
       h("span", { cls: "hero-credit", id: "hero-credit" }),
-      h("button", { cls: "icon-btn", id: "hero-refresh", title: "Load a new photo", "aria-label": "Load new photo" }),
+      h("button", { cls: "icon-btn", id: "hero-refresh", title: T("Load a new photo"), "aria-label": T("Load new photo") }),
     ),
   );
 
@@ -532,19 +585,14 @@ function buildDashboard() {
       h("p", { cls: "quote-text", id: "quote-text" }),
       h("footer", { cls: "quote-author", id: "quote-author" }),
     ),
-    // ZenQuotes' free API requires a visible credit linking back to zenquotes.io
-    h(
-      "div",
-      { cls: "quote-credit hidden", id: "quote-credit" },
-      "Inspirational quotes provided by ",
-      h("a", { href: "https://zenquotes.io/", text: "ZenQuotes API" }),
-    ),
+    // ZenQuotes' free API requires a visible credit linking back to zenquotes.io (built in displayQuote)
+    h("div", { cls: "quote-credit hidden", id: "quote-credit" }),
   );
 
   const favs = h(
     "div",
     { cls: "card favs-card", id: "favs-card" },
-    h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: S("Favourites") })),
+    h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: T("Favourites") })),
     h("div", { cls: "favs-list", id: "favs-list" }),
   );
 
@@ -557,23 +605,23 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: "Calendar" }),
+        h("span", { cls: "card-label", text: T("Calendar") }),
         h(
           "div",
           { cls: "cal-nav" },
-          h("button", { cls: "cal-btn", id: "cal-prev", title: "Previous month", "aria-label": "Previous month", text: "‹" }),
+          h("button", { cls: "cal-btn", id: "cal-prev", title: T("Previous month"), "aria-label": T("Previous month"), text: "‹" }),
           h("span", { id: "cal-month-label" }),
-          h("button", { cls: "cal-btn", id: "cal-next", title: "Next month", "aria-label": "Next month", text: "›" }),
+          h("button", { cls: "cal-btn", id: "cal-next", title: T("Next month"), "aria-label": T("Next month"), text: "›" }),
         ),
       ),
-      h("div", { cls: "cal-grid", id: "cal-grid", role: "grid", "aria-label": "Calendar" }),
-      h("button", { cls: "today-btn", id: "cal-today", text: "Today" }),
+      h("div", { cls: "cal-grid", id: "cal-grid", role: "grid", "aria-label": T("Calendar") }),
+      h("button", { cls: "today-btn", id: "cal-today", text: T("Today") }),
     ),
     h(
       "div",
       { cls: "card", id: "links-card" },
-      h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: "Quick links" })),
-      h("nav", { id: "quick-links", "aria-label": "Quick links" }),
+      h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: T("Quick links") })),
+      h("nav", { id: "quick-links", "aria-label": T("Quick links") }),
     ),
   );
 
@@ -586,8 +634,8 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: "Ring notes" }),
-        countRow("ring-count", h("a", { cls: "card-link", id: "ring-open", href: "#", title: "Open the notes file", text: "Open" })),
+        h("span", { cls: "card-label", text: T("Ring notes") }),
+        countRow("ring-count", h("a", { cls: "card-link", id: "ring-open", href: "#", title: T("Open the notes file"), text: T("Open") })),
       ),
       h("div", { id: "ring-body" }),
     ),
@@ -597,8 +645,8 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: "Web clips" }),
-        countRow("clips-count", refreshBtn("refresh-clips", "Refresh clips", "Refresh web clips")),
+        h("span", { cls: "card-label", text: T("Web clips") }),
+        countRow("clips-count", refreshBtn("refresh-clips", T("Refresh clips"), T("Refresh web clips"))),
       ),
       h("div", { id: "clips-body" }),
     ),
@@ -608,8 +656,8 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: "Recent notes" }),
-        countRow("recent-count", refreshBtn("refresh-recent", "Refresh recent notes", "Refresh recent notes")),
+        h("span", { cls: "card-label", text: T("Recent notes") }),
+        countRow("recent-count", refreshBtn("refresh-recent", T("Refresh recent notes"), T("Refresh recent notes"))),
       ),
       h("div", { id: "recent-body" }),
     ),
@@ -626,19 +674,19 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: "Tasks" }),
+        h("span", { cls: "card-label", text: T("Tasks") }),
         h("span", { cls: "tasks-stats", id: "tasks-stats", "aria-live": "polite", text: "0 / 0" }),
       ),
-      h("input", { type: "text", cls: "task-input", id: "task-input", placeholder: "Add a task and press Enter…", "aria-label": "New task" }),
+      h("input", { type: "text", cls: "task-input", id: "task-input", placeholder: T("Add a task and press Enter…"), "aria-label": T("New task") }),
       h(
         "div",
-        { cls: "tab-row", role: "tablist", "aria-label": "Filter tasks" },
-        tab("all", "All", true),
-        tab("active", "Active", false),
-        tab("done", "Done", false),
+        { cls: "tab-row", role: "tablist", "aria-label": T("Filter tasks") },
+        tab("all", T("All"), true),
+        tab("active", T("Active"), false),
+        tab("done", T("Done"), false),
       ),
       h("div", { id: "tasks-list", role: "list" }),
-      h("button", { cls: "clear-btn", id: "clear-done", text: "Clear completed" }),
+      h("button", { cls: "clear-btn", id: "clear-done", text: T("Clear completed") }),
     ),
     h(
       "div",
@@ -646,10 +694,10 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: "Quick note" }),
-        h("span", { cls: "autosave-dot", id: "autosave-dot", title: "Saved", "aria-label": "Saved" }),
+        h("span", { cls: "card-label", text: T("Quick note") }),
+        h("span", { cls: "autosave-dot", id: "autosave-dot", title: T("Saved"), "aria-label": T("Saved") }),
       ),
-      h("textarea", { id: "quick-note", placeholder: "Jot something down…", spellcheck: "true", "aria-label": "Quick note" }),
+      h("textarea", { id: "quick-note", placeholder: T("Jot something down…"), spellcheck: "true", "aria-label": T("Quick note") }),
     ),
   );
 
@@ -674,7 +722,7 @@ class HomepageView extends ItemView {
     return VIEW_TYPE;
   }
   getDisplayText() {
-    return "Homepage";
+    return T("Homepage");
   }
   getIcon() {
     return "home";
@@ -835,7 +883,7 @@ class HomepageView extends ItemView {
   openFile(path, evt) {
     const f = this.app.vault.getAbstractFileByPath(path);
     if (!(f instanceof TFile)) {
-      new Notice(`Note not found: ${path}`);
+      new Notice(T("Note not found: {path}", { path }));
       return;
     }
     const mod = evt ? Keymap.isModEvent(evt) : false;
@@ -851,8 +899,9 @@ class HomepageView extends ItemView {
     this.root.setAttribute("data-theme", dark ? "dark" : "light");
     const btn = this.$("theme-toggle");
     setIconSvg(btn, t === "system" ? "monitor" : dark ? "moon" : "sun");
-    const label = t === "system" ? `System (${dark ? "Dark" : "Light"})` : dark ? "Dark" : "Light";
-    btn.title = `Appearance: ${label} — click to change`;
+    const mode = dark ? T("Dark") : T("Light");
+    const label = t === "system" ? T("System ({mode})", { mode }) : mode;
+    btn.title = T("Appearance: {label} — click to change", { label });
   }
 
   initTheme() {
@@ -872,7 +921,7 @@ class HomepageView extends ItemView {
     const pad = (n) => String(n).padStart(2, "0");
 
     const phrase =
-      hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : hour < 21 ? "Good evening" : "Good night";
+      hour < 12 ? T("Good morning") : hour < 17 ? T("Good afternoon") : hour < 21 ? T("Good evening") : T("Good night");
     const name = this.settings.userName;
     // Rebuild only when the words change (this runs every second)
     const greetKey = `${phrase}|${name}`;
@@ -880,15 +929,19 @@ class HomepageView extends ItemView {
       this.greetKey = greetKey;
       const greeting = this.$("greeting");
       greeting.empty();
-      greeting.append(name ? `${phrase}, ` : phrase);
-      if (name) greeting.append(h("span", { cls: "gname", text: name }));
+      greeting.append(name ? T("{greeting}, ", { greeting: phrase }) : phrase);
+      if (name) {
+        greeting.append(h("span", { cls: "gname", text: name }));
+        const suffix = T("name suffix");
+        if (suffix !== "name suffix") greeting.append(suffix);
+      }
     }
 
     const main = this.$("clock-main");
     const ampm = this.$("clock-ampm");
     if (this.settings.clockFormat === "12h") {
       main.textContent = `${hour % 12 || 12}:${pad(now.getMinutes())}`;
-      ampm.textContent = hour < 12 ? "AM" : "PM";
+      ampm.textContent = dayPeriod(now);
       ampm.classList.remove("hidden");
     } else {
       main.textContent = `${pad(hour)}:${pad(now.getMinutes())}`;
@@ -947,7 +1000,7 @@ class HomepageView extends ItemView {
       try {
         f = await this.ensureFile(path, content);
       } catch (err) {
-        new Notice(`Could not create daily note: ${err.message}`);
+        new Notice(T("Could not create daily note: {error}", { error: err.message }));
         return;
       }
     }
@@ -980,7 +1033,9 @@ class HomepageView extends ItemView {
   renderCalendar() {
     const year = this.calYear;
     const month = this.calMonth;
-    this.$("cal-month-label").textContent = fmtDate(new Date(year, month, 1), { month: "long", year: "numeric" });
+    // Spanish writes "octubre de 2026"; the short form fits the narrow card
+    const monthLabel = fmtDate(new Date(year, month, 1), { month: "long", year: "numeric" });
+    this.$("cal-month-label").textContent = LANG === "es" ? monthLabel.replace(" de ", " ") : monthLabel;
 
     const ws = this.settings.weekStart === "auto" ? localeWeekStart() : Number(this.settings.weekStart);
     const grid = this.$("cal-grid");
@@ -1062,7 +1117,7 @@ class HomepageView extends ItemView {
       const file = await this.ensureFile(this.tasksPath);
       await this.app.vault.process(file, fn);
     } catch (err) {
-      new Notice(`Could not update tasks: ${err.message}`);
+      new Notice(T("Could not update tasks: {error}", { error: err.message }));
     }
     await this.loadTasks();
   }
@@ -1132,10 +1187,10 @@ class HomepageView extends ItemView {
     if (!filtered.length) {
       const msg =
         this.taskFilter === "done"
-          ? "No completed tasks yet."
+          ? T("No completed tasks yet.")
           : this.taskFilter === "active"
-            ? "Nothing left to do!"
-            : "No tasks yet — add one above.";
+            ? T("Nothing left to do!")
+            : T("No tasks yet — add one above.");
       this.showEmpty(list, msg);
       return;
     }
@@ -1144,12 +1199,12 @@ class HomepageView extends ItemView {
     for (const task of filtered) {
       const check = h("button", {
         cls: task.done ? "task-check checked" : "task-check",
-        "aria-label": task.done ? "Mark incomplete" : "Mark complete",
+        "aria-label": task.done ? T("Mark incomplete") : T("Mark complete"),
       });
       setIconSvg(check, task.done ? "check" : null);
       check.addEventListener("click", () => this.toggleTask(task.id));
 
-      const del = h("button", { cls: "task-del", title: "Delete", "aria-label": `Delete: ${task.text}` });
+      const del = h("button", { cls: "task-del", title: T("Delete"), "aria-label": T("Delete: {task}", { task: task.text }) });
       setIconSvg(del, "trash");
       del.addEventListener("click", () => this.deleteTask(task.id));
 
@@ -1193,7 +1248,7 @@ class HomepageView extends ItemView {
         this.$("autosave-dot").className = "autosave-dot saved";
       }
     } catch (err) {
-      new Notice(`Could not save quick note: ${err.message}`);
+      new Notice(T("Could not save quick note: {error}", { error: err.message }));
     }
   }
 
@@ -1213,7 +1268,7 @@ class HomepageView extends ItemView {
     const links = this.settings.quickLinks ?? [];
     nav.empty();
     if (!links.length) {
-      nav.createSpan({ cls: "hp-empty", text: "No quick links configured." });
+      nav.createSpan({ cls: "hp-empty", text: T("No quick links configured.") });
       return;
     }
     links.forEach((l, i) =>
@@ -1222,7 +1277,7 @@ class HomepageView extends ItemView {
           "a",
           { cls: "quick-link", href: "#", "data-ql": String(i) },
           h("span", { cls: "ql-icon", text: l.icon ?? "" }),
-          h("span", { text: l.label }),
+          h("span", { text: quickLinkLabel(l) }),
         ),
       ),
     );
@@ -1278,12 +1333,12 @@ class HomepageView extends ItemView {
     }
     if (a.startsWith("command:")) {
       const id = a.slice(8);
-      if (!this.app.commands.executeCommandById(id)) new Notice(`Command not found: ${id}`);
+      if (!this.app.commands.executeCommandById(id)) new Notice(T("Command not found: {id}", { id }));
       return;
     }
     if (a.startsWith("open:")) return this.openFile(normalizePath(a.slice(5)), evt);
     if (/^(https?|obsidian):\/\//.test(a)) return window.open(a);
-    new Notice(`Unknown quick link action: ${a}`);
+    new Notice(T("Unknown quick link action: {action}", { action: a }));
   }
 
   // ── Ring notes ──
@@ -1298,9 +1353,9 @@ class HomepageView extends ItemView {
     );
     const day =
       dayDiff === 0
-        ? "Today"
+        ? T("Today")
         : dayDiff === 1
-          ? "Yesterday"
+          ? T("Yesterday")
           : fmtDate(d, { month: "short", day: "numeric", year: d.getFullYear() === now.getFullYear() ? undefined : "numeric" });
     if (!e.hasTime) return day;
     const time = d.toLocaleTimeString(LOCALE, {
@@ -1330,7 +1385,7 @@ class HomepageView extends ItemView {
       const folder = this.ringFolder;
       if (!folder) {
         count.textContent = "0";
-        this.showEmpty(body, "Choose the folder your ring saves notes to in Genkan's settings.");
+        this.showEmpty(body, T("Choose the folder your ring saves notes to in Genkan's settings."));
         return;
       }
       const stamped = this.app.vault
@@ -1341,7 +1396,7 @@ class HomepageView extends ItemView {
       total = stamped.length;
       if (!total) {
         count.textContent = "0";
-        this.showEmpty(body, `No notes found in “${folder}”.`);
+        this.showEmpty(body, T("No notes found in “{folder}”.", { folder }));
         return;
       }
       entries = await Promise.all(
@@ -1361,14 +1416,14 @@ class HomepageView extends ItemView {
       const f = this.app.vault.getAbstractFileByPath(path);
       if (!(f instanceof TFile)) {
         count.textContent = "0";
-        this.showEmpty(body, `No ring notes yet. Looking for “${path}”.`);
+        this.showEmpty(body, T("No ring notes yet. Looking for “{path}”.", { path }));
         return;
       }
       const parsed = parseRingNotes(await this.app.vault.read(f));
       total = parsed.length;
       if (!total) {
         count.textContent = "0";
-        this.showEmpty(body, `No timestamped entries found in “${path}”.`);
+        this.showEmpty(body, T("No timestamped entries found in “{path}”.", { path }));
         return;
       }
       entries = parsed.slice(0, max).map((e) => ({ ...e, path }));
@@ -1412,7 +1467,7 @@ class HomepageView extends ItemView {
           {
             cls: file ? "fav-chip" : "fav-chip missing",
             "data-fav": f.target,
-            title: file ? file.path : "Not found — click to create",
+            title: file ? file.path : T("Not found — click to create"),
             role: "button",
             tabindex: "0",
           },
@@ -1421,19 +1476,19 @@ class HomepageView extends ItemView {
           h("button", {
             cls: "fav-x",
             "data-fav-remove": f.target,
-            title: S("Remove from favourites"),
-            "aria-label": S(`Remove ${label} from favourites`),
+            title: T("Remove from favourites"),
+            "aria-label": T("Remove {label} from favourites", { label }),
             text: "×",
           }),
         ),
       );
     }
-    list.append(h("button", { cls: "fav-add", id: "fav-add", title: S("Add a favourite"), text: "+ Add" }));
+    list.append(h("button", { cls: "fav-add", id: "fav-add", title: T("Add a favourite"), text: T("+ Add") }));
     if (!favs.length) {
       list.append(
         h("span", {
           cls: "hp-empty fav-hint",
-          text: S("Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”."),
+          text: T("Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”."),
         }),
       );
     }
@@ -1495,7 +1550,7 @@ class HomepageView extends ItemView {
 
     this.$("clips-count").textContent = fmtNum(clips.length);
     if (!clips.length) {
-      this.showEmpty(body, `No clips found in “${folder || "(no folder set)"}”.`);
+      this.showEmpty(body, T("No clips found in “{folder}”.", { folder: folder || T("(no folder set)") }));
       return;
     }
     body.empty();
@@ -1535,7 +1590,7 @@ class HomepageView extends ItemView {
 
     this.$("recent-count").textContent = fmtNum(notes.length);
     if (!notes.length) {
-      this.showEmpty(body, "No notes found.");
+      this.showEmpty(body, T("No notes found."));
       return;
     }
     body.empty();
@@ -1652,7 +1707,7 @@ class HomepageView extends ItemView {
     const results = this.$("search-results");
     results.classList.remove("hidden");
     results.empty();
-    results.createDiv({ cls: "search-status", text: "↻ Searching…" });
+    results.createDiv({ cls: "search-status", text: T("↻ Searching…") });
 
     const words = query.toLowerCase().split(/\s+/).filter(Boolean);
     const files = this.app.vault
@@ -1696,7 +1751,7 @@ class HomepageView extends ItemView {
 
     if (!hits.length) {
       results.empty();
-      results.createDiv({ cls: "search-status", text: `No results for “${query}”` });
+      results.createDiv({ cls: "search-status", text: T("No results for “{query}”", { query }) });
       return;
     }
     hits.sort((a, b) => Number(b.titleHit) - Number(a.titleHit));
@@ -1750,7 +1805,7 @@ class HomepageView extends ItemView {
         const photo = {
           date: today,
           src: data.urls.regular,
-          alt: data.alt_description || data.description || "Nature photo",
+          alt: data.alt_description || data.description || T("Nature photo"),
           photographer: data.user.name,
           photographerUrl: `${data.user.links.html}?utm_source=genkan&utm_medium=referral`,
           photoUrl: `${data.links.html}?utm_source=genkan&utm_medium=referral`,
@@ -1764,7 +1819,7 @@ class HomepageView extends ItemView {
     const photo = {
       date: today,
       src: `https://picsum.photos/seed/${today}/1600/500`,
-      alt: "Landscape photo of the day",
+      alt: T("Landscape photo of the day"),
       photographer: null,
       photoUrl: "https://picsum.photos",
     };
@@ -1776,7 +1831,7 @@ class HomepageView extends ItemView {
     const hero = this.$("hero");
     const img = this.$("hero-img");
     const credit = this.$("hero-credit");
-    img.alt = photo.alt || "Photo of the day";
+    img.alt = photo.alt || T("Photo of the day");
     img.classList.remove("visible");
     img.onload = () => {
       img.classList.add("visible");
@@ -1789,27 +1844,53 @@ class HomepageView extends ItemView {
     img.src = photo.src;
     credit.empty();
     if (photo.photographer) {
-      credit.append(
-        "Photo by ",
-        h("a", { href: safeUrl(photo.photographerUrl), text: photo.photographer }),
-        " on ",
-        h("a", { href: safeUrl(photo.photoUrl), text: "Unsplash" }),
-      );
+      appendTemplate(credit, T("Photo by {photographer} on {site}"), {
+        photographer: h("a", { href: safeUrl(photo.photographerUrl), text: photo.photographer }),
+        site: h("a", { href: safeUrl(photo.photoUrl), text: "Unsplash" }),
+      });
     } else {
-      credit.append("Photo from ", h("a", { href: safeUrl(photo.photoUrl), text: "Picsum Photos" }));
+      appendTemplate(credit, T("Photo from {site}"), {
+        site: h("a", { href: safeUrl(photo.photoUrl), text: "Picsum Photos" }),
+      });
     }
   }
 
   fallbackQuote() {
     const now = new Date();
     const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86_400_000);
-    return QUOTES[dayOfYear % QUOTES.length];
+    const list = QUOTES_I18N[LANG] ?? QUOTES;
+    return list[dayOfYear % list.length];
   }
 
+  // ZenQuotes needs a credit; Echoes is credited too. Bundled quotes need none.
   displayQuote({ q, a, src }) {
     this.$("quote-text").textContent = q;
     this.$("quote-author").textContent = `— ${a}`;
-    this.$("quote-credit").classList.toggle("hidden", src !== "zenquotes");
+    const credit = this.$("quote-credit");
+    const site = { zenquotes: ["https://zenquotes.io/", "ZenQuotes API"], echoes: ["https://echoes.soferity.com/", "Echoes API"] }[src];
+    credit.classList.toggle("hidden", !site);
+    credit.empty();
+    if (site) credit.append(T("Inspirational quotes provided by") + " ", h("a", { href: site[0], text: site[1] }));
+  }
+
+  // Existing English installs keep ZenQuotes; other languages start on the bundled list
+  get quoteSource() {
+    const v = this.settings.quoteSource;
+    return ["zenquotes", "echoes", "bundled"].includes(v) ? v : LANG === "en" ? "zenquotes" : "bundled";
+  }
+
+  async fetchZenQuotes() {
+    const res = await requestUrl({ url: "https://zenquotes.io/api/today" });
+    const d = res.json?.[0];
+    return d?.q ? { q: d.q, a: d.a, src: "zenquotes" } : null;
+  }
+
+  async fetchEchoes() {
+    const res = await requestUrl({ url: `https://echoes.soferity.com/api/quotes/random?lang=${LANG}` });
+    const raw = res.json?.data ?? res.json;
+    const d = Array.isArray(raw) ? raw[0] : raw;
+    const q = d?.quote ?? d?.content;
+    return q && d.author ? { q: String(q), a: String(d.author), src: "echoes" } : null;
   }
 
   async loadQuote() {
@@ -1817,31 +1898,40 @@ class HomepageView extends ItemView {
     bar.classList.toggle("hidden", !this.settings.showQuote);
     if (!this.settings.showQuote) return; // no quote, no network request
 
+    const source = this.quoteSource;
+    if (source === "bundled") return this.displayQuote({ ...this.fallbackQuote(), src: "builtin" }); // no request
+
     const today = new Date().toISOString().slice(0, 10);
     const cached = this.cacheGet("quote");
-    // Quotes cached before the source was recorded have no credit info: fetch those again once
-    if (cached?.date === today && cached.src) return this.displayQuote(cached);
+    if (cached?.date === today && cached.source === source && cached.lang === LANG && cached.src) {
+      return this.displayQuote(cached);
+    }
 
     this.displayQuote({ ...this.fallbackQuote(), src: "builtin" });
     try {
-      const res = await requestUrl({ url: "https://zenquotes.io/api/today" });
-      const d = res.json?.[0];
-      if (d?.q) {
-        const quote = { date: today, q: d.q, a: d.a, src: "zenquotes" };
+      const fetched = source === "echoes" ? await this.fetchEchoes() : await this.fetchZenQuotes();
+      if (fetched) {
+        const quote = { date: today, source, lang: LANG, ...fetched };
         this.cacheSet("quote", quote);
         return this.displayQuote(quote);
       }
     } catch {
       /* use the built-in quote */
     }
-    this.cacheSet("quote", { date: today, ...this.fallbackQuote(), src: "builtin" });
+    this.cacheSet("quote", { date: today, source, lang: LANG, ...this.fallbackQuote(), src: "builtin" });
   }
 }
 
 // ─── Settings tab ─────────────────────────────────────────────────────────────
 
+// The built-in links are stored in English; show them in the current language
+function quickLinkLabel(l) {
+  const builtin = DEFAULT_QUICK_LINKS.find((d) => d.action === l.action && d.label === l.label);
+  return builtin ? T(builtin.label) : l.label;
+}
+
 const quickLinksToText = (links) =>
-  (links ?? []).map((l) => `${l.icon ?? ""} | ${l.label} | ${l.action}`).join("\n");
+  (links ?? []).map((l) => `${l.icon ?? ""} | ${quickLinkLabel(l)} | ${l.action}`).join("\n");
 
 function textToQuickLinks(text) {
   return text
@@ -1879,38 +1969,54 @@ class HomepageSettingTab extends PluginSettingTab {
           if (opts.suggest && PathSuggest) new PathSuggest(this.app, t.inputEl, opts.suggest);
         });
 
-    text("Your name", "Shown in the greeting.", "userName", { placeholder: "e.g. Alex" });
+    text(T("Your name"), T("Shown in the greeting."), "userName", { placeholder: T("e.g. Alex") });
 
     new Setting(containerEl)
-      .setName("Open on startup")
-      .setDesc("Open the homepage when Obsidian starts.")
+      .setName(T("Open on startup"))
+      .setDesc(T("Open the homepage when Obsidian starts."))
       .addToggle((t) => t.setValue(s.openOnStartup).onChange((v) => save("openOnStartup", v)));
 
     new Setting(containerEl)
-      .setName("Appearance")
-      .setDesc("System follows Obsidian's light/dark theme.")
+      .setName(T("Appearance"))
+      .setDesc(T("System follows Obsidian's light/dark theme."))
       .addDropdown((d) =>
         d
-          .addOptions({ system: "System", dark: "Dark", light: "Light" })
+          .addOptions({ system: T("System"), dark: T("Dark"), light: T("Light") })
           .setValue(s.theme)
           .onChange((v) => save("theme", v)),
       );
 
     new Setting(containerEl)
-      .setName("Clock format")
+      .setName(T("Clock format"))
       .addDropdown((d) =>
         d
-          .addOptions({ "12h": "12-hour (AM/PM)", "24h": "24-hour" })
+          .addOptions({ "12h": T("12-hour (AM/PM)"), "24h": T("24-hour") })
           .setValue(s.clockFormat)
           .onChange((v) => save("clockFormat", v)),
       );
 
     new Setting(containerEl)
-      .setName("Spelling")
-      .setDesc("Automatic follows your device's region. Command names change after you restart Obsidian.")
+      .setName(T("Language"))
+      .setDesc(T("Automatic follows Obsidian's language setting."))
       .addDropdown((d) =>
         d
-          .addOptions({ auto: "Automatic", us: "American (favorite)", uk: "British (favourite)" })
+          .addOptions({ auto: T("Automatic"), ...LANGUAGES })
+          .setValue(s.language)
+          .onChange(async (v) => {
+            s.language = v;
+            applyLanguage(v);
+            await this.plugin.saveSettings();
+            await this.plugin.rebuildViews();
+            this.display();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName(T("Spelling"))
+      .setDesc(T("Automatic follows your device's region. Command names change after you restart Obsidian."))
+      .addDropdown((d) =>
+        d
+          .addOptions({ auto: T("Automatic"), us: T("American (favorite)"), uk: T("British (favourite)") })
           .setValue(s.spelling)
           .onChange((v) => {
             spellingChoice = v;
@@ -1919,28 +2025,27 @@ class HomepageSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("First day of the week")
-      .setDesc("Automatic follows your device's region.")
+      .setName(T("First day of the week"))
+      .setDesc(T("Automatic follows your device's region."))
       .addDropdown((d) =>
         d
-          .addOptions({ auto: "Automatic", "0": "Sunday", "1": "Monday", "6": "Saturday" })
+          .addOptions({ auto: T("Automatic"), "0": T("Sunday"), "1": T("Monday"), "6": T("Saturday") })
           .setValue(String(s.weekStart))
           .onChange((v) => save("weekStart", v)),
       );
 
     const customFont = text(
-      "Custom clock font",
-      "The name of a font installed on this device, such as Courier New or Avenir Next. A device without it uses the dashboard font.",
+      T("Custom clock font"), T("The name of a font installed on this device, such as Courier New or Avenir Next. A device without it uses the dashboard font."),
       "clockFontCustom",
-      { placeholder: "Font name" },
+      { placeholder: T("Font name") },
     );
     const showCustomFont = () => customFont.settingEl.toggleClass("genkan-hidden", s.clockFont !== "custom");
     const fontSetting = new Setting(containerEl)
-      .setName("Clock font")
-      .setDesc("Uses fonts already on your device. Your Obsidian theme's fonts are available too.")
+      .setName(T("Clock font"))
+      .setDesc(T("Uses fonts already on your device. Your Obsidian theme's fonts are available too."))
       .addDropdown((d) =>
         d
-          .addOptions(CLOCK_FONTS)
+          .addOptions(Object.fromEntries(Object.entries(CLOCK_FONTS).map(([k, v]) => [k, T(v)])))
           .setValue(Object.keys(CLOCK_FONTS).includes(s.clockFont) ? s.clockFont : "default")
           .onChange(async (v) => {
             s.clockFont = v;
@@ -1952,42 +2057,38 @@ class HomepageSettingTab extends PluginSettingTab {
     showCustomFont();
 
     new Setting(containerEl)
-      .setName("Folders")
+      .setName(T("Folders"))
       .setHeading();
-    text("Web Clipper folder", "Where the Web Clipper saves notes.", "clipsFolder", {
+    text(T("Web Clipper folder"), T("Where the Web Clipper saves notes."), "clipsFolder", {
       placeholder: "Clippings",
     });
     text(
-      "Daily notes folder",
-      "Leave blank to use your Daily Notes / Periodic Notes settings.",
+      T("Daily notes folder"), T("Leave blank to use your Daily Notes / Periodic Notes settings."),
       "dailyNotesFolder",
     );
     text(
-      "Data folder",
-      "Tasks.md and Quick Note.md are stored here, so Obsidian Sync shares them across devices.",
+      T("Data folder"), T("Tasks.md and Quick Note.md are stored here, so Obsidian Sync shares them across devices."),
       "dataFolder",
       { placeholder: "genkan/data" },
     );
 
-    new Setting(containerEl).setName("Content").setHeading();
-    text("Max web clips", "", "maxClips", { number: true });
-    text("Max recent notes", "", "maxRecent", { number: true });
+    new Setting(containerEl).setName(T("Content")).setHeading();
+    text(T("Max web clips"), "", "maxClips", { number: true });
+    text(T("Max recent notes"), "", "maxRecent", { number: true });
 
     new Setting(containerEl)
-      .setName("Pebble ring notes")
-      .setDesc("Show the latest voice notes from your Pebble Index ring.")
+      .setName(T("Pebble ring notes"))
+      .setDesc(T("Show the latest voice notes from your Pebble Index ring."))
       .addToggle((t) => t.setValue(s.showRingNotes).onChange((v) => save("showRingNotes", v)));
 
     // These mirror the three Obsidian choices in the Pebble app
     const noteSetting = text(
-      "Ring note",
-      "The note the ring adds your voice notes to, with entries under headings like “## 2026-10-05 21:55”.",
+      T("Ring note"), T("The note the ring adds your voice notes to, with entries under headings like “## 2026-10-05 21:55”."),
       "ringNotesFile",
       { placeholder: "Pebble Index.md", suggest: "file" },
     );
     const folderSetting = text(
-      "Ring notes folder",
-      "The folder the ring saves each voice note into, one file per note.",
+      T("Ring notes folder"), T("The folder the ring saves each voice note into, one file per note."),
       "ringNotesFolder",
       { placeholder: "Pebble Index", suggest: "folder" },
     );
@@ -1996,14 +2097,14 @@ class HomepageSettingTab extends PluginSettingTab {
       folderSetting.settingEl.toggleClass("genkan-hidden", s.ringMode !== "files");
     };
     const modeSetting = new Setting(containerEl)
-      .setName("Where does the ring save notes?")
-      .setDesc("Match the Obsidian setting in the Pebble app.")
+      .setName(T("Where does the ring save notes?"))
+      .setDesc(T("Match the Obsidian setting in the Pebble app."))
       .addDropdown((d) =>
         d
           .addOptions({
-            main: "One main note (Pebble Index.md)",
-            chosen: "An existing note I choose",
-            files: "A separate file for each note",
+            main: T("One main note (Pebble Index.md)"),
+            chosen: T("An existing note I choose"),
+            files: T("A separate file for each note"),
           })
           .setValue(["chosen", "files"].includes(s.ringMode) ? s.ringMode : "main")
           .onChange(async (v) => {
@@ -2015,32 +2116,42 @@ class HomepageSettingTab extends PluginSettingTab {
     // Keep the mode picker above the field it controls
     containerEl.insertBefore(modeSetting.settingEl, noteSetting.settingEl);
     showRingFields();
-    text("Max ring notes", "", "maxRingNotes", { number: true });
+    text(T("Max ring notes"), "", "maxRingNotes", { number: true });
 
     new Setting(containerEl)
-      .setName("Photo of the day")
-      .setDesc("Shows a landscape photo from Picsum, or from Unsplash if you add a key below. Off means no photo is requested.")
+      .setName(T("Photo of the day"))
+      .setDesc(T("Shows a landscape photo from Picsum, or from Unsplash if you add a key below. Off means no photo is requested."))
       .addToggle((t) => t.setValue(s.showHero).onChange((v) => save("showHero", v)));
     text(
-      "Unsplash access key",
-      "Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault.",
+      T("Unsplash access key"), T("Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault."),
       "unsplashKey",
       { password: true },
     );
     new Setting(containerEl)
-      .setName("Daily quote")
-      .setDesc("Shows a quote from ZenQuotes, fetched once a day. Off means no quote is requested.")
+      .setName(T("Daily quote"))
+      .setDesc(T("Shows a quote each day. Off means no quote is shown and none is requested."))
       .addToggle((t) => t.setValue(s.showQuote).onChange((v) => save("showQuote", v)));
     new Setting(containerEl)
-      .setName("Site icons on web clips")
-      .setDesc("Uses Google's favicon service, which receives the domain of each clipped page. Off means no icon requests.")
+      .setName(T("Quote source"))
+      .setDesc(T("ZenQuotes and Echoes are fetched once a day over the network, and ZenQuotes is English only. The bundled list works offline."))
+      .addDropdown((d) =>
+        d
+          .addOptions({
+            zenquotes: T("ZenQuotes (English)"),
+            echoes: T("Echoes (your language)"),
+            bundled: T("Bundled list (your language)"),
+          })
+          .setValue(["zenquotes", "echoes", "bundled"].includes(s.quoteSource) ? s.quoteSource : LANG === "en" ? "zenquotes" : "bundled")
+          .onChange((v) => save("quoteSource", v)),
+      );
+    new Setting(containerEl)
+      .setName(T("Site icons on web clips"))
+      .setDesc(T("Uses Google's favicon service, which receives the domain of each clipped page. Off means no icon requests."))
       .addToggle((t) => t.setValue(s.showFavicons).onChange((v) => save("showFavicons", v)));
 
     new Setting(containerEl)
-      .setName("Quick links")
-      .setDesc(
-        "One per line: icon | label | action. Actions: command:<command id>, open:<note path>, daily, random, or an https:// URL.",
-      )
+      .setName(T("Quick links"))
+      .setDesc(T("One per line: icon | label | action. Actions: command:<command id>, open:<note path>, daily, random, or an https:// URL."))
       .addTextArea((t) => {
         t.setValue(quickLinksToText(s.quickLinks)).onChange((v) =>
           save("quickLinks", textToQuickLinks(v)),
@@ -2057,10 +2168,10 @@ module.exports = class HomepagePlugin extends Plugin {
   async onload() {
     await this.loadSettings();
     this.registerView(VIEW_TYPE, (leaf) => new HomepageView(leaf, this));
-    this.addRibbonIcon("home", "Open homepage", () => this.activateView());
+    this.addRibbonIcon("home", T("Open homepage"), () => this.activateView());
     this.addCommand({
       id: "open-homepage",
-      name: "Open homepage",
+      name: T("Open homepage"),
       callback: () => this.activateView(),
     });
     this.addSettingTab(new HomepageSettingTab(this.app, this));
@@ -2078,7 +2189,7 @@ module.exports = class HomepagePlugin extends Plugin {
 
     this.addCommand({
       id: "toggle-favourite",
-      name: S("Add or remove current note from homepage favourites"),
+      name: T("Add or remove current note from homepage favourites"),
       checkCallback: (checking) => {
         const f = this.app.workspace.getActiveFile();
         if (!f || f.extension !== "md" || this.isDataFile(f)) return false;
@@ -2088,7 +2199,7 @@ module.exports = class HomepagePlugin extends Plugin {
     });
     this.addCommand({
       id: "add-favourite",
-      name: S("Add a note to homepage favourites…"),
+      name: T("Add a note to homepage favourites…"),
       callback: () => new FavouritePicker(this.app, this).open(),
     });
     this.registerEvent(
@@ -2129,7 +2240,7 @@ module.exports = class HomepagePlugin extends Plugin {
     const fav = this.favPaths.has(file.path);
     menu.addItem((item) =>
       item
-        .setTitle(S(fav ? "Remove from homepage favourites" : "Add to homepage favourites"))
+        .setTitle(fav ? T("Remove from homepage favourites") : T("Add to homepage favourites"))
         .setIcon("star")
         .onClick(() => this.toggleFavourite(file)),
     );
@@ -2139,7 +2250,7 @@ module.exports = class HomepagePlugin extends Plugin {
   decorateLeaf(leaf) {
     const view = leaf?.view;
     if (!(view instanceof MarkdownView) || this.stars.has(view)) return;
-    const el = view.addAction("star", S("Add or remove from homepage favourites"), () => {
+    const el = view.addAction("star", T("Add or remove from homepage favourites"), () => {
       if (view.file && !this.isDataFile(view.file)) this.toggleFavourite(view.file);
     });
     el.addClass("hp-fav-star");
@@ -2157,7 +2268,7 @@ module.exports = class HomepagePlugin extends Plugin {
       const f = view.file;
       const on = !!f && this.favPaths.has(f.path);
       el.toggleClass("is-active", on);
-      el.setAttribute("aria-label", S(on ? "Remove from homepage favourites" : "Add to homepage favourites"));
+      el.setAttribute("aria-label", on ? T("Remove from homepage favourites") : T("Add to homepage favourites"));
     }
   }
 
@@ -2171,6 +2282,9 @@ module.exports = class HomepagePlugin extends Plugin {
     const saved = await this.loadData();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, saved);
     spellingChoice = this.settings.spelling;
+    applyLanguage(this.settings.language);
+    // New installs follow the region's 12/24-hour preference
+    if (!saved?.clockFormat) this.settings.clockFormat = locale12h() ? "12h" : "24h";
     // Before ring modes existed, a custom note path meant "a note I choose"
     if (!saved?.ringMode) {
       const custom = saved?.ringNotesFile && saved.ringNotesFile !== RING_MAIN_NOTE;
@@ -2218,15 +2332,15 @@ module.exports = class HomepagePlugin extends Plugin {
   async addFavourite(file) {
     try {
       if (await this.isFavourite(file)) {
-        new Notice(S(`${file.basename} is already a favourite`));
+        new Notice(T("{name} is already a favourite", { name: file.basename }));
         return;
       }
       const link = this.app.metadataCache.fileToLinktext(file, "", true);
       const f = await ensureFileIn(this.app, this.favPath);
       await this.app.vault.process(f, (t) => `${t}${t && !t.endsWith("\n") ? "\n" : ""}- [[${link}]]\n`);
-      new Notice(S(`Added ${file.basename} to favourites`));
+      new Notice(T("Added {name} to favourites", { name: file.basename }));
     } catch (err) {
-      new Notice(S(`Could not add favourite: ${err.message}`));
+      new Notice(T("Could not add favourite: {error}", { error: err.message }));
     }
   }
 
@@ -2253,7 +2367,7 @@ module.exports = class HomepagePlugin extends Plugin {
     if (!(await this.isFavourite(file))) return this.addFavourite(file);
     const fav = (await this.readFavourites()).find((x) => this.favouriteFile(x)?.path === file.path);
     await this.removeFavourite(fav.target);
-    new Notice(S(`Removed ${file.basename} from favourites`));
+    new Notice(T("Removed {name} from favourites", { name: file.basename }));
   }
 
   async saveSettings() {
@@ -2268,6 +2382,14 @@ module.exports = class HomepagePlugin extends Plugin {
       await leaf.setViewState({ type: VIEW_TYPE, active: true });
     }
     workspace.revealLeaf(leaf);
+  }
+
+  // Labels are built once per view, so a language change reopens the dashboard
+  async rebuildViews() {
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE);
+    if (!leaves.length) return;
+    leaves.forEach((l) => l.detach());
+    await this.activateView();
   }
 
   refreshViews() {

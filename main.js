@@ -296,6 +296,753 @@ const QUOTES = [
   },
 ];
 
+// Built-in quotes in the other interface languages: quotations in their original language,
+// plus a few proverbs. Used when the quote source is the bundled list, or when a request fails.
+const QUOTES_I18N = {
+  fr: [
+    { q: "Je pense, donc je suis.", a: "René Descartes" },
+    { q: "Le cœur a ses raisons que la raison ne connaît point.", a: "Blaise Pascal" },
+    { q: "Cultivons notre jardin.", a: "Voltaire" },
+    { q: "Le doute n’est pas un état agréable, mais l’assurance est un état ridicule.", a: "Voltaire" },
+    { q: "On résiste à l’invasion des armées ; on ne résiste pas à l’invasion des idées.", a: "Victor Hugo" },
+    { q: "Il n’y a qu’un bonheur dans la vie, c’est d’aimer et d’être aimé.", a: "George Sand" },
+    { q: "On ne voit bien qu’avec le cœur. L’essentiel est invisible pour les yeux.", a: "Antoine de Saint-Exupéry" },
+    { q: "Ce qui embellit le désert, c’est qu’il cache un puits quelque part.", a: "Antoine de Saint-Exupéry" },
+    { q: "Il faut imaginer Sisyphe heureux.", a: "Albert Camus" },
+    { q: "Au milieu de l’hiver, j’apprenais enfin qu’il y avait en moi un été invincible.", a: "Albert Camus" },
+    { q: "Rien ne sert de courir ; il faut partir à point.", a: "Jean de La Fontaine" },
+    { q: "Patience et longueur de temps font plus que force ni que rage.", a: "Jean de La Fontaine" },
+    { q: "Le bonheur n’est pas chose aisée : il est très difficile de le trouver en nous, et impossible de le trouver ailleurs.", a: "Chamfort" },
+    { q: "Le temps est un grand maître, dit-on ; le malheur est qu’il tue ses élèves.", a: "Hector Berlioz" },
+  ],
+  es: [
+    { q: "El que lee mucho y anda mucho, ve mucho y sabe mucho.", a: "Miguel de Cervantes" },
+    { q: "La libertad, Sancho, es uno de los más preciosos dones que a los hombres dieron los cielos.", a: "Miguel de Cervantes" },
+    { q: "Caminante, no hay camino, se hace camino al andar.", a: "Antonio Machado" },
+    { q: "Yo soy yo y mi circunstancia, y si no la salvo a ella no me salvo yo.", a: "José Ortega y Gasset" },
+    { q: "Confieso que he vivido.", a: "Pablo Neruda" },
+    { q: "La vida no es la que uno vivió, sino la que uno recuerda y cómo la recuerda para contarla.", a: "Gabriel García Márquez" },
+    { q: "Los sueños, sueños son.", a: "Pedro Calderón de la Barca" },
+    { q: "A quien madruga, Dios le ayuda.", a: "Proverbio español" },
+    { q: "Poco a poco se va lejos.", a: "Proverbio español" },
+    { q: "No hay mal que por bien no venga.", a: "Proverbio español" },
+    { q: "Más vale tarde que nunca.", a: "Proverbio español" },
+    { q: "Quien canta, su mal espanta.", a: "Proverbio español" },
+    { q: "Del dicho al hecho hay mucho trecho.", a: "Proverbio español" },
+  ],
+  de: [
+    { q: "Es irrt der Mensch, solang er strebt.", a: "Johann Wolfgang von Goethe" },
+    { q: "Wer immer strebend sich bemüht, den können wir erlösen.", a: "Johann Wolfgang von Goethe" },
+    { q: "Was du ererbt von deinen Vätern hast, erwirb es, um es zu besitzen.", a: "Johann Wolfgang von Goethe" },
+    { q: "Der Mensch ist nur da ganz Mensch, wo er spielt.", a: "Friedrich Schiller" },
+    { q: "Habe Mut, dich deines eigenen Verstandes zu bedienen!", a: "Immanuel Kant" },
+    { q: "Der bestirnte Himmel über mir und das moralische Gesetz in mir.", a: "Immanuel Kant" },
+    { q: "Wer ein Warum zu leben hat, erträgt fast jedes Wie.", a: "Friedrich Nietzsche" },
+    { q: "Ohne Musik wäre das Leben ein Irrtum.", a: "Friedrich Nietzsche" },
+    { q: "Die Grenzen meiner Sprache bedeuten die Grenzen meiner Welt.", a: "Ludwig Wittgenstein" },
+    { q: "Jedem Anfang wohnt ein Zauber inne.", a: "Hermann Hesse" },
+    { q: "Es gibt nichts Gutes, außer: Man tut es.", a: "Erich Kästner" },
+    { q: "Die Gedanken sind frei.", a: "Volkslied" },
+  ],
+  ja: [
+    { q: "一期一会", a: "茶道の言葉" },
+    { q: "初心忘るべからず", a: "世阿弥" },
+    { q: "月日は百代の過客にして、行きかふ年もまた旅人なり。", a: "松尾芭蕉" },
+    { q: "古池や蛙飛びこむ水の音", a: "松尾芭蕉" },
+    { q: "春はあけぼの。やうやう白くなりゆく山ぎは、少しあかりて、紫だちたる雲のほそくたなびきたる。", a: "清少納言" },
+    { q: "天は人の上に人を造らず、人の下に人を造らずと云えり。", a: "福澤諭吉" },
+    { q: "雨にも負けず 風にも負けず", a: "宮沢賢治" },
+    { q: "千里の道も一歩から", a: "老子" },
+    { q: "知るを知るとなし、知らざるを知らずとせよ。これ知るなり。", a: "孔子" },
+    { q: "継続は力なり", a: "ことわざ" },
+    { q: "七転び八起き", a: "ことわざ" },
+    { q: "急がば回れ", a: "ことわざ" },
+    { q: "雨降って地固まる", a: "ことわざ" },
+    { q: "石の上にも三年", a: "ことわざ" },
+  ],
+};
+
+// Translations, keyed by the English source text (see T() in main.template.js).
+// {name} marks a value filled in at run time and must be kept as written.
+// "name suffix" is appended after the name in the greeting (Japanese "さん").
+const I18N = {
+  en: {},
+
+  fr: {
+    "Add a note to your homepage favourites…": "Ajouter une note aux favoris de la page d’accueil…",
+    "Refresh": "Actualiser",
+    "Toggle theme": "Changer de thème",
+    "Settings": "Réglages",
+    "Open settings": "Ouvrir les réglages",
+    "Search your vault…": "Rechercher dans votre coffre…",
+    "Search your vault": "Rechercher dans votre coffre",
+    "Clear search": "Effacer la recherche",
+    "Search results": "Résultats de la recherche",
+    "Photo of the day": "Photo du jour",
+    "Load a new photo": "Charger une nouvelle photo",
+    "Load new photo": "Charger une nouvelle photo",
+    "Inspirational quotes provided by": "Citations inspirantes fournies par",
+    "Favourites": "Favoris",
+    "Calendar": "Calendrier",
+    "Previous month": "Mois précédent",
+    "Next month": "Mois suivant",
+    "Today": "Aujourd’hui",
+    "Quick links": "Liens rapides",
+    "Ring notes": "Notes de la bague",
+    "Open the notes file": "Ouvrir le fichier de notes",
+    "Open": "Ouvrir",
+    "Web clips": "Clips web",
+    "Refresh clips": "Actualiser les clips",
+    "Refresh web clips": "Actualiser les clips web",
+    "Recent notes": "Notes récentes",
+    "Refresh recent notes": "Actualiser les notes récentes",
+    "Tasks": "Tâches",
+    "Add a task and press Enter…": "Ajouter une tâche…",
+    "New task": "Nouvelle tâche",
+    "Filter tasks": "Filtrer les tâches",
+    "All": "Toutes",
+    "Active": "En cours",
+    "Done": "Terminées",
+    "Clear completed": "Effacer les tâches terminées",
+    "Quick note": "Note rapide",
+    "Saved": "Enregistré",
+    "Jot something down…": "Notez quelque chose…",
+    "Homepage": "Page d’accueil",
+    "Note not found: {path}": "Note introuvable : {path}",
+    "Dark": "Sombre",
+    "Light": "Clair",
+    "System ({mode})": "Système ({mode})",
+    "Appearance: {label} — click to change": "Apparence : {label} — cliquer pour changer",
+    "Good morning": "Bonjour",
+    "Good afternoon": "Bon après-midi",
+    "Good evening": "Bonsoir",
+    "Good night": "Bonne nuit",
+    "Could not create daily note: {error}": "Impossible de créer la note quotidienne : {error}",
+    "Could not update tasks: {error}": "Impossible de mettre à jour les tâches : {error}",
+    "No completed tasks yet.": "Aucune tâche terminée pour l’instant.",
+    "Nothing left to do!": "Il ne reste rien à faire !",
+    "No tasks yet — add one above.": "Aucune tâche — ajoutez-en une ci-dessus.",
+    "Mark incomplete": "Marquer comme non terminée",
+    "Mark complete": "Marquer comme terminée",
+    "Delete": "Supprimer",
+    "Delete: {task}": "Supprimer : {task}",
+    "Could not save quick note: {error}": "Impossible d’enregistrer la note rapide : {error}",
+    "No quick links configured.": "Aucun lien rapide configuré.",
+    "Command not found: {id}": "Commande introuvable : {id}",
+    "Unknown quick link action: {action}": "Action de lien rapide inconnue : {action}",
+    "Yesterday": "Hier",
+    "Choose the folder your ring saves notes to in Genkan's settings.": "Choisissez dans les réglages de Genkan le dossier où votre bague enregistre les notes.",
+    "No notes found in “{folder}”.": "Aucune note trouvée dans « {folder} ».",
+    "No ring notes yet. Looking for “{path}”.": "Aucune note de la bague pour l’instant. Recherche de « {path} ».",
+    "No timestamped entries found in “{path}”.": "Aucune entrée horodatée trouvée dans « {path} ».",
+    "Not found — click to create": "Introuvable — cliquer pour créer",
+    "Remove from favourites": "Retirer des favoris",
+    "Remove {label} from favourites": "Retirer {label} des favoris",
+    "Add a favourite": "Ajouter un favori",
+    "+ Add": "+ Ajouter",
+    "Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”.": "Épinglez les notes que vous ouvrez le plus. Vous pouvez aussi faire un clic droit sur une note → « Ajouter aux favoris de la page d’accueil ».",
+    "No clips found in “{folder}”.": "Aucun clip trouvé dans « {folder} ».",
+    "(no folder set)": "(aucun dossier défini)",
+    "No notes found.": "Aucune note trouvée.",
+    "↻ Searching…": "↻ Recherche en cours…",
+    "No results for “{query}”": "Aucun résultat pour « {query} »",
+    "Nature photo": "Photo de nature",
+    "Landscape photo of the day": "Photo de paysage du jour",
+    "Photo by {photographer} on {site}": "Photo de {photographer} sur {site}",
+    "Photo from {site}": "Photo de {site}",
+    "Your name": "Votre prénom",
+    "Shown in the greeting.": "Affiché dans le message d’accueil.",
+    "e.g. Alex": "p. ex. Alex",
+    "Open on startup": "Ouvrir au démarrage",
+    "Open the homepage when Obsidian starts.": "Ouvrir la page d’accueil au démarrage d’Obsidian.",
+    "Appearance": "Apparence",
+    "System follows Obsidian's light/dark theme.": "« Système » suit le thème clair ou sombre d’Obsidian.",
+    "System": "Système",
+    "Clock format": "Format de l’heure",
+    "12-hour (AM/PM)": "12 heures (AM/PM)",
+    "24-hour": "24 heures",
+    "Language": "Langue",
+    "Automatic follows Obsidian's language setting.": "« Automatique » suit la langue d’Obsidian.",
+    "Automatic": "Automatique",
+    "Spelling": "Orthographe",
+    "Automatic follows your device's region. Command names change after you restart Obsidian.": "« Automatique » suit la région de votre appareil. Les noms des commandes changent après le redémarrage d’Obsidian.",
+    "American (favorite)": "Américaine (favorite)",
+    "British (favourite)": "Britannique (favourite)",
+    "First day of the week": "Premier jour de la semaine",
+    "Automatic follows your device's region.": "« Automatique » suit la région de votre appareil.",
+    "Sunday": "Dimanche",
+    "Monday": "Lundi",
+    "Saturday": "Samedi",
+    "Custom clock font": "Police personnalisée de l’horloge",
+    "The name of a font installed on this device, such as Courier New or Avenir Next. A device without it uses the dashboard font.": "Le nom d’une police installée sur cet appareil, comme Courier New ou Avenir Next. Un appareil qui ne l’a pas utilise la police du tableau de bord.",
+    "Font name": "Nom de la police",
+    "Clock font": "Police de l’horloge",
+    "Uses fonts already on your device. Your Obsidian theme's fonts are available too.": "Utilise les polices déjà présentes sur votre appareil. Les polices de votre thème Obsidian sont aussi disponibles.",
+    "Folders": "Dossiers",
+    "Web Clipper folder": "Dossier du Web Clipper",
+    "Where the Web Clipper saves notes.": "L’endroit où le Web Clipper enregistre les notes.",
+    "Daily notes folder": "Dossier des notes quotidiennes",
+    "Leave blank to use your Daily Notes / Periodic Notes settings.": "Laissez vide pour utiliser les réglages de Notes quotidiennes / Periodic Notes.",
+    "Data folder": "Dossier des données",
+    "Tasks.md and Quick Note.md are stored here, so Obsidian Sync shares them across devices.": "Tasks.md et Quick Note.md sont stockés ici, afin qu’Obsidian Sync les partage entre vos appareils.",
+    "Content": "Contenu",
+    "Max web clips": "Nombre max. de clips web",
+    "Max recent notes": "Nombre max. de notes récentes",
+    "Pebble ring notes": "Notes de la bague Pebble",
+    "Show the latest voice notes from your Pebble Index ring.": "Afficher les dernières notes vocales de votre bague Pebble Index.",
+    "Ring note": "Note de la bague",
+    "The note the ring adds your voice notes to, with entries under headings like “## 2026-10-05 21:55”.": "La note à laquelle la bague ajoute vos notes vocales, avec des entrées sous des titres comme « ## 2026-10-05 21:55 ».",
+    "Ring notes folder": "Dossier des notes de la bague",
+    "The folder the ring saves each voice note into, one file per note.": "Le dossier où la bague enregistre chaque note vocale, un fichier par note.",
+    "Where does the ring save notes?": "Où la bague enregistre-t-elle les notes ?",
+    "Match the Obsidian setting in the Pebble app.": "Choisissez le même réglage Obsidian que dans l’application Pebble.",
+    "One main note (Pebble Index.md)": "Une note principale (Pebble Index.md)",
+    "An existing note I choose": "Une note existante que je choisis",
+    "A separate file for each note": "Un fichier distinct pour chaque note",
+    "Max ring notes": "Nombre max. de notes de la bague",
+    "Shows a landscape photo from Picsum, or from Unsplash if you add a key below. Off means no photo is requested.": "Affiche une photo de paysage de Picsum, ou d’Unsplash si vous ajoutez une clé ci-dessous. Désactivé : aucune photo n’est demandée.",
+    "Unsplash access key": "Clé d’accès Unsplash",
+    "Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault.": "Facultatif. Active les photos de nature d’Unsplash avec attribution. La clé est stockée dans le fichier de réglages de ce plugin, dans votre coffre.",
+    "Daily quote": "Citation du jour",
+    "Site icons on web clips": "Icônes de site sur les clips web",
+    "Uses Google's favicon service, which receives the domain of each clipped page. Off means no icon requests.": "Utilise le service de favicons de Google, qui reçoit le domaine de chaque page clippée. Désactivé : aucune icône n’est demandée.",
+    "One per line: icon | label | action. Actions: command:<command id>, open:<note path>, daily, random, or an https:// URL.": "Un par ligne : icône | libellé | action. Actions : command:<id de la commande>, open:<chemin de la note>, daily, random ou une URL https://.",
+    "Open homepage": "Ouvrir la page d’accueil",
+    "Add or remove current note from homepage favourites": "Ajouter ou retirer la note actuelle des favoris de la page d’accueil",
+    "Add a note to homepage favourites…": "Ajouter une note aux favoris de la page d’accueil…",
+    "Remove from homepage favourites": "Retirer des favoris de la page d’accueil",
+    "Add to homepage favourites": "Ajouter aux favoris de la page d’accueil",
+    "Add or remove from homepage favourites": "Ajouter ou retirer des favoris de la page d’accueil",
+    "{name} is already a favourite": "{name} est déjà un favori",
+    "Added {name} to favourites": "{name} ajouté aux favoris",
+    "Could not add favourite: {error}": "Impossible d’ajouter le favori : {error}",
+    "Removed {name} from favourites": "{name} retiré des favoris",
+    "Dashboard default": "Par défaut du tableau de bord",
+    "Obsidian interface font": "Police d’interface d’Obsidian",
+    "Obsidian text font": "Police de texte d’Obsidian",
+    "Obsidian monospace font": "Police à chasse fixe d’Obsidian",
+    "System serif": "Police à empattements du système",
+    "Custom (a font installed on this device)": "Personnalisée (une police installée sur cet appareil)",
+    "New Note": "Nouvelle note",
+    "Today's Note": "Note du jour",
+    "Search Vault": "Rechercher dans le coffre",
+    "Graph View": "Vue graphique",
+    "Random Note": "Note aléatoire",
+    "Shows a quote each day. Off means no quote is shown and none is requested.": "Affiche une citation chaque jour. Désactivé : aucune citation n’est affichée ni demandée.",
+    "Quote source": "Source des citations",
+    "ZenQuotes and Echoes are fetched once a day over the network, and ZenQuotes is English only. The bundled list works offline.": "ZenQuotes et Echoes sont récupérées une fois par jour via le réseau, et ZenQuotes est uniquement en anglais. La liste intégrée fonctionne hors ligne.",
+    "ZenQuotes (English)": "ZenQuotes (anglais)",
+    "Echoes (your language)": "Echoes (votre langue)",
+    "Bundled list (your language)": "Liste intégrée (votre langue)",
+  },
+
+  es: {
+    "Add a note to your homepage favourites…": "Añadir una nota a los favoritos de la página de inicio…",
+    "Refresh": "Actualizar",
+    "Toggle theme": "Cambiar de tema",
+    "Settings": "Ajustes",
+    "Open settings": "Abrir ajustes",
+    "Search your vault…": "Buscar en tu bóveda…",
+    "Search your vault": "Buscar en tu bóveda",
+    "Clear search": "Borrar búsqueda",
+    "Search results": "Resultados de la búsqueda",
+    "Photo of the day": "Foto del día",
+    "Load a new photo": "Cargar una foto nueva",
+    "Load new photo": "Cargar una foto nueva",
+    "Inspirational quotes provided by": "Citas inspiradoras proporcionadas por",
+    "Favourites": "Favoritos",
+    "Calendar": "Calendario",
+    "Previous month": "Mes anterior",
+    "Next month": "Mes siguiente",
+    "Today": "Hoy",
+    "Quick links": "Enlaces rápidos",
+    "Ring notes": "Notas del anillo",
+    "Open the notes file": "Abrir el archivo de notas",
+    "Open": "Abrir",
+    "Web clips": "Recortes web",
+    "Refresh clips": "Actualizar recortes",
+    "Refresh web clips": "Actualizar recortes web",
+    "Recent notes": "Notas recientes",
+    "Refresh recent notes": "Actualizar notas recientes",
+    "Tasks": "Tareas",
+    "Add a task and press Enter…": "Añade una tarea y pulsa Intro…",
+    "New task": "Tarea nueva",
+    "Filter tasks": "Filtrar tareas",
+    "All": "Todas",
+    "Active": "Activas",
+    "Done": "Hechas",
+    "Clear completed": "Borrar completadas",
+    "Quick note": "Nota rápida",
+    "Saved": "Guardado",
+    "Jot something down…": "Anota algo…",
+    "Homepage": "Página de inicio",
+    "Note not found: {path}": "Nota no encontrada: {path}",
+    "Dark": "Oscuro",
+    "Light": "Claro",
+    "System ({mode})": "Sistema ({mode})",
+    "Appearance: {label} — click to change": "Apariencia: {label} — haz clic para cambiar",
+    "Good morning": "Buenos días",
+    "Good afternoon": "Buenas tardes",
+    "Good evening": "Buenas tardes",
+    "Good night": "Buenas noches",
+    "Could not create daily note: {error}": "No se pudo crear la nota diaria: {error}",
+    "Could not update tasks: {error}": "No se pudieron actualizar las tareas: {error}",
+    "No completed tasks yet.": "Aún no hay tareas completadas.",
+    "Nothing left to do!": "¡No queda nada por hacer!",
+    "No tasks yet — add one above.": "Aún no hay tareas: añade una arriba.",
+    "Mark incomplete": "Marcar como pendiente",
+    "Mark complete": "Marcar como completada",
+    "Delete": "Eliminar",
+    "Delete: {task}": "Eliminar: {task}",
+    "Could not save quick note: {error}": "No se pudo guardar la nota rápida: {error}",
+    "No quick links configured.": "No hay enlaces rápidos configurados.",
+    "Command not found: {id}": "Comando no encontrado: {id}",
+    "Unknown quick link action: {action}": "Acción de enlace rápido desconocida: {action}",
+    "Yesterday": "Ayer",
+    "Choose the folder your ring saves notes to in Genkan's settings.": "Elige en los ajustes de Genkan la carpeta donde tu anillo guarda las notas.",
+    "No notes found in “{folder}”.": "No se encontraron notas en «{folder}».",
+    "No ring notes yet. Looking for “{path}”.": "Aún no hay notas del anillo. Buscando «{path}».",
+    "No timestamped entries found in “{path}”.": "No se encontraron entradas con fecha y hora en «{path}».",
+    "Not found — click to create": "No encontrada: haz clic para crearla",
+    "Remove from favourites": "Quitar de favoritos",
+    "Remove {label} from favourites": "Quitar {label} de favoritos",
+    "Add a favourite": "Añadir un favorito",
+    "+ Add": "+ Añadir",
+    "Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”.": "Fija las notas que más abres. También puedes hacer clic derecho en cualquier nota → «Añadir a los favoritos de la página de inicio».",
+    "No clips found in “{folder}”.": "No se encontraron recortes en «{folder}».",
+    "(no folder set)": "(sin carpeta definida)",
+    "No notes found.": "No se encontraron notas.",
+    "↻ Searching…": "↻ Buscando…",
+    "No results for “{query}”": "Sin resultados para «{query}»",
+    "Nature photo": "Foto de la naturaleza",
+    "Landscape photo of the day": "Foto de paisaje del día",
+    "Photo by {photographer} on {site}": "Foto de {photographer} en {site}",
+    "Photo from {site}": "Foto de {site}",
+    "Your name": "Tu nombre",
+    "Shown in the greeting.": "Se muestra en el saludo.",
+    "e.g. Alex": "p. ej., Alex",
+    "Open on startup": "Abrir al iniciar",
+    "Open the homepage when Obsidian starts.": "Abre la página de inicio cuando se inicia Obsidian.",
+    "Appearance": "Apariencia",
+    "System follows Obsidian's light/dark theme.": "«Sistema» sigue el tema claro u oscuro de Obsidian.",
+    "System": "Sistema",
+    "Clock format": "Formato de hora",
+    "12-hour (AM/PM)": "12 horas (AM/PM)",
+    "24-hour": "24 horas",
+    "Language": "Idioma",
+    "Automatic follows Obsidian's language setting.": "«Automático» sigue el idioma de Obsidian.",
+    "Automatic": "Automático",
+    "Spelling": "Ortografía",
+    "Automatic follows your device's region. Command names change after you restart Obsidian.": "«Automático» sigue la región de tu dispositivo. Los nombres de los comandos cambian al reiniciar Obsidian.",
+    "American (favorite)": "Estadounidense (favorite)",
+    "British (favourite)": "Británica (favourite)",
+    "First day of the week": "Primer día de la semana",
+    "Automatic follows your device's region.": "«Automático» sigue la región de tu dispositivo.",
+    "Sunday": "Domingo",
+    "Monday": "Lunes",
+    "Saturday": "Sábado",
+    "Custom clock font": "Fuente personalizada del reloj",
+    "The name of a font installed on this device, such as Courier New or Avenir Next. A device without it uses the dashboard font.": "El nombre de una fuente instalada en este dispositivo, como Courier New o Avenir Next. Un dispositivo que no la tenga usa la fuente del panel.",
+    "Font name": "Nombre de la fuente",
+    "Clock font": "Fuente del reloj",
+    "Uses fonts already on your device. Your Obsidian theme's fonts are available too.": "Usa fuentes que ya están en tu dispositivo. Las fuentes de tu tema de Obsidian también están disponibles.",
+    "Folders": "Carpetas",
+    "Web Clipper folder": "Carpeta del Web Clipper",
+    "Where the Web Clipper saves notes.": "Dónde guarda las notas el Web Clipper.",
+    "Daily notes folder": "Carpeta de notas diarias",
+    "Leave blank to use your Daily Notes / Periodic Notes settings.": "Déjala vacía para usar los ajustes de Notas diarias / Periodic Notes.",
+    "Data folder": "Carpeta de datos",
+    "Tasks.md and Quick Note.md are stored here, so Obsidian Sync shares them across devices.": "Tasks.md y Quick Note.md se guardan aquí, de modo que Obsidian Sync los comparte entre tus dispositivos.",
+    "Content": "Contenido",
+    "Max web clips": "Máx. de recortes web",
+    "Max recent notes": "Máx. de notas recientes",
+    "Pebble ring notes": "Notas del anillo Pebble",
+    "Show the latest voice notes from your Pebble Index ring.": "Muestra las últimas notas de voz de tu anillo Pebble Index.",
+    "Ring note": "Nota del anillo",
+    "The note the ring adds your voice notes to, with entries under headings like “## 2026-10-05 21:55”.": "La nota a la que el anillo añade tus notas de voz, con entradas bajo encabezados como «## 2026-10-05 21:55».",
+    "Ring notes folder": "Carpeta de notas del anillo",
+    "The folder the ring saves each voice note into, one file per note.": "La carpeta donde el anillo guarda cada nota de voz, un archivo por nota.",
+    "Where does the ring save notes?": "¿Dónde guarda las notas el anillo?",
+    "Match the Obsidian setting in the Pebble app.": "Elige el mismo ajuste de Obsidian que en la app de Pebble.",
+    "One main note (Pebble Index.md)": "Una nota principal (Pebble Index.md)",
+    "An existing note I choose": "Una nota existente que elijo",
+    "A separate file for each note": "Un archivo distinto para cada nota",
+    "Max ring notes": "Máx. de notas del anillo",
+    "Shows a landscape photo from Picsum, or from Unsplash if you add a key below. Off means no photo is requested.": "Muestra una foto de paisaje de Picsum, o de Unsplash si añades una clave abajo. Desactivado: no se solicita ninguna foto.",
+    "Unsplash access key": "Clave de acceso de Unsplash",
+    "Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault.": "Opcional. Activa fotos de naturaleza de Unsplash con atribución. La clave se guarda en el archivo de ajustes de este complemento, dentro de tu bóveda.",
+    "Daily quote": "Cita del día",
+    "Site icons on web clips": "Iconos de sitio en los recortes web",
+    "Uses Google's favicon service, which receives the domain of each clipped page. Off means no icon requests.": "Usa el servicio de favicons de Google, que recibe el dominio de cada página recortada. Desactivado: no se solicita ningún icono.",
+    "One per line: icon | label | action. Actions: command:<command id>, open:<note path>, daily, random, or an https:// URL.": "Uno por línea: icono | etiqueta | acción. Acciones: command:<id del comando>, open:<ruta de la nota>, daily, random o una URL https://.",
+    "Open homepage": "Abrir la página de inicio",
+    "Add or remove current note from homepage favourites": "Añadir o quitar la nota actual de los favoritos de la página de inicio",
+    "Add a note to homepage favourites…": "Añadir una nota a los favoritos de la página de inicio…",
+    "Remove from homepage favourites": "Quitar de los favoritos de la página de inicio",
+    "Add to homepage favourites": "Añadir a los favoritos de la página de inicio",
+    "Add or remove from homepage favourites": "Añadir o quitar de los favoritos de la página de inicio",
+    "{name} is already a favourite": "{name} ya es un favorito",
+    "Added {name} to favourites": "{name} añadido a favoritos",
+    "Could not add favourite: {error}": "No se pudo añadir el favorito: {error}",
+    "Removed {name} from favourites": "{name} quitado de favoritos",
+    "Dashboard default": "Predeterminada del panel",
+    "Obsidian interface font": "Fuente de interfaz de Obsidian",
+    "Obsidian text font": "Fuente de texto de Obsidian",
+    "Obsidian monospace font": "Fuente monoespaciada de Obsidian",
+    "System serif": "Fuente con serifa del sistema",
+    "Custom (a font installed on this device)": "Personalizada (una fuente instalada en este dispositivo)",
+    "New Note": "Nota nueva",
+    "Today's Note": "Nota de hoy",
+    "Search Vault": "Buscar en la bóveda",
+    "Graph View": "Vista de grafo",
+    "Random Note": "Nota aleatoria",
+    "Shows a quote each day. Off means no quote is shown and none is requested.": "Muestra una cita cada día. Desactivado: no se muestra ninguna cita ni se solicita.",
+    "Quote source": "Fuente de las citas",
+    "ZenQuotes and Echoes are fetched once a day over the network, and ZenQuotes is English only. The bundled list works offline.": "ZenQuotes y Echoes se obtienen una vez al día por la red, y ZenQuotes solo está en inglés. La lista incluida funciona sin conexión.",
+    "ZenQuotes (English)": "ZenQuotes (inglés)",
+    "Echoes (your language)": "Echoes (tu idioma)",
+    "Bundled list (your language)": "Lista incluida (tu idioma)",
+  },
+
+  de: {
+    "Add a note to your homepage favourites…": "Notiz zu den Favoriten der Startseite hinzufügen …",
+    "Refresh": "Aktualisieren",
+    "Toggle theme": "Design wechseln",
+    "Settings": "Einstellungen",
+    "Open settings": "Einstellungen öffnen",
+    "Search your vault…": "Im Tresor suchen …",
+    "Search your vault": "Im Tresor suchen",
+    "Clear search": "Suche löschen",
+    "Search results": "Suchergebnisse",
+    "Photo of the day": "Foto des Tages",
+    "Load a new photo": "Neues Foto laden",
+    "Load new photo": "Neues Foto laden",
+    "Inspirational quotes provided by": "Inspirierende Zitate von",
+    "Favourites": "Favoriten",
+    "Calendar": "Kalender",
+    "Previous month": "Vorheriger Monat",
+    "Next month": "Nächster Monat",
+    "Today": "Heute",
+    "Quick links": "Schnellzugriff",
+    "Ring notes": "Ring-Notizen",
+    "Open the notes file": "Notizdatei öffnen",
+    "Open": "Öffnen",
+    "Web clips": "Web-Clips",
+    "Refresh clips": "Clips aktualisieren",
+    "Refresh web clips": "Web-Clips aktualisieren",
+    "Recent notes": "Zuletzt bearbeitet",
+    "Refresh recent notes": "Zuletzt bearbeitete Notizen aktualisieren",
+    "Tasks": "Aufgaben",
+    "Add a task and press Enter…": "Aufgabe hinzufügen …",
+    "New task": "Neue Aufgabe",
+    "Filter tasks": "Aufgaben filtern",
+    "All": "Alle",
+    "Active": "Offen",
+    "Done": "Erledigt",
+    "Clear completed": "Erledigte entfernen",
+    "Quick note": "Schnellnotiz",
+    "Saved": "Gespeichert",
+    "Jot something down…": "Etwas notieren …",
+    "Homepage": "Startseite",
+    "Note not found: {path}": "Notiz nicht gefunden: {path}",
+    "Dark": "Dunkel",
+    "Light": "Hell",
+    "System ({mode})": "System ({mode})",
+    "Appearance: {label} — click to change": "Erscheinungsbild: {label} – zum Ändern klicken",
+    "Good morning": "Guten Morgen",
+    "Good afternoon": "Guten Tag",
+    "Good evening": "Guten Abend",
+    "Good night": "Gute Nacht",
+    "Could not create daily note: {error}": "Tagesnotiz konnte nicht erstellt werden: {error}",
+    "Could not update tasks: {error}": "Aufgaben konnten nicht aktualisiert werden: {error}",
+    "No completed tasks yet.": "Noch keine erledigten Aufgaben.",
+    "Nothing left to do!": "Nichts mehr zu tun!",
+    "No tasks yet — add one above.": "Noch keine Aufgaben – oben eine hinzufügen.",
+    "Mark incomplete": "Als offen markieren",
+    "Mark complete": "Als erledigt markieren",
+    "Delete": "Löschen",
+    "Delete: {task}": "Löschen: {task}",
+    "Could not save quick note: {error}": "Schnellnotiz konnte nicht gespeichert werden: {error}",
+    "No quick links configured.": "Keine Schnellzugriffe eingerichtet.",
+    "Command not found: {id}": "Befehl nicht gefunden: {id}",
+    "Unknown quick link action: {action}": "Unbekannte Schnellzugriff-Aktion: {action}",
+    "Yesterday": "Gestern",
+    "Choose the folder your ring saves notes to in Genkan's settings.": "Wähle in den Genkan-Einstellungen den Ordner, in dem dein Ring Notizen speichert.",
+    "No notes found in “{folder}”.": "Keine Notizen in „{folder}“ gefunden.",
+    "No ring notes yet. Looking for “{path}”.": "Noch keine Ring-Notizen. Gesucht wird „{path}“.",
+    "No timestamped entries found in “{path}”.": "Keine Einträge mit Zeitstempel in „{path}“ gefunden.",
+    "Not found — click to create": "Nicht gefunden – zum Erstellen klicken",
+    "Remove from favourites": "Aus Favoriten entfernen",
+    "Remove {label} from favourites": "{label} aus Favoriten entfernen",
+    "Add a favourite": "Favorit hinzufügen",
+    "+ Add": "+ Hinzufügen",
+    "Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”.": "Hefte die Notizen an, die du am häufigsten öffnest. Du kannst auch eine Notiz mit der rechten Maustaste anklicken → „Zu Favoriten der Startseite hinzufügen“.",
+    "No clips found in “{folder}”.": "Keine Clips in „{folder}“ gefunden.",
+    "(no folder set)": "(kein Ordner festgelegt)",
+    "No notes found.": "Keine Notizen gefunden.",
+    "↻ Searching…": "↻ Suche läuft …",
+    "No results for “{query}”": "Keine Ergebnisse für „{query}“",
+    "Nature photo": "Naturfoto",
+    "Landscape photo of the day": "Landschaftsfoto des Tages",
+    "Photo by {photographer} on {site}": "Foto von {photographer} auf {site}",
+    "Photo from {site}": "Foto von {site}",
+    "Your name": "Dein Name",
+    "Shown in the greeting.": "Wird in der Begrüßung angezeigt.",
+    "e.g. Alex": "z. B. Alex",
+    "Open on startup": "Beim Start öffnen",
+    "Open the homepage when Obsidian starts.": "Öffnet die Startseite, wenn Obsidian startet.",
+    "Appearance": "Erscheinungsbild",
+    "System follows Obsidian's light/dark theme.": "„System“ folgt dem hellen oder dunklen Design von Obsidian.",
+    "System": "System",
+    "Clock format": "Uhrzeitformat",
+    "12-hour (AM/PM)": "12-Stunden (AM/PM)",
+    "24-hour": "24-Stunden",
+    "Language": "Sprache",
+    "Automatic follows Obsidian's language setting.": "„Automatisch“ folgt der Sprache von Obsidian.",
+    "Automatic": "Automatisch",
+    "Spelling": "Rechtschreibung",
+    "Automatic follows your device's region. Command names change after you restart Obsidian.": "„Automatisch“ folgt der Region deines Geräts. Befehlsnamen ändern sich nach einem Neustart von Obsidian.",
+    "American (favorite)": "Amerikanisch (favorite)",
+    "British (favourite)": "Britisch (favourite)",
+    "First day of the week": "Erster Tag der Woche",
+    "Automatic follows your device's region.": "„Automatisch“ folgt der Region deines Geräts.",
+    "Sunday": "Sonntag",
+    "Monday": "Montag",
+    "Saturday": "Samstag",
+    "Custom clock font": "Eigene Uhrschrift",
+    "The name of a font installed on this device, such as Courier New or Avenir Next. A device without it uses the dashboard font.": "Der Name einer auf diesem Gerät installierten Schrift, z. B. Courier New oder Avenir Next. Ein Gerät ohne diese Schrift verwendet die Schrift des Dashboards.",
+    "Font name": "Schriftname",
+    "Clock font": "Uhrschrift",
+    "Uses fonts already on your device. Your Obsidian theme's fonts are available too.": "Verwendet Schriften, die bereits auf deinem Gerät vorhanden sind. Auch die Schriften deines Obsidian-Designs stehen zur Verfügung.",
+    "Folders": "Ordner",
+    "Web Clipper folder": "Web-Clipper-Ordner",
+    "Where the Web Clipper saves notes.": "Wo der Web Clipper Notizen speichert.",
+    "Daily notes folder": "Ordner für Tagesnotizen",
+    "Leave blank to use your Daily Notes / Periodic Notes settings.": "Leer lassen, um die Einstellungen von Tägliche Notizen / Periodic Notes zu verwenden.",
+    "Data folder": "Datenordner",
+    "Tasks.md and Quick Note.md are stored here, so Obsidian Sync shares them across devices.": "Tasks.md und Quick Note.md werden hier gespeichert, damit Obsidian Sync sie auf all deinen Geräten teilt.",
+    "Content": "Inhalt",
+    "Max web clips": "Max. Web-Clips",
+    "Max recent notes": "Max. zuletzt bearbeitete Notizen",
+    "Pebble ring notes": "Pebble-Ring-Notizen",
+    "Show the latest voice notes from your Pebble Index ring.": "Zeigt die neuesten Sprachnotizen deines Pebble-Index-Rings.",
+    "Ring note": "Ring-Notiz",
+    "The note the ring adds your voice notes to, with entries under headings like “## 2026-10-05 21:55”.": "Die Notiz, der der Ring deine Sprachnotizen hinzufügt, mit Einträgen unter Überschriften wie „## 2026-10-05 21:55“.",
+    "Ring notes folder": "Ordner für Ring-Notizen",
+    "The folder the ring saves each voice note into, one file per note.": "Der Ordner, in dem der Ring jede Sprachnotiz speichert, eine Datei pro Notiz.",
+    "Where does the ring save notes?": "Wo speichert der Ring Notizen?",
+    "Match the Obsidian setting in the Pebble app.": "Wähle dieselbe Obsidian-Einstellung wie in der Pebble-App.",
+    "One main note (Pebble Index.md)": "Eine Hauptnotiz (Pebble Index.md)",
+    "An existing note I choose": "Eine vorhandene Notiz, die ich auswähle",
+    "A separate file for each note": "Eine eigene Datei pro Notiz",
+    "Max ring notes": "Max. Ring-Notizen",
+    "Shows a landscape photo from Picsum, or from Unsplash if you add a key below. Off means no photo is requested.": "Zeigt ein Landschaftsfoto von Picsum oder, wenn du unten einen Schlüssel einträgst, von Unsplash. Aus bedeutet: Es wird kein Foto angefordert.",
+    "Unsplash access key": "Unsplash-Zugangsschlüssel",
+    "Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault.": "Optional. Aktiviert Naturfotos von Unsplash mit Quellenangabe. Der Schlüssel wird in der Einstellungsdatei dieses Plugins in deinem Tresor gespeichert.",
+    "Daily quote": "Zitat des Tages",
+    "Site icons on web clips": "Website-Symbole bei Web-Clips",
+    "Uses Google's favicon service, which receives the domain of each clipped page. Off means no icon requests.": "Verwendet den Favicon-Dienst von Google, der die Domain jeder geclippten Seite erhält. Aus bedeutet: Es werden keine Symbole angefordert.",
+    "One per line: icon | label | action. Actions: command:<command id>, open:<note path>, daily, random, or an https:// URL.": "Eins pro Zeile: Symbol | Beschriftung | Aktion. Aktionen: command:<Befehls-ID>, open:<Notizpfad>, daily, random oder eine https://-URL.",
+    "Open homepage": "Startseite öffnen",
+    "Add or remove current note from homepage favourites": "Aktuelle Notiz zu den Favoriten der Startseite hinzufügen oder daraus entfernen",
+    "Add a note to homepage favourites…": "Notiz zu den Favoriten der Startseite hinzufügen …",
+    "Remove from homepage favourites": "Aus den Favoriten der Startseite entfernen",
+    "Add to homepage favourites": "Zu den Favoriten der Startseite hinzufügen",
+    "Add or remove from homepage favourites": "Zu den Favoriten der Startseite hinzufügen oder daraus entfernen",
+    "{name} is already a favourite": "{name} ist bereits ein Favorit",
+    "Added {name} to favourites": "{name} zu den Favoriten hinzugefügt",
+    "Could not add favourite: {error}": "Favorit konnte nicht hinzugefügt werden: {error}",
+    "Removed {name} from favourites": "{name} aus den Favoriten entfernt",
+    "Dashboard default": "Standard des Dashboards",
+    "Obsidian interface font": "Obsidian-Oberflächenschrift",
+    "Obsidian text font": "Obsidian-Textschrift",
+    "Obsidian monospace font": "Obsidian-Festbreitenschrift",
+    "System serif": "System-Serifenschrift",
+    "Custom (a font installed on this device)": "Eigene (eine auf diesem Gerät installierte Schrift)",
+    "New Note": "Neue Notiz",
+    "Today's Note": "Heutige Notiz",
+    "Search Vault": "Tresor durchsuchen",
+    "Graph View": "Graphansicht",
+    "Random Note": "Zufällige Notiz",
+    "Shows a quote each day. Off means no quote is shown and none is requested.": "Zeigt jeden Tag ein Zitat. Aus bedeutet: Es wird kein Zitat angezeigt oder angefordert.",
+    "Quote source": "Zitatquelle",
+    "ZenQuotes and Echoes are fetched once a day over the network, and ZenQuotes is English only. The bundled list works offline.": "ZenQuotes und Echoes werden einmal täglich über das Netzwerk abgerufen, ZenQuotes gibt es nur auf Englisch. Die integrierte Liste funktioniert offline.",
+    "ZenQuotes (English)": "ZenQuotes (Englisch)",
+    "Echoes (your language)": "Echoes (deine Sprache)",
+    "Bundled list (your language)": "Integrierte Liste (deine Sprache)",
+  },
+
+  ja: {
+    "Add a note to your homepage favourites…": "ホームページのお気に入りにノートを追加…",
+    "Refresh": "更新",
+    "Toggle theme": "テーマを切り替え",
+    "Settings": "設定",
+    "Open settings": "設定を開く",
+    "Search your vault…": "保管庫を検索…",
+    "Search your vault": "保管庫を検索",
+    "Clear search": "検索をクリア",
+    "Search results": "検索結果",
+    "Photo of the day": "今日の写真",
+    "Load a new photo": "新しい写真を読み込む",
+    "Load new photo": "新しい写真を読み込む",
+    "Inspirational quotes provided by": "名言の提供元:",
+    "Favourites": "お気に入り",
+    "Calendar": "カレンダー",
+    "Previous month": "前の月",
+    "Next month": "次の月",
+    "Today": "今日",
+    "Quick links": "クイックリンク",
+    "Ring notes": "リングのメモ",
+    "Open the notes file": "メモのファイルを開く",
+    "Open": "開く",
+    "Web clips": "ウェブクリップ",
+    "Refresh clips": "クリップを更新",
+    "Refresh web clips": "ウェブクリップを更新",
+    "Recent notes": "最近のノート",
+    "Refresh recent notes": "最近のノートを更新",
+    "Tasks": "タスク",
+    "Add a task and press Enter…": "タスクを入力して Enter キーを押す…",
+    "New task": "新しいタスク",
+    "Filter tasks": "タスクを絞り込む",
+    "All": "すべて",
+    "Active": "未完了",
+    "Done": "完了",
+    "Clear completed": "完了したタスクを削除",
+    "Quick note": "クイックメモ",
+    "Saved": "保存済み",
+    "Jot something down…": "メモを書く…",
+    "Homepage": "ホームページ",
+    "Note not found: {path}": "ノートが見つかりません: {path}",
+    "Dark": "ダーク",
+    "Light": "ライト",
+    "System ({mode})": "システム（{mode}）",
+    "Appearance: {label} — click to change": "外観: {label} — クリックで変更",
+    "Good morning": "おはようございます",
+    "Good afternoon": "こんにちは",
+    "Good evening": "こんばんは",
+    "Good night": "おやすみなさい",
+    "{greeting}, ": "{greeting}、",
+    "name suffix": "さん",
+    "Could not create daily note: {error}": "デイリーノートを作成できませんでした: {error}",
+    "Could not update tasks: {error}": "タスクを更新できませんでした: {error}",
+    "No completed tasks yet.": "完了したタスクはまだありません。",
+    "Nothing left to do!": "やることはありません！",
+    "No tasks yet — add one above.": "タスクはまだありません。上から追加してください。",
+    "Mark incomplete": "未完了にする",
+    "Mark complete": "完了にする",
+    "Delete": "削除",
+    "Delete: {task}": "削除: {task}",
+    "Could not save quick note: {error}": "クイックメモを保存できませんでした: {error}",
+    "No quick links configured.": "クイックリンクが設定されていません。",
+    "Command not found: {id}": "コマンドが見つかりません: {id}",
+    "Unknown quick link action: {action}": "不明なクイックリンクの動作: {action}",
+    "Yesterday": "昨日",
+    "Choose the folder your ring saves notes to in Genkan's settings.": "Genkan の設定で、リングがメモを保存するフォルダを選んでください。",
+    "No notes found in “{folder}”.": "「{folder}」にノートが見つかりません。",
+    "No ring notes yet. Looking for “{path}”.": "リングのメモはまだありません。「{path}」を探しています。",
+    "No timestamped entries found in “{path}”.": "「{path}」に日時付きの項目が見つかりません。",
+    "Not found — click to create": "見つかりません — クリックして作成",
+    "Remove from favourites": "お気に入りから削除",
+    "Remove {label} from favourites": "{label} をお気に入りから削除",
+    "Add a favourite": "お気に入りを追加",
+    "+ Add": "+ 追加",
+    "Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”.": "よく開くノートをピン留めできます。ノートを右クリックして「ホームページのお気に入りに追加」を選ぶこともできます。",
+    "No clips found in “{folder}”.": "「{folder}」にクリップが見つかりません。",
+    "(no folder set)": "（フォルダ未設定）",
+    "No notes found.": "ノートが見つかりません。",
+    "↻ Searching…": "↻ 検索中…",
+    "No results for “{query}”": "「{query}」の検索結果はありません",
+    "Nature photo": "自然の写真",
+    "Landscape photo of the day": "今日の風景写真",
+    "Photo by {photographer} on {site}": "写真: {photographer}（{site}）",
+    "Photo from {site}": "写真: {site}",
+    "Your name": "あなたの名前",
+    "Shown in the greeting.": "あいさつに表示されます。",
+    "e.g. Alex": "例: Alex",
+    "Open on startup": "起動時に開く",
+    "Open the homepage when Obsidian starts.": "Obsidian の起動時にホームページを開きます。",
+    "Appearance": "外観",
+    "System follows Obsidian's light/dark theme.": "「システム」は Obsidian のライト/ダークテーマに従います。",
+    "System": "システム",
+    "Clock format": "時刻の形式",
+    "12-hour (AM/PM)": "12時間制（午前/午後）",
+    "24-hour": "24時間制",
+    "Language": "言語",
+    "Automatic follows Obsidian's language setting.": "「自動」は Obsidian の言語設定に従います。",
+    "Automatic": "自動",
+    "Spelling": "スペル",
+    "Automatic follows your device's region. Command names change after you restart Obsidian.": "「自動」はデバイスの地域設定に従います。コマンド名は Obsidian を再起動すると変わります。",
+    "American (favorite)": "アメリカ英語 (favorite)",
+    "British (favourite)": "イギリス英語 (favourite)",
+    "First day of the week": "週の開始日",
+    "Automatic follows your device's region.": "「自動」はデバイスの地域設定に従います。",
+    "Sunday": "日曜日",
+    "Monday": "月曜日",
+    "Saturday": "土曜日",
+    "Custom clock font": "時計のカスタムフォント",
+    "The name of a font installed on this device, such as Courier New or Avenir Next. A device without it uses the dashboard font.": "このデバイスにインストールされているフォント名（Courier New や Avenir Next など）。そのフォントがないデバイスでは、ダッシュボードのフォントが使われます。",
+    "Font name": "フォント名",
+    "Clock font": "時計のフォント",
+    "Uses fonts already on your device. Your Obsidian theme's fonts are available too.": "デバイスにあるフォントを使います。Obsidian のテーマのフォントも使えます。",
+    "Folders": "フォルダ",
+    "Web Clipper folder": "Web Clipper のフォルダ",
+    "Where the Web Clipper saves notes.": "Web Clipper がノートを保存する場所です。",
+    "Daily notes folder": "デイリーノートのフォルダ",
+    "Leave blank to use your Daily Notes / Periodic Notes settings.": "空欄にすると、デイリーノート / Periodic Notes の設定を使います。",
+    "Data folder": "データフォルダ",
+    "Tasks.md and Quick Note.md are stored here, so Obsidian Sync shares them across devices.": "Tasks.md と Quick Note.md がここに保存され、Obsidian Sync でデバイス間で共有されます。",
+    "Content": "表示内容",
+    "Max web clips": "ウェブクリップの最大数",
+    "Max recent notes": "最近のノートの最大数",
+    "Pebble ring notes": "Pebble リングのメモ",
+    "Show the latest voice notes from your Pebble Index ring.": "Pebble Index リングの最新の音声メモを表示します。",
+    "Ring note": "リングのノート",
+    "The note the ring adds your voice notes to, with entries under headings like “## 2026-10-05 21:55”.": "リングが音声メモを追記するノートです。「## 2026-10-05 21:55」のような見出しの下に項目が追加されます。",
+    "Ring notes folder": "リングのメモのフォルダ",
+    "The folder the ring saves each voice note into, one file per note.": "リングが音声メモを1件ごとに別のファイルとして保存するフォルダです。",
+    "Where does the ring save notes?": "リングはメモをどこに保存しますか？",
+    "Match the Obsidian setting in the Pebble app.": "Pebble アプリの Obsidian 設定と同じものを選んでください。",
+    "One main note (Pebble Index.md)": "1つのメインノート（Pebble Index.md）",
+    "An existing note I choose": "自分で選んだ既存のノート",
+    "A separate file for each note": "メモごとに別のファイル",
+    "Max ring notes": "リングのメモの最大数",
+    "Shows a landscape photo from Picsum, or from Unsplash if you add a key below. Off means no photo is requested.": "Picsum の風景写真を表示します。下にキーを入力すると Unsplash の写真になります。オフにすると写真は取得されません。",
+    "Unsplash access key": "Unsplash アクセスキー",
+    "Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault.": "任意です。出典を明記して Unsplash の自然の写真を表示できます。キーは保管庫内のこのプラグインの設定ファイルに保存されます。",
+    "Daily quote": "今日の名言",
+    "Site icons on web clips": "ウェブクリップのサイトアイコン",
+    "Uses Google's favicon service, which receives the domain of each clipped page. Off means no icon requests.": "Google のファビコンサービスを使い、クリップしたページのドメインが送信されます。オフにするとアイコンは取得されません。",
+    "One per line: icon | label | action. Actions: command:<command id>, open:<note path>, daily, random, or an https:// URL.": "1行に1つ: アイコン | ラベル | 動作。動作: command:<コマンドID>、open:<ノートのパス>、daily、random、または https:// の URL。",
+    "Open homepage": "ホームページを開く",
+    "Add or remove current note from homepage favourites": "現在のノートをホームページのお気に入りに追加または削除",
+    "Add a note to homepage favourites…": "ホームページのお気に入りにノートを追加…",
+    "Remove from homepage favourites": "ホームページのお気に入りから削除",
+    "Add to homepage favourites": "ホームページのお気に入りに追加",
+    "Add or remove from homepage favourites": "ホームページのお気に入りに追加または削除",
+    "{name} is already a favourite": "{name} はすでにお気に入りです",
+    "Added {name} to favourites": "{name} をお気に入りに追加しました",
+    "Could not add favourite: {error}": "お気に入りを追加できませんでした: {error}",
+    "Removed {name} from favourites": "{name} をお気に入りから削除しました",
+    "Dashboard default": "ダッシュボードの標準",
+    "Obsidian interface font": "Obsidian のインターフェースフォント",
+    "Obsidian text font": "Obsidian のテキストフォント",
+    "Obsidian monospace font": "Obsidian の等幅フォント",
+    "System serif": "システムの明朝体",
+    "Custom (a font installed on this device)": "カスタム（このデバイスにあるフォント）",
+    "New Note": "新規ノート",
+    "Today's Note": "今日のノート",
+    "Search Vault": "保管庫を検索",
+    "Graph View": "グラフビュー",
+    "Random Note": "ランダムノート",
+    "Shows a quote each day. Off means no quote is shown and none is requested.": "毎日1つ名言を表示します。オフにすると名言は表示も取得もされません。",
+    "Quote source": "名言の取得元",
+    "ZenQuotes and Echoes are fetched once a day over the network, and ZenQuotes is English only. The bundled list works offline.": "ZenQuotes と Echoes は1日1回ネットワーク経由で取得します（ZenQuotes は英語のみ）。内蔵リストはオフラインで使えます。",
+    "ZenQuotes (English)": "ZenQuotes（英語）",
+    "Echoes (your language)": "Echoes（あなたの言語）",
+    "Bundled list (your language)": "内蔵リスト（あなたの言語）",
+  },
+};
+
 const DEFAULT_QUICK_LINKS = [
   { icon: "📝", label: "New Note", action: "command:file-explorer:new-file" },
   { icon: "📅", label: "Today's Note", action: "daily" },
@@ -304,41 +1051,91 @@ const DEFAULT_QUICK_LINKS = [
   { icon: "🎲", label: "Random Note", action: "random" },
 ];
 
-// ─── Locale ───────────────────────────────────────────────────────────────────
-// Dates, times and the first day of the week follow the device's locale.
-// Spelling is British unless the locale is American ("favourites" -> "favorites").
+// ─── Language and locale ──────────────────────────────────────────────────────
+// The interface language follows Obsidian's own language setting (or the plugin's Language
+// setting). Dates, times and the first day of the week follow the matching region from the
+// device. English spelling is British unless the region is American ("favourites" -> "favorites").
 
+const LANGUAGES = { en: "English", fr: "Français", es: "Español", de: "Deutsch", ja: "日本語" };
+
+let LANG = "en";
 let LOCALE = "en-US";
 let US_DETECTED = false; // an unknown or invalid locale keeps British spelling
 let spellingChoice = "auto"; // auto | us | uk (the setting)
 
+function obsidianLanguage() {
+  try {
+    if (typeof obsidian.getLanguage === "function") return obsidian.getLanguage();
+  } catch {
+    // older Obsidian
+  }
+  try {
+    return moment.locale();
+  } catch {
+    return "en";
+  }
+}
+
 // Obsidian's Electron shell reports en-US in navigator.language for any English region it has
 // no translation for (Canada, say) and lists the OS preferences after it in navigator.languages.
-function preferredLocale() {
+function deviceLocaleFor(lang) {
+  const list = [...(navigator.languages || []), navigator.language].filter(Boolean);
   const first = navigator.language || "";
-  const rest = (navigator.languages || []).filter((l) => l && l !== first);
-  if (/^en-US$/i.test(first)) {
-    const other = rest.find((l) => /^en-[A-Za-z]{2}$/.test(l) && !/^en-US$/i.test(l));
-    if (other) return other;
+  if (lang === "en") {
+    if (/^en-US$/i.test(first)) {
+      const other = list.find((l) => /^en-[A-Za-z]{2}$/.test(l) && !/^en-US$/i.test(l));
+      if (other) return other;
+    }
+    return list.find((l) => /^en(-|$)/i.test(l)) || "en";
   }
-  return first;
+  return list.find((l) => new RegExp(`^${lang}-`, "i").test(l)) || lang;
 }
 
-try {
-  const l = typeof navigator !== "undefined" ? preferredLocale() : "";
-  if (l) {
+function applyLanguage(choice) {
+  const wanted = !choice || choice === "auto" ? obsidianLanguage() : choice;
+  const base = String(wanted || "en").toLowerCase().split(/[-_]/)[0];
+  LANG = LANGUAGES[base] ? base : "en";
+  LOCALE = "en-US";
+  US_DETECTED = false;
+  try {
+    const l = deviceLocaleFor(LANG);
     new Intl.DateTimeFormat(l);
     LOCALE = l;
-    US_DETECTED = /^en-(US|PR|GU|VI|AS|MP)\b/i.test(l);
+    US_DETECTED = LANG === "en" && /^en-(US|PR|GU|VI|AS|MP)\b/i.test(l);
+  } catch {
+    // keep the defaults
   }
-} catch {
-  // keep the defaults
 }
 
-// Source strings are written in British spelling; this converts them for American English
+// Source strings are written in British English; this converts them for American English
 function S(text) {
   const us = spellingChoice === "us" || (spellingChoice === "auto" && US_DETECTED);
   return us ? text.replace(/favourite/g, "favorite").replace(/Favourite/g, "Favorite") : text;
+}
+
+// Translate a source string. Tables are keyed by the English text; {name} marks a value.
+function T(key, vars) {
+  let out = (LANG !== "en" && I18N[LANG]?.[key]) || I18N.en?.[key] || key;
+  if (vars) out = out.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
+  return LANG === "en" ? S(out) : out;
+}
+
+// Fill {name} slots in a translated sentence with DOM nodes (links), keeping the word order
+function appendTemplate(parent, template, nodes) {
+  for (const part of template.split(/(\{\w+\})/)) {
+    const key = part.slice(1, -1);
+    if (part.startsWith("{") && nodes[key]) parent.append(nodes[key]);
+    else if (part) parent.append(part);
+  }
+}
+
+// AM/PM in the current language ("午前" in Japanese); English keeps AM and PM
+function dayPeriod(date) {
+  if (LANG === "en") return date.getHours() < 12 ? "AM" : "PM";
+  const part = new Intl.DateTimeFormat(LOCALE, { hour: "numeric", hour12: true })
+    .formatToParts(date)
+    .find((p) => p.type === "dayPeriod");
+  return part ? part.value : date.getHours() < 12 ? "AM" : "PM";
 }
 
 function locale12h() {
@@ -373,13 +1170,14 @@ const DEFAULT_SETTINGS = {
   maxClips: 12,
   maxRecent: 8,
   theme: "system", // system | dark | light
-  clockFormat: locale12h() ? "12h" : "24h", // new installs follow the device locale
+  language: "auto", // auto (follow Obsidian) | en | fr | es | de | ja
   spelling: "auto", // auto | us | uk
   weekStart: "auto", // auto | 0 (Sunday) | 1 (Monday) | 6 (Saturday)
   clockFont: "default", // see CLOCK_FONTS
   clockFontCustom: "", // font name(s) typed in settings when clockFont is "custom"
   showHero: true,
-  showQuote: true, // daily quote from ZenQuotes (one request a day)
+  showQuote: true, // a daily quote
+  quoteSource: undefined, // zenquotes | echoes | bundled (unset: ZenQuotes in English, else bundled)
   showFavicons: true, // site icons on web clips (Google's favicon service)
   showRingNotes: false, // Pebble Index ring notes card (off unless enabled)
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
@@ -715,7 +1513,7 @@ class FavouritePicker extends FuzzySuggestModal {
   constructor(app, plugin) {
     super(app);
     this.plugin = plugin;
-    this.setPlaceholder(S("Add a note to your homepage favourites…"));
+    this.setPlaceholder(T("Add a note to your homepage favourites…"));
   }
   getItems() {
     return this.app.vault
@@ -747,9 +1545,9 @@ function buildDashboard() {
       h(
         "div",
         { cls: "header-controls" },
-        h("button", { cls: "icon-btn", id: "page-refresh", title: "Refresh", "aria-label": "Refresh" }),
-        h("button", { cls: "icon-btn", id: "theme-toggle", title: "Toggle theme", "aria-label": "Toggle theme" }),
-        h("button", { cls: "icon-btn", id: "settings-btn", title: "Settings", "aria-label": "Open settings" }),
+        h("button", { cls: "icon-btn", id: "page-refresh", title: T("Refresh"), "aria-label": T("Refresh") }),
+        h("button", { cls: "icon-btn", id: "theme-toggle", title: T("Toggle theme"), "aria-label": T("Toggle theme") }),
+        h("button", { cls: "icon-btn", id: "settings-btn", title: T("Settings"), "aria-label": T("Open settings") }),
       ),
     ),
     h(
@@ -772,24 +1570,24 @@ function buildDashboard() {
         "form",
         { cls: "search-wrap", id: "search-form", role: "search", autocomplete: "off" },
         iconNode("search"),
-        h("input", { type: "search", id: "search-input", placeholder: "Search your vault…", spellcheck: "false", "aria-label": "Search your vault" }),
-        h("button", { type: "button", cls: "search-clear hidden", id: "search-clear", title: "Clear search", "aria-label": "Clear search" }, iconNode("clear")),
+        h("input", { type: "search", id: "search-input", placeholder: T("Search your vault…"), spellcheck: "false", "aria-label": T("Search your vault") }),
+        h("button", { type: "button", cls: "search-clear hidden", id: "search-clear", title: T("Clear search"), "aria-label": T("Clear search") }, iconNode("clear")),
         h("kbd", { cls: "search-kbd", id: "search-kbd", text: "/" }),
       ),
-      h("div", { cls: "search-results hidden", id: "search-results", role: "listbox", "aria-label": "Search results" }),
+      h("div", { cls: "search-results hidden", id: "search-results", role: "listbox", "aria-label": T("Search results") }),
     ),
   );
 
   const hero = h(
     "div",
-    { cls: "hero", id: "hero", role: "img", "aria-label": "Photo of the day" },
-    h("img", { cls: "hero-img", id: "hero-img", alt: "Photo of the day" }),
+    { cls: "hero", id: "hero", role: "img", "aria-label": T("Photo of the day") },
+    h("img", { cls: "hero-img", id: "hero-img", alt: T("Photo of the day") }),
     h("div", { cls: "hero-overlay", "aria-hidden": "true" }),
     h(
       "div",
       { cls: "hero-footer" },
       h("span", { cls: "hero-credit", id: "hero-credit" }),
-      h("button", { cls: "icon-btn", id: "hero-refresh", title: "Load a new photo", "aria-label": "Load new photo" }),
+      h("button", { cls: "icon-btn", id: "hero-refresh", title: T("Load a new photo"), "aria-label": T("Load new photo") }),
     ),
   );
 
@@ -802,19 +1600,14 @@ function buildDashboard() {
       h("p", { cls: "quote-text", id: "quote-text" }),
       h("footer", { cls: "quote-author", id: "quote-author" }),
     ),
-    // ZenQuotes' free API requires a visible credit linking back to zenquotes.io
-    h(
-      "div",
-      { cls: "quote-credit hidden", id: "quote-credit" },
-      "Inspirational quotes provided by ",
-      h("a", { href: "https://zenquotes.io/", text: "ZenQuotes API" }),
-    ),
+    // ZenQuotes' free API requires a visible credit linking back to zenquotes.io (built in displayQuote)
+    h("div", { cls: "quote-credit hidden", id: "quote-credit" }),
   );
 
   const favs = h(
     "div",
     { cls: "card favs-card", id: "favs-card" },
-    h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: S("Favourites") })),
+    h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: T("Favourites") })),
     h("div", { cls: "favs-list", id: "favs-list" }),
   );
 
@@ -827,23 +1620,23 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: "Calendar" }),
+        h("span", { cls: "card-label", text: T("Calendar") }),
         h(
           "div",
           { cls: "cal-nav" },
-          h("button", { cls: "cal-btn", id: "cal-prev", title: "Previous month", "aria-label": "Previous month", text: "‹" }),
+          h("button", { cls: "cal-btn", id: "cal-prev", title: T("Previous month"), "aria-label": T("Previous month"), text: "‹" }),
           h("span", { id: "cal-month-label" }),
-          h("button", { cls: "cal-btn", id: "cal-next", title: "Next month", "aria-label": "Next month", text: "›" }),
+          h("button", { cls: "cal-btn", id: "cal-next", title: T("Next month"), "aria-label": T("Next month"), text: "›" }),
         ),
       ),
-      h("div", { cls: "cal-grid", id: "cal-grid", role: "grid", "aria-label": "Calendar" }),
-      h("button", { cls: "today-btn", id: "cal-today", text: "Today" }),
+      h("div", { cls: "cal-grid", id: "cal-grid", role: "grid", "aria-label": T("Calendar") }),
+      h("button", { cls: "today-btn", id: "cal-today", text: T("Today") }),
     ),
     h(
       "div",
       { cls: "card", id: "links-card" },
-      h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: "Quick links" })),
-      h("nav", { id: "quick-links", "aria-label": "Quick links" }),
+      h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: T("Quick links") })),
+      h("nav", { id: "quick-links", "aria-label": T("Quick links") }),
     ),
   );
 
@@ -856,8 +1649,8 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: "Ring notes" }),
-        countRow("ring-count", h("a", { cls: "card-link", id: "ring-open", href: "#", title: "Open the notes file", text: "Open" })),
+        h("span", { cls: "card-label", text: T("Ring notes") }),
+        countRow("ring-count", h("a", { cls: "card-link", id: "ring-open", href: "#", title: T("Open the notes file"), text: T("Open") })),
       ),
       h("div", { id: "ring-body" }),
     ),
@@ -867,8 +1660,8 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: "Web clips" }),
-        countRow("clips-count", refreshBtn("refresh-clips", "Refresh clips", "Refresh web clips")),
+        h("span", { cls: "card-label", text: T("Web clips") }),
+        countRow("clips-count", refreshBtn("refresh-clips", T("Refresh clips"), T("Refresh web clips"))),
       ),
       h("div", { id: "clips-body" }),
     ),
@@ -878,8 +1671,8 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: "Recent notes" }),
-        countRow("recent-count", refreshBtn("refresh-recent", "Refresh recent notes", "Refresh recent notes")),
+        h("span", { cls: "card-label", text: T("Recent notes") }),
+        countRow("recent-count", refreshBtn("refresh-recent", T("Refresh recent notes"), T("Refresh recent notes"))),
       ),
       h("div", { id: "recent-body" }),
     ),
@@ -896,19 +1689,19 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: "Tasks" }),
+        h("span", { cls: "card-label", text: T("Tasks") }),
         h("span", { cls: "tasks-stats", id: "tasks-stats", "aria-live": "polite", text: "0 / 0" }),
       ),
-      h("input", { type: "text", cls: "task-input", id: "task-input", placeholder: "Add a task and press Enter…", "aria-label": "New task" }),
+      h("input", { type: "text", cls: "task-input", id: "task-input", placeholder: T("Add a task and press Enter…"), "aria-label": T("New task") }),
       h(
         "div",
-        { cls: "tab-row", role: "tablist", "aria-label": "Filter tasks" },
-        tab("all", "All", true),
-        tab("active", "Active", false),
-        tab("done", "Done", false),
+        { cls: "tab-row", role: "tablist", "aria-label": T("Filter tasks") },
+        tab("all", T("All"), true),
+        tab("active", T("Active"), false),
+        tab("done", T("Done"), false),
       ),
       h("div", { id: "tasks-list", role: "list" }),
-      h("button", { cls: "clear-btn", id: "clear-done", text: "Clear completed" }),
+      h("button", { cls: "clear-btn", id: "clear-done", text: T("Clear completed") }),
     ),
     h(
       "div",
@@ -916,10 +1709,10 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: "Quick note" }),
-        h("span", { cls: "autosave-dot", id: "autosave-dot", title: "Saved", "aria-label": "Saved" }),
+        h("span", { cls: "card-label", text: T("Quick note") }),
+        h("span", { cls: "autosave-dot", id: "autosave-dot", title: T("Saved"), "aria-label": T("Saved") }),
       ),
-      h("textarea", { id: "quick-note", placeholder: "Jot something down…", spellcheck: "true", "aria-label": "Quick note" }),
+      h("textarea", { id: "quick-note", placeholder: T("Jot something down…"), spellcheck: "true", "aria-label": T("Quick note") }),
     ),
   );
 
@@ -944,7 +1737,7 @@ class HomepageView extends ItemView {
     return VIEW_TYPE;
   }
   getDisplayText() {
-    return "Homepage";
+    return T("Homepage");
   }
   getIcon() {
     return "home";
@@ -1105,7 +1898,7 @@ class HomepageView extends ItemView {
   openFile(path, evt) {
     const f = this.app.vault.getAbstractFileByPath(path);
     if (!(f instanceof TFile)) {
-      new Notice(`Note not found: ${path}`);
+      new Notice(T("Note not found: {path}", { path }));
       return;
     }
     const mod = evt ? Keymap.isModEvent(evt) : false;
@@ -1121,8 +1914,9 @@ class HomepageView extends ItemView {
     this.root.setAttribute("data-theme", dark ? "dark" : "light");
     const btn = this.$("theme-toggle");
     setIconSvg(btn, t === "system" ? "monitor" : dark ? "moon" : "sun");
-    const label = t === "system" ? `System (${dark ? "Dark" : "Light"})` : dark ? "Dark" : "Light";
-    btn.title = `Appearance: ${label} — click to change`;
+    const mode = dark ? T("Dark") : T("Light");
+    const label = t === "system" ? T("System ({mode})", { mode }) : mode;
+    btn.title = T("Appearance: {label} — click to change", { label });
   }
 
   initTheme() {
@@ -1142,7 +1936,7 @@ class HomepageView extends ItemView {
     const pad = (n) => String(n).padStart(2, "0");
 
     const phrase =
-      hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : hour < 21 ? "Good evening" : "Good night";
+      hour < 12 ? T("Good morning") : hour < 17 ? T("Good afternoon") : hour < 21 ? T("Good evening") : T("Good night");
     const name = this.settings.userName;
     // Rebuild only when the words change (this runs every second)
     const greetKey = `${phrase}|${name}`;
@@ -1150,15 +1944,19 @@ class HomepageView extends ItemView {
       this.greetKey = greetKey;
       const greeting = this.$("greeting");
       greeting.empty();
-      greeting.append(name ? `${phrase}, ` : phrase);
-      if (name) greeting.append(h("span", { cls: "gname", text: name }));
+      greeting.append(name ? T("{greeting}, ", { greeting: phrase }) : phrase);
+      if (name) {
+        greeting.append(h("span", { cls: "gname", text: name }));
+        const suffix = T("name suffix");
+        if (suffix !== "name suffix") greeting.append(suffix);
+      }
     }
 
     const main = this.$("clock-main");
     const ampm = this.$("clock-ampm");
     if (this.settings.clockFormat === "12h") {
       main.textContent = `${hour % 12 || 12}:${pad(now.getMinutes())}`;
-      ampm.textContent = hour < 12 ? "AM" : "PM";
+      ampm.textContent = dayPeriod(now);
       ampm.classList.remove("hidden");
     } else {
       main.textContent = `${pad(hour)}:${pad(now.getMinutes())}`;
@@ -1217,7 +2015,7 @@ class HomepageView extends ItemView {
       try {
         f = await this.ensureFile(path, content);
       } catch (err) {
-        new Notice(`Could not create daily note: ${err.message}`);
+        new Notice(T("Could not create daily note: {error}", { error: err.message }));
         return;
       }
     }
@@ -1250,7 +2048,9 @@ class HomepageView extends ItemView {
   renderCalendar() {
     const year = this.calYear;
     const month = this.calMonth;
-    this.$("cal-month-label").textContent = fmtDate(new Date(year, month, 1), { month: "long", year: "numeric" });
+    // Spanish writes "octubre de 2026"; the short form fits the narrow card
+    const monthLabel = fmtDate(new Date(year, month, 1), { month: "long", year: "numeric" });
+    this.$("cal-month-label").textContent = LANG === "es" ? monthLabel.replace(" de ", " ") : monthLabel;
 
     const ws = this.settings.weekStart === "auto" ? localeWeekStart() : Number(this.settings.weekStart);
     const grid = this.$("cal-grid");
@@ -1332,7 +2132,7 @@ class HomepageView extends ItemView {
       const file = await this.ensureFile(this.tasksPath);
       await this.app.vault.process(file, fn);
     } catch (err) {
-      new Notice(`Could not update tasks: ${err.message}`);
+      new Notice(T("Could not update tasks: {error}", { error: err.message }));
     }
     await this.loadTasks();
   }
@@ -1402,10 +2202,10 @@ class HomepageView extends ItemView {
     if (!filtered.length) {
       const msg =
         this.taskFilter === "done"
-          ? "No completed tasks yet."
+          ? T("No completed tasks yet.")
           : this.taskFilter === "active"
-            ? "Nothing left to do!"
-            : "No tasks yet — add one above.";
+            ? T("Nothing left to do!")
+            : T("No tasks yet — add one above.");
       this.showEmpty(list, msg);
       return;
     }
@@ -1414,12 +2214,12 @@ class HomepageView extends ItemView {
     for (const task of filtered) {
       const check = h("button", {
         cls: task.done ? "task-check checked" : "task-check",
-        "aria-label": task.done ? "Mark incomplete" : "Mark complete",
+        "aria-label": task.done ? T("Mark incomplete") : T("Mark complete"),
       });
       setIconSvg(check, task.done ? "check" : null);
       check.addEventListener("click", () => this.toggleTask(task.id));
 
-      const del = h("button", { cls: "task-del", title: "Delete", "aria-label": `Delete: ${task.text}` });
+      const del = h("button", { cls: "task-del", title: T("Delete"), "aria-label": T("Delete: {task}", { task: task.text }) });
       setIconSvg(del, "trash");
       del.addEventListener("click", () => this.deleteTask(task.id));
 
@@ -1463,7 +2263,7 @@ class HomepageView extends ItemView {
         this.$("autosave-dot").className = "autosave-dot saved";
       }
     } catch (err) {
-      new Notice(`Could not save quick note: ${err.message}`);
+      new Notice(T("Could not save quick note: {error}", { error: err.message }));
     }
   }
 
@@ -1483,7 +2283,7 @@ class HomepageView extends ItemView {
     const links = this.settings.quickLinks ?? [];
     nav.empty();
     if (!links.length) {
-      nav.createSpan({ cls: "hp-empty", text: "No quick links configured." });
+      nav.createSpan({ cls: "hp-empty", text: T("No quick links configured.") });
       return;
     }
     links.forEach((l, i) =>
@@ -1492,7 +2292,7 @@ class HomepageView extends ItemView {
           "a",
           { cls: "quick-link", href: "#", "data-ql": String(i) },
           h("span", { cls: "ql-icon", text: l.icon ?? "" }),
-          h("span", { text: l.label }),
+          h("span", { text: quickLinkLabel(l) }),
         ),
       ),
     );
@@ -1548,12 +2348,12 @@ class HomepageView extends ItemView {
     }
     if (a.startsWith("command:")) {
       const id = a.slice(8);
-      if (!this.app.commands.executeCommandById(id)) new Notice(`Command not found: ${id}`);
+      if (!this.app.commands.executeCommandById(id)) new Notice(T("Command not found: {id}", { id }));
       return;
     }
     if (a.startsWith("open:")) return this.openFile(normalizePath(a.slice(5)), evt);
     if (/^(https?|obsidian):\/\//.test(a)) return window.open(a);
-    new Notice(`Unknown quick link action: ${a}`);
+    new Notice(T("Unknown quick link action: {action}", { action: a }));
   }
 
   // ── Ring notes ──
@@ -1568,9 +2368,9 @@ class HomepageView extends ItemView {
     );
     const day =
       dayDiff === 0
-        ? "Today"
+        ? T("Today")
         : dayDiff === 1
-          ? "Yesterday"
+          ? T("Yesterday")
           : fmtDate(d, { month: "short", day: "numeric", year: d.getFullYear() === now.getFullYear() ? undefined : "numeric" });
     if (!e.hasTime) return day;
     const time = d.toLocaleTimeString(LOCALE, {
@@ -1600,7 +2400,7 @@ class HomepageView extends ItemView {
       const folder = this.ringFolder;
       if (!folder) {
         count.textContent = "0";
-        this.showEmpty(body, "Choose the folder your ring saves notes to in Genkan's settings.");
+        this.showEmpty(body, T("Choose the folder your ring saves notes to in Genkan's settings."));
         return;
       }
       const stamped = this.app.vault
@@ -1611,7 +2411,7 @@ class HomepageView extends ItemView {
       total = stamped.length;
       if (!total) {
         count.textContent = "0";
-        this.showEmpty(body, `No notes found in “${folder}”.`);
+        this.showEmpty(body, T("No notes found in “{folder}”.", { folder }));
         return;
       }
       entries = await Promise.all(
@@ -1631,14 +2431,14 @@ class HomepageView extends ItemView {
       const f = this.app.vault.getAbstractFileByPath(path);
       if (!(f instanceof TFile)) {
         count.textContent = "0";
-        this.showEmpty(body, `No ring notes yet. Looking for “${path}”.`);
+        this.showEmpty(body, T("No ring notes yet. Looking for “{path}”.", { path }));
         return;
       }
       const parsed = parseRingNotes(await this.app.vault.read(f));
       total = parsed.length;
       if (!total) {
         count.textContent = "0";
-        this.showEmpty(body, `No timestamped entries found in “${path}”.`);
+        this.showEmpty(body, T("No timestamped entries found in “{path}”.", { path }));
         return;
       }
       entries = parsed.slice(0, max).map((e) => ({ ...e, path }));
@@ -1682,7 +2482,7 @@ class HomepageView extends ItemView {
           {
             cls: file ? "fav-chip" : "fav-chip missing",
             "data-fav": f.target,
-            title: file ? file.path : "Not found — click to create",
+            title: file ? file.path : T("Not found — click to create"),
             role: "button",
             tabindex: "0",
           },
@@ -1691,19 +2491,19 @@ class HomepageView extends ItemView {
           h("button", {
             cls: "fav-x",
             "data-fav-remove": f.target,
-            title: S("Remove from favourites"),
-            "aria-label": S(`Remove ${label} from favourites`),
+            title: T("Remove from favourites"),
+            "aria-label": T("Remove {label} from favourites", { label }),
             text: "×",
           }),
         ),
       );
     }
-    list.append(h("button", { cls: "fav-add", id: "fav-add", title: S("Add a favourite"), text: "+ Add" }));
+    list.append(h("button", { cls: "fav-add", id: "fav-add", title: T("Add a favourite"), text: T("+ Add") }));
     if (!favs.length) {
       list.append(
         h("span", {
           cls: "hp-empty fav-hint",
-          text: S("Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”."),
+          text: T("Pin the notes you open most. You can also right-click any note → “Add to homepage favourites”."),
         }),
       );
     }
@@ -1765,7 +2565,7 @@ class HomepageView extends ItemView {
 
     this.$("clips-count").textContent = fmtNum(clips.length);
     if (!clips.length) {
-      this.showEmpty(body, `No clips found in “${folder || "(no folder set)"}”.`);
+      this.showEmpty(body, T("No clips found in “{folder}”.", { folder: folder || T("(no folder set)") }));
       return;
     }
     body.empty();
@@ -1805,7 +2605,7 @@ class HomepageView extends ItemView {
 
     this.$("recent-count").textContent = fmtNum(notes.length);
     if (!notes.length) {
-      this.showEmpty(body, "No notes found.");
+      this.showEmpty(body, T("No notes found."));
       return;
     }
     body.empty();
@@ -1922,7 +2722,7 @@ class HomepageView extends ItemView {
     const results = this.$("search-results");
     results.classList.remove("hidden");
     results.empty();
-    results.createDiv({ cls: "search-status", text: "↻ Searching…" });
+    results.createDiv({ cls: "search-status", text: T("↻ Searching…") });
 
     const words = query.toLowerCase().split(/\s+/).filter(Boolean);
     const files = this.app.vault
@@ -1966,7 +2766,7 @@ class HomepageView extends ItemView {
 
     if (!hits.length) {
       results.empty();
-      results.createDiv({ cls: "search-status", text: `No results for “${query}”` });
+      results.createDiv({ cls: "search-status", text: T("No results for “{query}”", { query }) });
       return;
     }
     hits.sort((a, b) => Number(b.titleHit) - Number(a.titleHit));
@@ -2020,7 +2820,7 @@ class HomepageView extends ItemView {
         const photo = {
           date: today,
           src: data.urls.regular,
-          alt: data.alt_description || data.description || "Nature photo",
+          alt: data.alt_description || data.description || T("Nature photo"),
           photographer: data.user.name,
           photographerUrl: `${data.user.links.html}?utm_source=genkan&utm_medium=referral`,
           photoUrl: `${data.links.html}?utm_source=genkan&utm_medium=referral`,
@@ -2034,7 +2834,7 @@ class HomepageView extends ItemView {
     const photo = {
       date: today,
       src: `https://picsum.photos/seed/${today}/1600/500`,
-      alt: "Landscape photo of the day",
+      alt: T("Landscape photo of the day"),
       photographer: null,
       photoUrl: "https://picsum.photos",
     };
@@ -2046,7 +2846,7 @@ class HomepageView extends ItemView {
     const hero = this.$("hero");
     const img = this.$("hero-img");
     const credit = this.$("hero-credit");
-    img.alt = photo.alt || "Photo of the day";
+    img.alt = photo.alt || T("Photo of the day");
     img.classList.remove("visible");
     img.onload = () => {
       img.classList.add("visible");
@@ -2059,27 +2859,53 @@ class HomepageView extends ItemView {
     img.src = photo.src;
     credit.empty();
     if (photo.photographer) {
-      credit.append(
-        "Photo by ",
-        h("a", { href: safeUrl(photo.photographerUrl), text: photo.photographer }),
-        " on ",
-        h("a", { href: safeUrl(photo.photoUrl), text: "Unsplash" }),
-      );
+      appendTemplate(credit, T("Photo by {photographer} on {site}"), {
+        photographer: h("a", { href: safeUrl(photo.photographerUrl), text: photo.photographer }),
+        site: h("a", { href: safeUrl(photo.photoUrl), text: "Unsplash" }),
+      });
     } else {
-      credit.append("Photo from ", h("a", { href: safeUrl(photo.photoUrl), text: "Picsum Photos" }));
+      appendTemplate(credit, T("Photo from {site}"), {
+        site: h("a", { href: safeUrl(photo.photoUrl), text: "Picsum Photos" }),
+      });
     }
   }
 
   fallbackQuote() {
     const now = new Date();
     const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86_400_000);
-    return QUOTES[dayOfYear % QUOTES.length];
+    const list = QUOTES_I18N[LANG] ?? QUOTES;
+    return list[dayOfYear % list.length];
   }
 
+  // ZenQuotes needs a credit; Echoes is credited too. Bundled quotes need none.
   displayQuote({ q, a, src }) {
     this.$("quote-text").textContent = q;
     this.$("quote-author").textContent = `— ${a}`;
-    this.$("quote-credit").classList.toggle("hidden", src !== "zenquotes");
+    const credit = this.$("quote-credit");
+    const site = { zenquotes: ["https://zenquotes.io/", "ZenQuotes API"], echoes: ["https://echoes.soferity.com/", "Echoes API"] }[src];
+    credit.classList.toggle("hidden", !site);
+    credit.empty();
+    if (site) credit.append(T("Inspirational quotes provided by") + " ", h("a", { href: site[0], text: site[1] }));
+  }
+
+  // Existing English installs keep ZenQuotes; other languages start on the bundled list
+  get quoteSource() {
+    const v = this.settings.quoteSource;
+    return ["zenquotes", "echoes", "bundled"].includes(v) ? v : LANG === "en" ? "zenquotes" : "bundled";
+  }
+
+  async fetchZenQuotes() {
+    const res = await requestUrl({ url: "https://zenquotes.io/api/today" });
+    const d = res.json?.[0];
+    return d?.q ? { q: d.q, a: d.a, src: "zenquotes" } : null;
+  }
+
+  async fetchEchoes() {
+    const res = await requestUrl({ url: `https://echoes.soferity.com/api/quotes/random?lang=${LANG}` });
+    const raw = res.json?.data ?? res.json;
+    const d = Array.isArray(raw) ? raw[0] : raw;
+    const q = d?.quote ?? d?.content;
+    return q && d.author ? { q: String(q), a: String(d.author), src: "echoes" } : null;
   }
 
   async loadQuote() {
@@ -2087,31 +2913,40 @@ class HomepageView extends ItemView {
     bar.classList.toggle("hidden", !this.settings.showQuote);
     if (!this.settings.showQuote) return; // no quote, no network request
 
+    const source = this.quoteSource;
+    if (source === "bundled") return this.displayQuote({ ...this.fallbackQuote(), src: "builtin" }); // no request
+
     const today = new Date().toISOString().slice(0, 10);
     const cached = this.cacheGet("quote");
-    // Quotes cached before the source was recorded have no credit info: fetch those again once
-    if (cached?.date === today && cached.src) return this.displayQuote(cached);
+    if (cached?.date === today && cached.source === source && cached.lang === LANG && cached.src) {
+      return this.displayQuote(cached);
+    }
 
     this.displayQuote({ ...this.fallbackQuote(), src: "builtin" });
     try {
-      const res = await requestUrl({ url: "https://zenquotes.io/api/today" });
-      const d = res.json?.[0];
-      if (d?.q) {
-        const quote = { date: today, q: d.q, a: d.a, src: "zenquotes" };
+      const fetched = source === "echoes" ? await this.fetchEchoes() : await this.fetchZenQuotes();
+      if (fetched) {
+        const quote = { date: today, source, lang: LANG, ...fetched };
         this.cacheSet("quote", quote);
         return this.displayQuote(quote);
       }
     } catch {
       /* use the built-in quote */
     }
-    this.cacheSet("quote", { date: today, ...this.fallbackQuote(), src: "builtin" });
+    this.cacheSet("quote", { date: today, source, lang: LANG, ...this.fallbackQuote(), src: "builtin" });
   }
 }
 
 // ─── Settings tab ─────────────────────────────────────────────────────────────
 
+// The built-in links are stored in English; show them in the current language
+function quickLinkLabel(l) {
+  const builtin = DEFAULT_QUICK_LINKS.find((d) => d.action === l.action && d.label === l.label);
+  return builtin ? T(builtin.label) : l.label;
+}
+
 const quickLinksToText = (links) =>
-  (links ?? []).map((l) => `${l.icon ?? ""} | ${l.label} | ${l.action}`).join("\n");
+  (links ?? []).map((l) => `${l.icon ?? ""} | ${quickLinkLabel(l)} | ${l.action}`).join("\n");
 
 function textToQuickLinks(text) {
   return text
@@ -2149,38 +2984,54 @@ class HomepageSettingTab extends PluginSettingTab {
           if (opts.suggest && PathSuggest) new PathSuggest(this.app, t.inputEl, opts.suggest);
         });
 
-    text("Your name", "Shown in the greeting.", "userName", { placeholder: "e.g. Alex" });
+    text(T("Your name"), T("Shown in the greeting."), "userName", { placeholder: T("e.g. Alex") });
 
     new Setting(containerEl)
-      .setName("Open on startup")
-      .setDesc("Open the homepage when Obsidian starts.")
+      .setName(T("Open on startup"))
+      .setDesc(T("Open the homepage when Obsidian starts."))
       .addToggle((t) => t.setValue(s.openOnStartup).onChange((v) => save("openOnStartup", v)));
 
     new Setting(containerEl)
-      .setName("Appearance")
-      .setDesc("System follows Obsidian's light/dark theme.")
+      .setName(T("Appearance"))
+      .setDesc(T("System follows Obsidian's light/dark theme."))
       .addDropdown((d) =>
         d
-          .addOptions({ system: "System", dark: "Dark", light: "Light" })
+          .addOptions({ system: T("System"), dark: T("Dark"), light: T("Light") })
           .setValue(s.theme)
           .onChange((v) => save("theme", v)),
       );
 
     new Setting(containerEl)
-      .setName("Clock format")
+      .setName(T("Clock format"))
       .addDropdown((d) =>
         d
-          .addOptions({ "12h": "12-hour (AM/PM)", "24h": "24-hour" })
+          .addOptions({ "12h": T("12-hour (AM/PM)"), "24h": T("24-hour") })
           .setValue(s.clockFormat)
           .onChange((v) => save("clockFormat", v)),
       );
 
     new Setting(containerEl)
-      .setName("Spelling")
-      .setDesc("Automatic follows your device's region. Command names change after you restart Obsidian.")
+      .setName(T("Language"))
+      .setDesc(T("Automatic follows Obsidian's language setting."))
       .addDropdown((d) =>
         d
-          .addOptions({ auto: "Automatic", us: "American (favorite)", uk: "British (favourite)" })
+          .addOptions({ auto: T("Automatic"), ...LANGUAGES })
+          .setValue(s.language)
+          .onChange(async (v) => {
+            s.language = v;
+            applyLanguage(v);
+            await this.plugin.saveSettings();
+            await this.plugin.rebuildViews();
+            this.display();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName(T("Spelling"))
+      .setDesc(T("Automatic follows your device's region. Command names change after you restart Obsidian."))
+      .addDropdown((d) =>
+        d
+          .addOptions({ auto: T("Automatic"), us: T("American (favorite)"), uk: T("British (favourite)") })
           .setValue(s.spelling)
           .onChange((v) => {
             spellingChoice = v;
@@ -2189,28 +3040,27 @@ class HomepageSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("First day of the week")
-      .setDesc("Automatic follows your device's region.")
+      .setName(T("First day of the week"))
+      .setDesc(T("Automatic follows your device's region."))
       .addDropdown((d) =>
         d
-          .addOptions({ auto: "Automatic", "0": "Sunday", "1": "Monday", "6": "Saturday" })
+          .addOptions({ auto: T("Automatic"), "0": T("Sunday"), "1": T("Monday"), "6": T("Saturday") })
           .setValue(String(s.weekStart))
           .onChange((v) => save("weekStart", v)),
       );
 
     const customFont = text(
-      "Custom clock font",
-      "The name of a font installed on this device, such as Courier New or Avenir Next. A device without it uses the dashboard font.",
+      T("Custom clock font"), T("The name of a font installed on this device, such as Courier New or Avenir Next. A device without it uses the dashboard font."),
       "clockFontCustom",
-      { placeholder: "Font name" },
+      { placeholder: T("Font name") },
     );
     const showCustomFont = () => customFont.settingEl.toggleClass("genkan-hidden", s.clockFont !== "custom");
     const fontSetting = new Setting(containerEl)
-      .setName("Clock font")
-      .setDesc("Uses fonts already on your device. Your Obsidian theme's fonts are available too.")
+      .setName(T("Clock font"))
+      .setDesc(T("Uses fonts already on your device. Your Obsidian theme's fonts are available too."))
       .addDropdown((d) =>
         d
-          .addOptions(CLOCK_FONTS)
+          .addOptions(Object.fromEntries(Object.entries(CLOCK_FONTS).map(([k, v]) => [k, T(v)])))
           .setValue(Object.keys(CLOCK_FONTS).includes(s.clockFont) ? s.clockFont : "default")
           .onChange(async (v) => {
             s.clockFont = v;
@@ -2222,42 +3072,38 @@ class HomepageSettingTab extends PluginSettingTab {
     showCustomFont();
 
     new Setting(containerEl)
-      .setName("Folders")
+      .setName(T("Folders"))
       .setHeading();
-    text("Web Clipper folder", "Where the Web Clipper saves notes.", "clipsFolder", {
+    text(T("Web Clipper folder"), T("Where the Web Clipper saves notes."), "clipsFolder", {
       placeholder: "Clippings",
     });
     text(
-      "Daily notes folder",
-      "Leave blank to use your Daily Notes / Periodic Notes settings.",
+      T("Daily notes folder"), T("Leave blank to use your Daily Notes / Periodic Notes settings."),
       "dailyNotesFolder",
     );
     text(
-      "Data folder",
-      "Tasks.md and Quick Note.md are stored here, so Obsidian Sync shares them across devices.",
+      T("Data folder"), T("Tasks.md and Quick Note.md are stored here, so Obsidian Sync shares them across devices."),
       "dataFolder",
       { placeholder: "genkan/data" },
     );
 
-    new Setting(containerEl).setName("Content").setHeading();
-    text("Max web clips", "", "maxClips", { number: true });
-    text("Max recent notes", "", "maxRecent", { number: true });
+    new Setting(containerEl).setName(T("Content")).setHeading();
+    text(T("Max web clips"), "", "maxClips", { number: true });
+    text(T("Max recent notes"), "", "maxRecent", { number: true });
 
     new Setting(containerEl)
-      .setName("Pebble ring notes")
-      .setDesc("Show the latest voice notes from your Pebble Index ring.")
+      .setName(T("Pebble ring notes"))
+      .setDesc(T("Show the latest voice notes from your Pebble Index ring."))
       .addToggle((t) => t.setValue(s.showRingNotes).onChange((v) => save("showRingNotes", v)));
 
     // These mirror the three Obsidian choices in the Pebble app
     const noteSetting = text(
-      "Ring note",
-      "The note the ring adds your voice notes to, with entries under headings like “## 2026-10-05 21:55”.",
+      T("Ring note"), T("The note the ring adds your voice notes to, with entries under headings like “## 2026-10-05 21:55”."),
       "ringNotesFile",
       { placeholder: "Pebble Index.md", suggest: "file" },
     );
     const folderSetting = text(
-      "Ring notes folder",
-      "The folder the ring saves each voice note into, one file per note.",
+      T("Ring notes folder"), T("The folder the ring saves each voice note into, one file per note."),
       "ringNotesFolder",
       { placeholder: "Pebble Index", suggest: "folder" },
     );
@@ -2266,14 +3112,14 @@ class HomepageSettingTab extends PluginSettingTab {
       folderSetting.settingEl.toggleClass("genkan-hidden", s.ringMode !== "files");
     };
     const modeSetting = new Setting(containerEl)
-      .setName("Where does the ring save notes?")
-      .setDesc("Match the Obsidian setting in the Pebble app.")
+      .setName(T("Where does the ring save notes?"))
+      .setDesc(T("Match the Obsidian setting in the Pebble app."))
       .addDropdown((d) =>
         d
           .addOptions({
-            main: "One main note (Pebble Index.md)",
-            chosen: "An existing note I choose",
-            files: "A separate file for each note",
+            main: T("One main note (Pebble Index.md)"),
+            chosen: T("An existing note I choose"),
+            files: T("A separate file for each note"),
           })
           .setValue(["chosen", "files"].includes(s.ringMode) ? s.ringMode : "main")
           .onChange(async (v) => {
@@ -2285,32 +3131,42 @@ class HomepageSettingTab extends PluginSettingTab {
     // Keep the mode picker above the field it controls
     containerEl.insertBefore(modeSetting.settingEl, noteSetting.settingEl);
     showRingFields();
-    text("Max ring notes", "", "maxRingNotes", { number: true });
+    text(T("Max ring notes"), "", "maxRingNotes", { number: true });
 
     new Setting(containerEl)
-      .setName("Photo of the day")
-      .setDesc("Shows a landscape photo from Picsum, or from Unsplash if you add a key below. Off means no photo is requested.")
+      .setName(T("Photo of the day"))
+      .setDesc(T("Shows a landscape photo from Picsum, or from Unsplash if you add a key below. Off means no photo is requested."))
       .addToggle((t) => t.setValue(s.showHero).onChange((v) => save("showHero", v)));
     text(
-      "Unsplash access key",
-      "Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault.",
+      T("Unsplash access key"), T("Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault."),
       "unsplashKey",
       { password: true },
     );
     new Setting(containerEl)
-      .setName("Daily quote")
-      .setDesc("Shows a quote from ZenQuotes, fetched once a day. Off means no quote is requested.")
+      .setName(T("Daily quote"))
+      .setDesc(T("Shows a quote each day. Off means no quote is shown and none is requested."))
       .addToggle((t) => t.setValue(s.showQuote).onChange((v) => save("showQuote", v)));
     new Setting(containerEl)
-      .setName("Site icons on web clips")
-      .setDesc("Uses Google's favicon service, which receives the domain of each clipped page. Off means no icon requests.")
+      .setName(T("Quote source"))
+      .setDesc(T("ZenQuotes and Echoes are fetched once a day over the network, and ZenQuotes is English only. The bundled list works offline."))
+      .addDropdown((d) =>
+        d
+          .addOptions({
+            zenquotes: T("ZenQuotes (English)"),
+            echoes: T("Echoes (your language)"),
+            bundled: T("Bundled list (your language)"),
+          })
+          .setValue(["zenquotes", "echoes", "bundled"].includes(s.quoteSource) ? s.quoteSource : LANG === "en" ? "zenquotes" : "bundled")
+          .onChange((v) => save("quoteSource", v)),
+      );
+    new Setting(containerEl)
+      .setName(T("Site icons on web clips"))
+      .setDesc(T("Uses Google's favicon service, which receives the domain of each clipped page. Off means no icon requests."))
       .addToggle((t) => t.setValue(s.showFavicons).onChange((v) => save("showFavicons", v)));
 
     new Setting(containerEl)
-      .setName("Quick links")
-      .setDesc(
-        "One per line: icon | label | action. Actions: command:<command id>, open:<note path>, daily, random, or an https:// URL.",
-      )
+      .setName(T("Quick links"))
+      .setDesc(T("One per line: icon | label | action. Actions: command:<command id>, open:<note path>, daily, random, or an https:// URL."))
       .addTextArea((t) => {
         t.setValue(quickLinksToText(s.quickLinks)).onChange((v) =>
           save("quickLinks", textToQuickLinks(v)),
@@ -2327,10 +3183,10 @@ module.exports = class HomepagePlugin extends Plugin {
   async onload() {
     await this.loadSettings();
     this.registerView(VIEW_TYPE, (leaf) => new HomepageView(leaf, this));
-    this.addRibbonIcon("home", "Open homepage", () => this.activateView());
+    this.addRibbonIcon("home", T("Open homepage"), () => this.activateView());
     this.addCommand({
       id: "open-homepage",
-      name: "Open homepage",
+      name: T("Open homepage"),
       callback: () => this.activateView(),
     });
     this.addSettingTab(new HomepageSettingTab(this.app, this));
@@ -2348,7 +3204,7 @@ module.exports = class HomepagePlugin extends Plugin {
 
     this.addCommand({
       id: "toggle-favourite",
-      name: S("Add or remove current note from homepage favourites"),
+      name: T("Add or remove current note from homepage favourites"),
       checkCallback: (checking) => {
         const f = this.app.workspace.getActiveFile();
         if (!f || f.extension !== "md" || this.isDataFile(f)) return false;
@@ -2358,7 +3214,7 @@ module.exports = class HomepagePlugin extends Plugin {
     });
     this.addCommand({
       id: "add-favourite",
-      name: S("Add a note to homepage favourites…"),
+      name: T("Add a note to homepage favourites…"),
       callback: () => new FavouritePicker(this.app, this).open(),
     });
     this.registerEvent(
@@ -2399,7 +3255,7 @@ module.exports = class HomepagePlugin extends Plugin {
     const fav = this.favPaths.has(file.path);
     menu.addItem((item) =>
       item
-        .setTitle(S(fav ? "Remove from homepage favourites" : "Add to homepage favourites"))
+        .setTitle(fav ? T("Remove from homepage favourites") : T("Add to homepage favourites"))
         .setIcon("star")
         .onClick(() => this.toggleFavourite(file)),
     );
@@ -2409,7 +3265,7 @@ module.exports = class HomepagePlugin extends Plugin {
   decorateLeaf(leaf) {
     const view = leaf?.view;
     if (!(view instanceof MarkdownView) || this.stars.has(view)) return;
-    const el = view.addAction("star", S("Add or remove from homepage favourites"), () => {
+    const el = view.addAction("star", T("Add or remove from homepage favourites"), () => {
       if (view.file && !this.isDataFile(view.file)) this.toggleFavourite(view.file);
     });
     el.addClass("hp-fav-star");
@@ -2427,7 +3283,7 @@ module.exports = class HomepagePlugin extends Plugin {
       const f = view.file;
       const on = !!f && this.favPaths.has(f.path);
       el.toggleClass("is-active", on);
-      el.setAttribute("aria-label", S(on ? "Remove from homepage favourites" : "Add to homepage favourites"));
+      el.setAttribute("aria-label", on ? T("Remove from homepage favourites") : T("Add to homepage favourites"));
     }
   }
 
@@ -2441,6 +3297,9 @@ module.exports = class HomepagePlugin extends Plugin {
     const saved = await this.loadData();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, saved);
     spellingChoice = this.settings.spelling;
+    applyLanguage(this.settings.language);
+    // New installs follow the region's 12/24-hour preference
+    if (!saved?.clockFormat) this.settings.clockFormat = locale12h() ? "12h" : "24h";
     // Before ring modes existed, a custom note path meant "a note I choose"
     if (!saved?.ringMode) {
       const custom = saved?.ringNotesFile && saved.ringNotesFile !== RING_MAIN_NOTE;
@@ -2488,15 +3347,15 @@ module.exports = class HomepagePlugin extends Plugin {
   async addFavourite(file) {
     try {
       if (await this.isFavourite(file)) {
-        new Notice(S(`${file.basename} is already a favourite`));
+        new Notice(T("{name} is already a favourite", { name: file.basename }));
         return;
       }
       const link = this.app.metadataCache.fileToLinktext(file, "", true);
       const f = await ensureFileIn(this.app, this.favPath);
       await this.app.vault.process(f, (t) => `${t}${t && !t.endsWith("\n") ? "\n" : ""}- [[${link}]]\n`);
-      new Notice(S(`Added ${file.basename} to favourites`));
+      new Notice(T("Added {name} to favourites", { name: file.basename }));
     } catch (err) {
-      new Notice(S(`Could not add favourite: ${err.message}`));
+      new Notice(T("Could not add favourite: {error}", { error: err.message }));
     }
   }
 
@@ -2523,7 +3382,7 @@ module.exports = class HomepagePlugin extends Plugin {
     if (!(await this.isFavourite(file))) return this.addFavourite(file);
     const fav = (await this.readFavourites()).find((x) => this.favouriteFile(x)?.path === file.path);
     await this.removeFavourite(fav.target);
-    new Notice(S(`Removed ${file.basename} from favourites`));
+    new Notice(T("Removed {name} from favourites", { name: file.basename }));
   }
 
   async saveSettings() {
@@ -2538,6 +3397,14 @@ module.exports = class HomepagePlugin extends Plugin {
       await leaf.setViewState({ type: VIEW_TYPE, active: true });
     }
     workspace.revealLeaf(leaf);
+  }
+
+  // Labels are built once per view, so a language change reopens the dashboard
+  async rebuildViews() {
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE);
+    if (!leaves.length) return;
+    leaves.forEach((l) => l.detach());
+    await this.activateView();
   }
 
   refreshViews() {
