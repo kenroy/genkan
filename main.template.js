@@ -39,21 +39,36 @@ const DEFAULT_QUICK_LINKS = [
 // Spelling is British unless the locale is American ("favourites" -> "favorites").
 
 let LOCALE = "en-US";
-let US_SPELLING = false; // an unknown or invalid locale keeps British spelling
+let US_DETECTED = false; // an unknown or invalid locale keeps British spelling
+let spellingChoice = "auto"; // auto | us | uk (the setting)
+
+// Obsidian's Electron shell reports en-US in navigator.language for any English region it has
+// no translation for (Canada, say) and lists the OS preferences after it in navigator.languages.
+function preferredLocale() {
+  const first = navigator.language || "";
+  const rest = (navigator.languages || []).filter((l) => l && l !== first);
+  if (/^en-US$/i.test(first)) {
+    const other = rest.find((l) => /^en-[A-Za-z]{2}$/.test(l) && !/^en-US$/i.test(l));
+    if (other) return other;
+  }
+  return first;
+}
+
 try {
-  const l = (typeof navigator !== "undefined" && navigator.language) || "";
+  const l = typeof navigator !== "undefined" ? preferredLocale() : "";
   if (l) {
     new Intl.DateTimeFormat(l);
     LOCALE = l;
-    US_SPELLING = /^en-(US|PR|GU|VI|AS|MP)\b/i.test(l);
+    US_DETECTED = /^en-(US|PR|GU|VI|AS|MP)\b/i.test(l);
   }
 } catch {
   // keep the defaults
 }
 
-// Source strings are written in British spelling; this converts them for American locales
+// Source strings are written in British spelling; this converts them for American English
 function S(text) {
-  return US_SPELLING ? text.replace(/favourite/g, "favorite").replace(/Favourite/g, "Favorite") : text;
+  const us = spellingChoice === "us" || (spellingChoice === "auto" && US_DETECTED);
+  return us ? text.replace(/favourite/g, "favorite").replace(/Favourite/g, "Favorite") : text;
 }
 
 function locale12h() {
@@ -89,6 +104,7 @@ const DEFAULT_SETTINGS = {
   maxRecent: 8,
   theme: "system", // system | dark | light
   clockFormat: locale12h() ? "12h" : "24h", // new installs follow the device locale
+  spelling: "auto", // auto | us | uk
   weekStart: "auto", // auto | 0 (Sunday) | 1 (Monday) | 6 (Saturday)
   clockFont: "default", // see CLOCK_FONTS
   clockFontCustom: "", // font name(s) typed in settings when clockFont is "custom"
@@ -1895,6 +1911,19 @@ class HomepageSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("Spelling")
+      .setDesc("Automatic follows your device's region. Command names change after you restart Obsidian.")
+      .addDropdown((d) =>
+        d
+          .addOptions({ auto: "Automatic", us: "American (favorite)", uk: "British (favourite)" })
+          .setValue(s.spelling)
+          .onChange((v) => {
+            spellingChoice = v;
+            save("spelling", v);
+          }),
+      );
+
+    new Setting(containerEl)
       .setName("First day of the week")
       .setDesc("Automatic follows your device's region.")
       .addDropdown((d) =>
@@ -2146,6 +2175,7 @@ module.exports = class HomepagePlugin extends Plugin {
   async loadSettings() {
     const saved = await this.loadData();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, saved);
+    spellingChoice = this.settings.spelling;
     // Before ring modes existed, a custom note path meant "a note I choose"
     if (!saved?.ringMode) {
       const custom = saved?.ringNotesFile && saved.ringNotesFile !== RING_MAIN_NOTE;
