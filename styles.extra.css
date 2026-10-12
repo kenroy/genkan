@@ -615,3 +615,10 @@
     animation: none;
   }
 }
+
+/* Long unbroken text (a URL in a task, a clip title) wraps instead of spilling out of its card */
+.hp-root .task-text,
+.hp-root .clip-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
