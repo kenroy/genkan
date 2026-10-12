@@ -1978,13 +1978,35 @@ class HomepageSettingTab extends PluginSettingTab {
     const s = this.plugin.settings;
     containerEl.empty();
 
+    // Obsidian 1.11+ draws each SettingGroup as one card; older versions get a flat list
+    const Group = obsidian.SettingGroup;
+    let group = null;
+    const startGroup = (heading) => {
+      group = null;
+      if (Group) {
+        group = new Group(containerEl);
+        if (heading) group.setHeading(heading);
+      } else if (heading) {
+        new Setting(containerEl).setName(heading).setHeading();
+      }
+    };
+    const add = () => {
+      if (!group) return new Setting(containerEl);
+      let created;
+      group.addSetting((st) => {
+        created = st;
+      });
+      return created;
+    };
+    startGroup();
+
     const save = async (key, value) => {
       s[key] = value;
       await this.plugin.saveSettings();
       this.plugin.refreshViews();
     };
     const text = (name, desc, key, opts = {}) =>
-      new Setting(containerEl)
+      add()
         .setName(name)
         .setDesc(desc)
         .addText((t) => {
@@ -1997,12 +2019,12 @@ class HomepageSettingTab extends PluginSettingTab {
 
     text(T("Your name"), T("Shown in the greeting."), "userName", { placeholder: T("e.g. Alex") });
 
-    new Setting(containerEl)
+    add()
       .setName(T("Open on startup"))
       .setDesc(T("Open the homepage when Obsidian starts."))
       .addToggle((t) => t.setValue(s.openOnStartup).onChange((v) => save("openOnStartup", v)));
 
-    new Setting(containerEl)
+    add()
       .setName(T("Appearance"))
       .setDesc(T("System follows Obsidian's light/dark theme."))
       .addDropdown((d) =>
@@ -2012,7 +2034,7 @@ class HomepageSettingTab extends PluginSettingTab {
           .onChange((v) => save("theme", v)),
       );
 
-    new Setting(containerEl)
+    add()
       .setName(T("Clock format"))
       .addDropdown((d) =>
         d
@@ -2021,7 +2043,7 @@ class HomepageSettingTab extends PluginSettingTab {
           .onChange((v) => save("clockFormat", v)),
       );
 
-    new Setting(containerEl)
+    add()
       .setName(T("Language"))
       .setDesc(T("Automatic follows Obsidian's language setting."))
       .addDropdown((d) =>
@@ -2041,7 +2063,7 @@ class HomepageSettingTab extends PluginSettingTab {
           }),
       );
 
-    new Setting(containerEl)
+    add()
       .setName(T("Spelling"))
       .setDesc(T("Automatic follows your device's region. Command names change after you restart Obsidian."))
       .addDropdown((d) =>
@@ -2054,7 +2076,7 @@ class HomepageSettingTab extends PluginSettingTab {
           }),
       );
 
-    new Setting(containerEl)
+    add()
       .setName(T("First day of the week"))
       .setDesc(T("Automatic follows your device's region."))
       .addDropdown((d) =>
@@ -2069,8 +2091,13 @@ class HomepageSettingTab extends PluginSettingTab {
       "clockFontCustom",
       { placeholder: T("Font name") },
     );
-    const showCustomFont = () => customFont.settingEl.toggleClass("genkan-hidden", s.clockFont !== "custom");
-    const fontSetting = new Setting(containerEl)
+    // The custom-font row is last in its card, so take it out of the page when unused
+    // (a merely hidden last row would leave the card without its bottom edge)
+    const showCustomFont = () => {
+      if (s.clockFont === "custom") fontSetting.settingEl.after(customFont.settingEl);
+      else customFont.settingEl.remove();
+    };
+    const fontSetting = add()
       .setName(T("Clock font"))
       .setDesc(T("Uses fonts already on your device. Your Obsidian theme's fonts are available too."))
       .addDropdown((d) =>
@@ -2083,12 +2110,9 @@ class HomepageSettingTab extends PluginSettingTab {
             showCustomFont();
           }),
       );
-    containerEl.insertBefore(fontSetting.settingEl, customFont.settingEl); // picker above its custom field
     showCustomFont();
 
-    new Setting(containerEl)
-      .setName(T("Folders"))
-      .setHeading();
+    startGroup(T("Folders"));
     text(T("Web Clipper folder"), T("Where the Web Clipper saves notes."), "clipsFolder", {
       placeholder: "Clippings",
     });
@@ -2102,11 +2126,11 @@ class HomepageSettingTab extends PluginSettingTab {
       { placeholder: "genkan/data" },
     );
 
-    new Setting(containerEl).setName(T("Content")).setHeading();
+    startGroup(T("Content"));
     text(T("Max web clips"), "", "maxClips", { number: true });
     text(T("Max recent notes"), "", "maxRecent", { number: true });
 
-    new Setting(containerEl)
+    add()
       .setName(T("Pebble ring notes"))
       .setDesc(T("Show the latest voice notes from your Pebble Index ring."))
       .addToggle((t) => t.setValue(s.showRingNotes).onChange((v) => save("showRingNotes", v)));
@@ -2126,7 +2150,7 @@ class HomepageSettingTab extends PluginSettingTab {
       noteSetting.settingEl.toggleClass("genkan-hidden", s.ringMode !== "chosen");
       folderSetting.settingEl.toggleClass("genkan-hidden", s.ringMode !== "files");
     };
-    const modeSetting = new Setting(containerEl)
+    const modeSetting = add()
       .setName(T("Where does the ring save notes?"))
       .setDesc(T("Match the Obsidian setting in the Pebble app."))
       .addDropdown((d) =>
@@ -2144,11 +2168,11 @@ class HomepageSettingTab extends PluginSettingTab {
           }),
       );
     // Keep the mode picker above the field it controls
-    containerEl.insertBefore(modeSetting.settingEl, noteSetting.settingEl);
+    noteSetting.settingEl.before(modeSetting.settingEl);
     showRingFields();
     text(T("Max ring notes"), "", "maxRingNotes", { number: true });
 
-    new Setting(containerEl)
+    add()
       .setName(T("Photo of the day"))
       .setDesc(T("Shows a landscape photo from Picsum, or from Unsplash if you add a key below. Off means no photo is requested."))
       .addToggle((t) => t.setValue(s.showHero).onChange((v) => save("showHero", v)));
@@ -2157,11 +2181,11 @@ class HomepageSettingTab extends PluginSettingTab {
       "unsplashKey",
       { password: true },
     );
-    new Setting(containerEl)
+    add()
       .setName(T("Daily quote"))
       .setDesc(T("Shows a quote each day. Off means no quote is shown and none is requested."))
       .addToggle((t) => t.setValue(s.showQuote).onChange((v) => save("showQuote", v)));
-    new Setting(containerEl)
+    add()
       .setName(T("Quote source"))
       .setDesc(T("ZenQuotes and Echoes are fetched once a day over the network, and ZenQuotes is English only. The bundled list works offline."))
       .addDropdown((d) =>
@@ -2174,12 +2198,12 @@ class HomepageSettingTab extends PluginSettingTab {
           .setValue(["zenquotes", "echoes", "bundled"].includes(s.quoteSource) ? s.quoteSource : LANG === "en" ? "zenquotes" : "bundled")
           .onChange((v) => save("quoteSource", v)),
       );
-    new Setting(containerEl)
+    add()
       .setName(T("Site icons on web clips"))
       .setDesc(T("Uses Google's favicon service, which receives the domain of each clipped page. Off means no icon requests."))
       .addToggle((t) => t.setValue(s.showFavicons).onChange((v) => save("showFavicons", v)));
 
-    new Setting(containerEl)
+    add()
       .setName(T("Quick links"))
       .setDesc(T("One per line: icon | label | action. Actions: command:<command id>, open:<note path>, daily, random, or an https:// URL."))
       .addTextArea((t) => {
