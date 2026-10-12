@@ -1905,7 +1905,7 @@
 .hp-root .note-toolbar {
   border-bottom: 1px solid var(--border-hi);
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* one row: the buttons shrink to fit a narrow card rather than wrapping */
   gap: 2px;
   margin: 0 0 8px;
   padding: 0 0 8px;
@@ -1925,10 +1925,11 @@
   font-family: var(--font);
   font-size: 13px;
   height: 28px;
+  flex: 0 1 28px;
   justify-content: center;
   line-height: 1;
   min-height: 0;
-  min-width: 0;
+  min-width: 24px; /* WCAG 2.2 minimum target size */
   padding: 0;
   width: 28px;
 }
@@ -1963,6 +1964,7 @@
 
 /* Bigger touch targets on phones and tablets */
 .is-mobile #genkan-root .fmt-btn {
+  flex-basis: 32px;
   height: 32px;
   width: 32px;
 }
