@@ -17,6 +17,7 @@ const {
   normalizePath,
   requestUrl,
   moment,
+  Scope,
 } = obsidian;
 
 const VIEW_TYPE = "genkan-view";
@@ -1736,12 +1737,14 @@ function noteToMarkdown(root) {
   const pushLines = (text) => {
     for (const l of text.split("\n")) lines.push(l);
   };
-  // A trailing <br> is the browser's placeholder for an empty line, not a line break
+  // A trailing <br> is the browser's placeholder for an empty line, not a line break. It can sit
+  // inside styling too: Enter after bold text leaves <div><b><br></b></div>.
   const textOf = (nodes) => {
     const list = Array.from(nodes);
     const t = inlineToMarkdown(list);
-    const last = list[list.length - 1];
-    return last && last.nodeName === "BR" && t.endsWith("\n") ? t.slice(0, -1) : t;
+    let leaf = list[list.length - 1];
+    while (leaf && leaf.lastChild) leaf = leaf.lastChild;
+    return leaf && leaf.nodeName === "BR" && t.endsWith("\n") ? t.slice(0, -1) : t;
   };
   const listItem = (li, marker, indent) => {
     const inline = [];
@@ -2311,6 +2314,29 @@ class HomepageView extends ItemView {
     });
 
     this.registerDomEvent(document, "selectionchange", () => this.updateFormatState());
+
+    // Obsidian claims Cmd/Ctrl+B, I and K (and Shift+X) for its own editor before a page element
+    // sees them. A view's scope sits ahead of those global hotkeys while this tab is active, so
+    // register the note's shortcuts there. They only act while the note itself has focus.
+    const inNote = () => {
+      const a = document.activeElement;
+      return !!a && (a.id === "quick-note-rich" || a.id === "quick-note");
+    };
+    // (a view only gets a scope if it makes one; Obsidian's own editor views do)
+    if (!this.scope && Scope) this.scope = new Scope(this.app.scope);
+    for (const [modifiers, key, action] of [
+      [["Mod"], "b", "bold"],
+      [["Mod"], "i", "italic"],
+      [["Mod"], "u", "underline"],
+      [["Mod"], "k", "link"],
+      [["Mod", "Shift"], "x", "strike"],
+    ]) {
+      this.scope?.register(modifiers, key, () => {
+        if (!inNote()) return true; // not ours: let Obsidian handle it
+        this.formatNote(action);
+        return false;
+      });
+    }
 
     // Live updates: Obsidian Sync writes land here as vault events
     const v = this.app.vault;

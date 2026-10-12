@@ -1903,10 +1903,12 @@
 
 /* Quick note formatting toolbar */
 .hp-root .note-toolbar {
+  border-bottom: 1px solid var(--border-hi);
   display: flex;
   flex-wrap: wrap;
   gap: 2px;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
+  padding: 0 0 8px;
 }
 
 #genkan-root .fmt-btn {
