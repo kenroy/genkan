@@ -546,6 +546,11 @@ const I18N = {
     "Bulleted list": "Liste à puces",
     "Numbered list": "Liste numérotée",
     "Link": "Lien",
+    "Link address": "Adresse du lien",
+    "Apply": "Appliquer",
+    "Cancel": "Annuler",
+    "That kind of link isn't supported.": "Ce type de lien n’est pas pris en charge.",
+    "This note has formatting the editor can't show, so it appears as plain text.": "Cette note contient une mise en forme que l’éditeur ne peut pas afficher ; elle apparaît donc en texte brut.",
   },
 
   es: {
@@ -723,6 +728,11 @@ const I18N = {
     "Bulleted list": "Lista con viñetas",
     "Numbered list": "Lista numerada",
     "Link": "Enlace",
+    "Link address": "Dirección del enlace",
+    "Apply": "Aplicar",
+    "Cancel": "Cancelar",
+    "That kind of link isn't supported.": "Este tipo de enlace no es compatible.",
+    "This note has formatting the editor can't show, so it appears as plain text.": "Esta nota tiene un formato que el editor no puede mostrar, así que aparece como texto sin formato.",
   },
 
   de: {
@@ -900,6 +910,11 @@ const I18N = {
     "Bulleted list": "Aufzählung",
     "Numbered list": "Nummerierte Liste",
     "Link": "Link",
+    "Link address": "Link-Adresse",
+    "Apply": "Übernehmen",
+    "Cancel": "Abbrechen",
+    "That kind of link isn't supported.": "Diese Art von Link wird nicht unterstützt.",
+    "This note has formatting the editor can't show, so it appears as plain text.": "Diese Notiz enthält Formatierungen, die der Editor nicht darstellen kann, daher wird sie als reiner Text angezeigt.",
   },
 
   ja: {
@@ -1079,6 +1094,11 @@ const I18N = {
     "Bulleted list": "箇条書き",
     "Numbered list": "番号付きリスト",
     "Link": "リンク",
+    "Link address": "リンク先",
+    "Apply": "適用",
+    "Cancel": "キャンセル",
+    "That kind of link isn't supported.": "この種類のリンクには対応していません。",
+    "This note has formatting the editor can't show, so it appears as plain text.": "このメモにはエディタで表示できない書式が含まれているため、プレーンテキストで表示しています。",
   },
 };
 
@@ -1541,6 +1561,240 @@ function lineEdit(text, s, e, action) {
   return { from, to, insert, selStart: caret, selEnd: caret };
 }
 
+// ─── Quick note rich editor ───────────────────────────────────────────────────
+// The note file stays plain markdown. These convert between markdown and the editor's DOM for
+// the subset the toolbar writes: **bold**, *italic*, <u>underline</u>, ~~strike~~, [links](url),
+// "# " headings, "- " bullets and "1. " numbering. Every other line is kept as literal text, and
+// noteRoundTrips() lets the editor refuse any note it could not write back unchanged.
+
+const SAFE_HREF = /^(https?:\/\/|mailto:|obsidian:\/\/)\S+$/i;
+const NOT_SPACE = (ch) => ch !== undefined && !/\s/.test(ch);
+
+function markdownToInline(s) {
+  const frag = document.createDocumentFragment();
+  let buf = "";
+  const flush = () => {
+    if (buf) {
+      frag.append(buf);
+      buf = "";
+    }
+  };
+  const wrap = (tag, inner, attrs) => {
+    flush();
+    const el = document.createElement(tag);
+    if (attrs) for (const k of Object.keys(attrs)) el.setAttribute(k, attrs[k]);
+    el.append(markdownToInline(inner));
+    frag.append(el);
+  };
+  let i = 0;
+  while (i < s.length) {
+    const two = s.substr(i, 2);
+    if (two === "**" || two === "~~") {
+      const j = s.indexOf(two, i + 2);
+      if (j > i + 2 && NOT_SPACE(s[i + 2]) && NOT_SPACE(s[j - 1])) {
+        wrap(two === "**" ? "strong" : "s", s.slice(i + 2, j));
+        i = j + 2;
+        continue;
+      }
+    } else if (s[i] === "*" && NOT_SPACE(s[i + 1]) && s[i + 1] !== "*") {
+      let j = i + 1;
+      while ((j = s.indexOf("*", j)) !== -1) {
+        if (s[j + 1] === "*") {
+          j += 2;
+          continue;
+        }
+        if (NOT_SPACE(s[j - 1])) break;
+        j++;
+      }
+      if (j !== -1) {
+        wrap("em", s.slice(i + 1, j));
+        i = j + 1;
+        continue;
+      }
+    } else if (s.startsWith("<u>", i)) {
+      const j = s.indexOf("</u>", i + 3);
+      if (j > i + 3) {
+        wrap("u", s.slice(i + 3, j));
+        i = j + 4;
+        continue;
+      }
+    } else if (s[i] === "[") {
+      const m = /^\[([^\]\n]+)\]\(([^)\s]+)\)/.exec(s.slice(i));
+      if (m && SAFE_HREF.test(m[2])) {
+        wrap("a", m[1], { href: m[2] });
+        i += m[0].length;
+        continue;
+      }
+    }
+    buf += s[i++];
+  }
+  flush();
+  return frag;
+}
+
+// One block per line, so the editor and the file always agree on where lines are
+function markdownToBlocks(md) {
+  const frag = document.createDocumentFragment();
+  let list = null; // the open <ul>/<ol>
+  let n = 0; // last number in the open <ol>
+  const line = (tag, text) => {
+    const el = document.createElement(tag);
+    el.append(markdownToInline(text));
+    if (!text) el.append(document.createElement("br"));
+    return el;
+  };
+  for (const raw of md.split("\n")) {
+    let m = /^(#{1,6}) (.*)$/.exec(raw);
+    if (m) {
+      list = null;
+      frag.append(line(`h${m[1].length}`, m[2]));
+      continue;
+    }
+    m = /^- (.*)$/.exec(raw);
+    if (m) {
+      if (!list || list.kind !== "ul") {
+        list = { kind: "ul", el: document.createElement("ul") };
+        frag.append(list.el);
+      }
+      list.el.append(line("li", m[1]));
+      continue;
+    }
+    m = /^(\d+)\. (.*)$/.exec(raw);
+    if (m) {
+      // Only a list that counts 1, 2, 3 is rebuilt as one; anything else stays literal text
+      const expected = list && list.kind === "ol" ? n + 1 : 1;
+      if (m[1] === String(expected)) {
+        if (!list || list.kind !== "ol") {
+          list = { kind: "ol", el: document.createElement("ol") };
+          frag.append(list.el);
+        }
+        n = expected;
+        list.el.append(line("li", m[2]));
+        continue;
+      }
+    }
+    list = null;
+    frag.append(line("div", raw));
+  }
+  return frag;
+}
+
+const BLOCK_TAGS = new Set(["DIV", "P", "H1", "H2", "H3", "H4", "H5", "H6", "UL", "OL", "LI", "BLOCKQUOTE", "PRE"]);
+
+// Wrap an element's text in the markdown for its styling (b, i, u, s, links, styled spans)
+function styledToMarkdown(el, inner) {
+  const tag = el.tagName;
+  let bold = tag === "B" || tag === "STRONG";
+  let italic = tag === "I" || tag === "EM";
+  let under = tag === "U";
+  let strike = tag === "S" || tag === "STRIKE" || tag === "DEL";
+  if (tag === "SPAN" || tag === "FONT") {
+    const st = el.style;
+    bold = st.fontWeight === "bold" || Number(st.fontWeight) >= 600;
+    italic = st.fontStyle === "italic";
+    const deco = st.textDecorationLine || st.textDecoration || "";
+    under = deco.includes("underline");
+    strike = deco.includes("line-through");
+  }
+  let out = inner;
+  // Markers go against the text, with any spaces outside them, and never span a line break
+  const mark = (open, close) =>
+    out
+      .split("\n")
+      .map((l) => {
+        const core = l.trim();
+        if (!core) return l;
+        return l.slice(0, l.length - l.trimStart().length) + open + core + close + l.slice(l.trimEnd().length);
+      })
+      .join("\n");
+  if (strike) out = mark("~~", "~~");
+  if (under) out = mark("<u>", "</u>");
+  if (italic) out = mark("*", "*");
+  if (bold) out = mark("**", "**");
+  if (tag === "A") {
+    const href = el.getAttribute("href");
+    if (href && out.trim()) out = `[${out}](${href})`;
+  }
+  return out;
+}
+
+function inlineToMarkdown(nodes) {
+  let out = "";
+  for (const c of nodes) {
+    if (c.nodeType === 3) {
+      out += c.nodeValue.replace(/ /g, " ").replace(/​/g, "");
+    } else if (c.nodeType === 1) {
+      out += c.tagName === "BR" ? "\n" : styledToMarkdown(c, inlineToMarkdown(c.childNodes));
+    }
+  }
+  return out;
+}
+
+// Read the editor back into markdown, whatever structure the browser built while typing
+function noteToMarkdown(root) {
+  const lines = [];
+  const pushLines = (text) => {
+    for (const l of text.split("\n")) lines.push(l);
+  };
+  // A trailing <br> is the browser's placeholder for an empty line, not a line break
+  const textOf = (nodes) => {
+    const list = Array.from(nodes);
+    const t = inlineToMarkdown(list);
+    const last = list[list.length - 1];
+    return last && last.nodeName === "BR" && t.endsWith("\n") ? t.slice(0, -1) : t;
+  };
+  const listItem = (li, marker, indent) => {
+    const inline = [];
+    const nested = [];
+    for (const ch of li.childNodes) (ch.nodeType === 1 && (ch.tagName === "UL" || ch.tagName === "OL") ? nested : inline).push(ch);
+    lines.push(indent + marker + textOf(inline).replace(/\n/g, " "));
+    for (const sub of nested) {
+      let k = 0;
+      for (const subLi of sub.children) listItem(subLi, sub.tagName === "OL" ? `${++k}. ` : "- ", indent + "  ");
+    }
+  };
+  let run = [];
+  const flushRun = () => {
+    if (run.length) pushLines(textOf(run));
+    run = [];
+  };
+  const block = (el) => {
+    const tag = el.tagName;
+    if (/^H[1-6]$/.test(tag)) {
+      lines.push(`${"#".repeat(Number(tag[1]))} ${textOf(el.childNodes).replace(/\n/g, " ")}`);
+    } else if (tag === "UL" || tag === "OL") {
+      let k = 0;
+      for (const li of el.children) listItem(li, tag === "OL" ? `${++k}. ` : "- ", "");
+    } else if (tag === "LI") {
+      listItem(el, "- ", "");
+    } else if (Array.from(el.children).some((ch) => BLOCK_TAGS.has(ch.tagName))) {
+      walk(el);
+    } else {
+      pushLines(textOf(el.childNodes));
+    }
+  };
+  const walk = (parent) => {
+    for (const c of parent.childNodes) {
+      if (c.nodeType === 1 && BLOCK_TAGS.has(c.tagName)) {
+        flushRun();
+        block(c);
+      } else {
+        run.push(c);
+      }
+    }
+    flushRun();
+  };
+  walk(root);
+  return lines.join("\n");
+}
+
+// True when the editor can show this note and write it back byte for byte
+function noteRoundTrips(md) {
+  const probe = document.createElement("div");
+  probe.append(markdownToBlocks(md));
+  return noteToMarkdown(probe) === md;
+}
+
 // ─── Ring notes (Pebble Index) ────────────────────────────────────────────────
 // The ring's app appends entries to a note under timestamp headings:
 //   ## 2026-10-05 21:55
@@ -1899,7 +2153,25 @@ function buildDashboard() {
         h("span", { cls: "autosave-dot", id: "autosave-dot", title: T("Saved"), "aria-label": T("Saved") }),
       ),
       noteToolbar,
-      h("textarea", { id: "quick-note", placeholder: T("Jot something down…"), spellcheck: "true", "aria-label": T("Quick note") }),
+      h(
+        "div",
+        { cls: "note-link-row hidden" },
+        h("input", { type: "text", id: "note-link-input", inputmode: "url", placeholder: "https://…", "aria-label": T("Link address"), autocomplete: "off", spellcheck: "false" }),
+        h("button", { type: "button", cls: "fmt-text-btn", id: "note-link-apply", text: T("Apply") }),
+        h("button", { type: "button", cls: "fmt-text-btn", id: "note-link-cancel", text: T("Cancel") }),
+      ),
+      h("div", {
+        id: "quick-note-rich",
+        cls: "note-editor is-empty",
+        contenteditable: "true",
+        role: "textbox",
+        "aria-multiline": "true",
+        "aria-label": T("Quick note"),
+        "data-placeholder": T("Jot something down…"),
+        spellcheck: "true",
+      }),
+      h("textarea", { id: "quick-note", cls: "hidden", placeholder: T("Jot something down…"), spellcheck: "true", "aria-label": T("Quick note") }),
+      h("div", { cls: "note-hint hidden", id: "note-hint", text: T("This note has formatting the editor can't show, so it appears as plain text.") }),
     ),
   );
 
@@ -1916,6 +2188,8 @@ class HomepageView extends ItemView {
     this.calMonth = new Date().getMonth();
     this.searchToken = 0;
     this.noteDirty = false;
+    this.noteMode = "rich"; // "plain" when the note holds markdown the rich editor cannot reproduce
+    this.noteComposing = false; // an IME (Japanese, say) is mid-composition
     this.fixingIds = false;
     this.timers = {};
   }
@@ -2035,6 +2309,8 @@ class HomepageView extends ItemView {
       e.preventDefault();
       this.$("search-input")?.focus();
     });
+
+    this.registerDomEvent(document, "selectionchange", () => this.updateFormatState());
 
     // Live updates: Obsidian Sync writes land here as vault events
     const v = this.app.vault;
@@ -2464,43 +2740,88 @@ class HomepageView extends ItemView {
 
   initNote() {
     const textarea = this.$("quick-note");
-    textarea.addEventListener("input", () => {
+    const rich = this.$("quick-note-rich");
+    this.setNoteMd(""); // builds the editor's first (empty) line
+
+    const changed = () => {
       this.noteDirty = true;
       this.$("autosave-dot").className = "autosave-dot unsaved";
+      this.syncNoteEmpty();
       this.later("noteSave", 800, () => this.saveNote());
-    });
+    };
     // Flush on blur so switching tabs right after typing never loses text
-    textarea.addEventListener("blur", () => {
-      if (this.noteDirty) this.saveNote();
+    const flush = () => {
+      if (this.noteDirty && !this.noteComposing) this.saveNote();
+    };
+    for (const el of [textarea, rich]) {
+      el.addEventListener("input", changed);
+      el.addEventListener("blur", flush);
+    }
+    rich.addEventListener("compositionstart", () => (this.noteComposing = true));
+    rich.addEventListener("compositionend", () => (this.noteComposing = false));
+    // Paste and drop as plain text, so no foreign styling ever enters the note
+    const insertPlain = (text) => {
+      if (text) document.execCommand("insertText", false, text);
+    };
+    rich.addEventListener("paste", (e) => {
+      e.preventDefault();
+      insertPlain((e.clipboardData || window.clipboardData).getData("text/plain"));
+    });
+    rich.addEventListener("drop", (e) => {
+      e.preventDefault();
+      insertPlain(e.dataTransfer && e.dataTransfer.getData("text/plain"));
+    });
+    // Links are plain text to click in; Cmd/Ctrl-click follows one
+    rich.addEventListener("click", (e) => {
+      const a = e.target.closest && e.target.closest("a[href]");
+      if (a && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        window.open(a.getAttribute("href"));
+      }
     });
 
     // Formatting toolbar. mousedown is cancelled so the click does not take focus (and the
-    // selection) away from the text box.
+    // selection) away from the note.
     const bar = this.root.querySelector(".note-toolbar");
     bar.addEventListener("mousedown", (e) => e.preventDefault());
     bar.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-fmt]");
       if (btn) this.formatNote(btn.dataset.fmt);
     });
-    textarea.addEventListener("keydown", (e) => {
+    const shortcuts = (e) => {
       if (!(e.metaKey || e.ctrlKey) || e.altKey || e.isComposing) return;
       const k = e.key.toLowerCase();
       const action = e.shiftKey ? (k === "x" ? "strike" : null) : { b: "bold", i: "italic", u: "underline", k: "link" }[k];
       if (!action) return;
       e.preventDefault();
       this.formatNote(action);
+    };
+    textarea.addEventListener("keydown", shortcuts);
+    rich.addEventListener("keydown", shortcuts);
+
+    // The link address row
+    const input = this.$("note-link-input");
+    this.$("note-link-apply").addEventListener("click", () => this.applyLink());
+    this.$("note-link-cancel").addEventListener("click", () => this.closeLinkRow());
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        this.applyLink();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        this.closeLinkRow();
+      }
     });
     this.$("autosave-dot").className = "autosave-dot saved";
   }
 
   async saveNote() {
     clearTimeout(this.timers.noteSave);
-    const textarea = this.$("quick-note");
-    const value = textarea.value;
+    const value = this.getNoteMd();
     try {
       const file = await this.ensureFile(this.notePath);
       await this.app.vault.process(file, () => value);
-      if (textarea.value === value) {
+      if (this.getNoteMd() === value) {
         this.noteDirty = false;
         this.$("autosave-dot").className = "autosave-dot saved";
       }
@@ -2509,9 +2830,236 @@ class HomepageView extends ItemView {
     }
   }
 
+  // The note as markdown, whichever editor is showing
+  getNoteMd() {
+    return this.noteMode === "rich" ? noteToMarkdown(this.$("quick-note-rich")) : this.$("quick-note").value;
+  }
+
+  // Show markdown in the rich editor, unless it could not be written back unchanged
+  setNoteMd(md) {
+    const textarea = this.$("quick-note");
+    const rich = this.$("quick-note-rich");
+    const ok = noteRoundTrips(md);
+    this.noteMode = ok ? "rich" : "plain";
+    rich.classList.toggle("hidden", !ok);
+    textarea.classList.toggle("hidden", ok);
+    this.$("note-hint").classList.toggle("hidden", ok);
+    if (ok) rich.replaceChildren(markdownToBlocks(md));
+    else textarea.value = md;
+    this.syncNoteEmpty();
+    this.updateFormatState();
+  }
+
+  // The placeholder shows while the note is empty (a contenteditable has none of its own)
+  syncNoteEmpty() {
+    const rich = this.$("quick-note-rich");
+    rich.classList.toggle("is-empty", this.noteMode === "rich" && noteToMarkdown(rich) === "");
+  }
+
+  currentHeadingLevel() {
+    const rich = this.$("quick-note-rich");
+    let n = window.getSelection() && window.getSelection().anchorNode;
+    while (n && n !== rich) {
+      if (n.nodeType === 1 && /^H[1-6]$/.test(n.tagName)) return Number(n.tagName[1]);
+      n = n.parentNode;
+    }
+    return 0;
+  }
+
+  // Light the toolbar buttons that match the text under the cursor
+  updateFormatState() {
+    if (!this.root) return;
+    const rich = this.$("quick-note-rich");
+    const sel = window.getSelection();
+    const inside = this.noteMode === "rich" && sel && sel.anchorNode && rich.contains(sel.anchorNode);
+    const q = (c) => {
+      try {
+        return document.queryCommandState(c);
+      } catch {
+        return false;
+      }
+    };
+    const states = inside
+      ? {
+          bold: q("bold"),
+          italic: q("italic"),
+          underline: q("underline"),
+          strike: q("strikeThrough"),
+          bullet: q("insertUnorderedList"),
+          numbered: q("insertOrderedList"),
+          heading: this.currentHeadingLevel() > 0,
+        }
+      : {};
+    for (const btn of this.root.querySelectorAll(".note-toolbar [data-fmt]")) {
+      const on = !!states[btn.dataset.fmt];
+      btn.classList.toggle("is-active", on);
+      if (btn.dataset.fmt !== "link") btn.setAttribute("aria-pressed", String(on));
+    }
+  }
+
+  // ── Link address row (rich editor) ──
+  openLinkRow() {
+    const rich = this.$("quick-note-rich");
+    const sel = window.getSelection();
+    this.noteRange = sel && sel.rangeCount && rich.contains(sel.anchorNode) ? sel.getRangeAt(0).cloneRange() : null;
+    let node = sel && sel.anchorNode;
+    while (node && node !== rich && !(node.nodeType === 1 && node.tagName === "A")) node = node.parentNode;
+    const existing = node && node !== rich ? node.getAttribute("href") : "";
+    const selected = this.noteRange ? this.noteRange.toString() : "";
+    const input = this.$("note-link-input");
+    input.value = existing || (/^https?:\/\/\S+$/.test(selected) ? selected : "https://");
+    this.root.querySelector(".note-link-row").classList.remove("hidden");
+    input.focus();
+    input.select();
+  }
+
+  closeLinkRow() {
+    this.root.querySelector(".note-link-row").classList.add("hidden");
+    const rich = this.$("quick-note-rich");
+    rich.focus();
+    const sel = window.getSelection();
+    if (this.noteRange && sel) {
+      sel.removeAllRanges();
+      sel.addRange(this.noteRange);
+    }
+  }
+
+  applyLink() {
+    let url = this.$("note-link-input").value.trim();
+    this.closeLinkRow();
+    const rich = this.$("quick-note-rich");
+    const sel = window.getSelection();
+    if (!url || url === "https://") {
+      document.execCommand("unlink");
+      return;
+    }
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(url)) url = `https://${url}`;
+    if (!SAFE_HREF.test(url)) {
+      new Notice(T("That kind of link isn't supported."));
+      return;
+    }
+    const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
+    if (range && range.collapsed) {
+      const a = document.createElement("a");
+      a.setAttribute("href", url);
+      a.textContent = url;
+      range.insertNode(a);
+      range.setStartAfter(a);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      rich.dispatchEvent(new Event("input", { bubbles: true }));
+    } else {
+      document.execCommand("createLink", false, url);
+    }
+  }
+
+  // Which line (counting like the markdown does) a point in the editor falls on, and how far
+  // into that line's text it is. Works whatever structure the browser built while typing.
+  noteLineAt(node, offset) {
+    const rich = this.$("quick-note-rich");
+    const r = document.createRange();
+    r.setStart(rich, 0);
+    r.setEnd(node, offset);
+    const holder = document.createElement("div");
+    holder.append(r.cloneContents());
+    const lines = noteToMarkdown(holder).split("\n");
+    // The text typed on this line so far, without its markers
+    const plain = document.createElement("div");
+    plain.append(r.cloneContents());
+    const last = Array.from(plain.querySelectorAll("div, p, li, h1, h2, h3, h4, h5, h6")).pop() || plain;
+    return { line: lines.length - 1, offset: last.textContent.length };
+  }
+
+  // The editor's lines as separate blocks (list items count individually), once it has been
+  // redrawn from markdown
+  noteLines() {
+    const lines = [];
+    for (const c of this.$("quick-note-rich").children) {
+      if (c.tagName === "UL" || c.tagName === "OL") lines.push(...c.children);
+      else lines.push(c);
+    }
+    return lines;
+  }
+
+  // Headings and lists change whole lines, which Chrome's own commands do unreliably (they merge
+  // lines and drop the selection). Edit the markdown lines instead, redraw, and reselect them.
+  formatNoteLines(action) {
+    const rich = this.$("quick-note-rich");
+    const sel = window.getSelection();
+    let range = sel && sel.rangeCount && rich.contains(sel.anchorNode) ? sel.getRangeAt(0) : null;
+    if (!range) {
+      range = document.createRange();
+      range.selectNodeContents(rich);
+      range.collapse(false);
+    }
+    // A Range is live and collapses when its nodes are replaced below, so read it first
+    const wasCollapsed = range.collapsed;
+    const startPoint = this.noteLineAt(range.startContainer, range.startOffset);
+    let endPoint = wasCollapsed ? startPoint : this.noteLineAt(range.endContainer, range.endOffset);
+    // A selection that ends at the very start of a line does not include that line
+    if (endPoint.line > startPoint.line && endPoint.offset === 0) endPoint = { line: endPoint.line - 1, offset: Infinity };
+    const md = this.getNoteMd();
+    const lines = md.split("\n");
+    const first = Math.min(startPoint.line, lines.length - 1);
+    const last = Math.min(Math.max(endPoint.line, first), lines.length - 1);
+    const from = lines.slice(0, first).join("\n").length + (first > 0 ? 1 : 0);
+    const to = from + lines.slice(first, last + 1).join("\n").length;
+    const edit = formatEdit(md, from, to, action);
+    if (!edit) return;
+    const next = md.slice(0, edit.from) + edit.insert + md.slice(edit.to);
+    rich.replaceChildren(markdownToBlocks(next));
+    rich.dispatchEvent(new Event("input", { bubbles: true }));
+
+    // Put the cursor (or the selected lines) back
+    const blocks = this.noteLines();
+    const textEnd = (block) => {
+      const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+      let node = null;
+      let t;
+      while ((t = walker.nextNode())) node = t;
+      return node ? [node, node.nodeValue.length] : [block, 0];
+    };
+    const textAt = (block, offset) => {
+      const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+      let left = offset;
+      let t;
+      while ((t = walker.nextNode())) {
+        if (left <= t.nodeValue.length) return [t, left];
+        left -= t.nodeValue.length;
+      }
+      return textEnd(block);
+    };
+    const out = document.createRange();
+    if (wasCollapsed) {
+      const [n, o] = textAt(blocks[first], startPoint.offset);
+      out.setStart(n, o);
+      out.collapse(true);
+    } else {
+      out.setStart(blocks[first], 0);
+      const [n, o] = textEnd(blocks[last]);
+      out.setEnd(n, o);
+    }
+    rich.focus();
+    sel.removeAllRanges();
+    sel.addRange(out);
+    this.updateFormatState();
+  }
+
+  formatRich(action) {
+    if (action === "link") return this.openLinkRow();
+    if (action === "heading" || action === "bullet" || action === "numbered") return this.formatNoteLines(action);
+    const rich = this.$("quick-note-rich");
+    rich.focus();
+    document.execCommand("styleWithCSS", false, false);
+    document.execCommand({ bold: "bold", italic: "italic", underline: "underline", strike: "strikeThrough" }[action]);
+    this.updateFormatState();
+  }
+
   // Apply a toolbar action to the quick note, through the browser's own text insertion where
   // possible so undo (Cmd/Ctrl+Z) still steps back through it
   formatNote(action) {
+    if (this.noteMode === "rich") return this.formatRich(action);
     const ta = this.$("quick-note");
     const r = formatEdit(ta.value, ta.selectionStart, ta.selectionEnd, action);
     if (!r || !r.insert) return;
@@ -2533,11 +3081,10 @@ class HomepageView extends ItemView {
 
   async loadNote() {
     // Never replace text the user is in the middle of editing
-    if (this.noteDirty) return;
+    if (this.noteDirty || this.noteComposing) return;
     const f = this.app.vault.getAbstractFileByPath(this.notePath);
     const text = f instanceof TFile ? await this.app.vault.read(f) : "";
-    const textarea = this.$("quick-note");
-    if (!this.noteDirty && textarea.value !== text) textarea.value = text;
+    if (!this.noteDirty && !this.noteComposing && this.getNoteMd() !== text) this.setNoteMd(text);
   }
 
   // ── Quick Links ──

@@ -1377,6 +1377,8 @@
     /* 16px stops iOS zooming into focused fields */
     .hp-root .task-input,
     .hp-root #quick-note,
+    .hp-root .note-editor,
+    .hp-root #note-link-input,
     .hp-root #search-input {
         font-size: 16px;
     }
@@ -1961,4 +1963,173 @@
 .is-mobile #genkan-root .fmt-btn {
   height: 32px;
   width: 32px;
+}
+
+/* Quick note rich editor: looks like the plain text box it replaces, with the styling shown */
+.hp-root .note-editor {
+  box-sizing: border-box;
+  color: var(--text);
+  cursor: text;
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 140px;
+  outline: none;
+  overflow-wrap: anywhere;
+  padding: 4px 2px;
+  position: relative;
+  white-space: pre-wrap;
+  width: 100%;
+}
+
+.hp-root .note-editor:focus {
+  outline: none;
+}
+
+.hp-root .note-editor.is-empty::before {
+  color: var(--text-3);
+  content: attr(data-placeholder);
+  left: 2px;
+  pointer-events: none;
+  position: absolute;
+  top: 4px;
+}
+
+/* Obsidian styles headings, lists and links globally, so spell out what the note shows */
+#genkan-root .note-editor h1,
+#genkan-root .note-editor h2,
+#genkan-root .note-editor h3,
+#genkan-root .note-editor h4,
+#genkan-root .note-editor h5,
+#genkan-root .note-editor h6 {
+  color: var(--text);
+  font-family: var(--font);
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: normal;
+  line-height: 1.35;
+  margin: 0;
+  padding: 0;
+}
+
+#genkan-root .note-editor h1 {
+  font-size: 1.45em;
+}
+
+#genkan-root .note-editor h2 {
+  font-size: 1.25em;
+}
+
+#genkan-root .note-editor h3,
+#genkan-root .note-editor h4,
+#genkan-root .note-editor h5,
+#genkan-root .note-editor h6 {
+  font-size: 1.1em;
+}
+
+#genkan-root .note-editor ul,
+#genkan-root .note-editor ol {
+  list-style-position: outside;
+  margin: 0;
+  padding: 0 0 0 1.5em;
+}
+
+#genkan-root .note-editor ul {
+  list-style-type: disc;
+}
+
+#genkan-root .note-editor ol {
+  list-style-type: decimal;
+}
+
+#genkan-root .note-editor li {
+  margin: 0;
+  padding: 0;
+}
+
+#genkan-root .note-editor strong,
+#genkan-root .note-editor b {
+  font-weight: 700;
+}
+
+#genkan-root .note-editor em,
+#genkan-root .note-editor i {
+  font-style: italic;
+}
+
+#genkan-root .note-editor u {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+#genkan-root .note-editor s,
+#genkan-root .note-editor strike {
+  text-decoration: line-through;
+}
+
+#genkan-root .note-editor a {
+  color: var(--accent-txt);
+  cursor: text;
+  text-decoration: underline;
+}
+
+/* Toolbar buttons light up for the styling under the cursor */
+#genkan-root .fmt-btn.is-active {
+  background: var(--accent-lo);
+  color: var(--accent-txt);
+}
+
+/* Link address row */
+.hp-root .note-link-row {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  margin: 0 0 8px;
+}
+
+#genkan-root #note-link-input {
+  appearance: none;
+  background: var(--surface-2);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  box-sizing: border-box;
+  color: var(--text);
+  flex: 1;
+  font-family: var(--font);
+  font-size: 13px;
+  height: auto;
+  min-width: 0;
+  padding: 6px 10px;
+}
+
+#genkan-root .fmt-text-btn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  box-sizing: border-box;
+  color: var(--text-2);
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: var(--font);
+  font-size: 12px;
+  height: auto;
+  line-height: 1.2;
+  min-height: 0;
+  padding: 6px 10px;
+}
+
+#genkan-root .fmt-text-btn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* Shown when a note holds markdown the rich editor cannot reproduce exactly */
+.hp-root .note-hint {
+  color: var(--text-3);
+  font-size: 11px;
+  line-height: 1.4;
+  margin: 6px 0 0;
 }

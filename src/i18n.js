@@ -179,6 +179,11 @@ const I18N = {
     "Bulleted list": "Liste à puces",
     "Numbered list": "Liste numérotée",
     "Link": "Lien",
+    "Link address": "Adresse du lien",
+    "Apply": "Appliquer",
+    "Cancel": "Annuler",
+    "That kind of link isn't supported.": "Ce type de lien n’est pas pris en charge.",
+    "This note has formatting the editor can't show, so it appears as plain text.": "Cette note contient une mise en forme que l’éditeur ne peut pas afficher ; elle apparaît donc en texte brut.",
   },
 
   es: {
@@ -356,6 +361,11 @@ const I18N = {
     "Bulleted list": "Lista con viñetas",
     "Numbered list": "Lista numerada",
     "Link": "Enlace",
+    "Link address": "Dirección del enlace",
+    "Apply": "Aplicar",
+    "Cancel": "Cancelar",
+    "That kind of link isn't supported.": "Este tipo de enlace no es compatible.",
+    "This note has formatting the editor can't show, so it appears as plain text.": "Esta nota tiene un formato que el editor no puede mostrar, así que aparece como texto sin formato.",
   },
 
   de: {
@@ -533,6 +543,11 @@ const I18N = {
     "Bulleted list": "Aufzählung",
     "Numbered list": "Nummerierte Liste",
     "Link": "Link",
+    "Link address": "Link-Adresse",
+    "Apply": "Übernehmen",
+    "Cancel": "Abbrechen",
+    "That kind of link isn't supported.": "Diese Art von Link wird nicht unterstützt.",
+    "This note has formatting the editor can't show, so it appears as plain text.": "Diese Notiz enthält Formatierungen, die der Editor nicht darstellen kann, daher wird sie als reiner Text angezeigt.",
   },
 
   ja: {
@@ -712,5 +727,10 @@ const I18N = {
     "Bulleted list": "箇条書き",
     "Numbered list": "番号付きリスト",
     "Link": "リンク",
+    "Link address": "リンク先",
+    "Apply": "適用",
+    "Cancel": "キャンセル",
+    "That kind of link isn't supported.": "この種類のリンクには対応していません。",
+    "This note has formatting the editor can't show, so it appears as plain text.": "このメモにはエディタで表示できない書式が含まれているため、プレーンテキストで表示しています。",
   },
 };
