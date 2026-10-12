@@ -2137,3 +2137,13 @@
   line-height: 1.4;
   margin: 6px 0 0;
 }
+
+/* Horizontal rule in the quick note (a line of --- in the markdown) */
+#genkan-root .note-editor hr {
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--input-border);
+  height: 0;
+  margin: 10px 0;
+  padding: 0;
+}

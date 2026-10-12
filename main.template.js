@@ -462,8 +462,12 @@ function lineEdit(text, s, e, action) {
   const nl = text.indexOf("\n", last);
   const to = nl === -1 ? text.length : nl;
   const lines = text.slice(from, to).split("\n");
-  let on = lines.map((l) => l.trim() !== "");
-  if (!on.some(Boolean)) on = lines.map((_, i) => i === 0); // a blank line still gets its marker
+  // Blank lines and horizontal rules (---) are left alone
+  let on = lines.map((l) => l.trim() !== "" && l !== "---");
+  if (!on.some(Boolean)) {
+    if (lines.length !== 1 || lines[0].trim() !== "") return null; // only rules: nothing to do
+    on = [true]; // a lone blank line still gets its marker
+  }
   const indent = (l) => l.match(/^\s*/)[0];
   const stripList = (l) => l.replace(/^(\s*)(?:[-*+]|\d+\.)\s+/, "$1");
   const stripHead = (l) => l.replace(/^(\s*)#{1,6}\s+/, "$1");
@@ -571,6 +575,11 @@ function markdownToBlocks(md) {
     return el;
   };
   for (const raw of md.split("\n")) {
+    if (raw === "---") {
+      list = null;
+      frag.append(document.createElement("hr"));
+      continue;
+    }
     let m = /^(#{1,6}) (.*)$/.exec(raw);
     if (m) {
       list = null;
@@ -606,7 +615,7 @@ function markdownToBlocks(md) {
   return frag;
 }
 
-const BLOCK_TAGS = new Set(["DIV", "P", "H1", "H2", "H3", "H4", "H5", "H6", "UL", "OL", "LI", "BLOCKQUOTE", "PRE"]);
+const BLOCK_TAGS = new Set(["DIV", "P", "H1", "H2", "H3", "H4", "H5", "H6", "UL", "OL", "LI", "BLOCKQUOTE", "PRE", "HR"]);
 
 // Wrap an element's text in the markdown for its styling (b, i, u, s, links, styled spans)
 function styledToMarkdown(el, inner) {
@@ -689,7 +698,9 @@ function noteToMarkdown(root) {
   };
   const block = (el) => {
     const tag = el.tagName;
-    if (/^H[1-6]$/.test(tag)) {
+    if (tag === "HR") {
+      lines.push("---");
+    } else if (/^H[1-6]$/.test(tag)) {
       lines.push(`${"#".repeat(Number(tag[1]))} ${textOf(el.childNodes).replace(/\n/g, " ")}`);
     } else if (tag === "UL" || tag === "OL") {
       let k = 0;
@@ -1723,6 +1734,25 @@ class HomepageView extends ItemView {
       e.preventDefault();
       insertPlain(e.dataTransfer && e.dataTransfer.getData("text/plain"));
     });
+    // "---" then Enter becomes a horizontal rule, as in markdown
+    rich.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" || e.shiftKey || e.metaKey || e.ctrlKey || e.altKey || e.isComposing) return;
+      const sel = window.getSelection();
+      if (!sel || !sel.rangeCount || !sel.isCollapsed) return;
+      let block = sel.anchorNode;
+      while (block && block.parentNode !== rich) block = block.parentNode;
+      if (!block || block.tagName !== "DIV" || block.textContent !== "---") return;
+      e.preventDefault();
+      const next = document.createElement("div");
+      next.append(document.createElement("br"));
+      block.replaceWith(document.createElement("hr"), next);
+      const caret = document.createRange();
+      caret.setStart(next, 0);
+      caret.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(caret);
+      rich.dispatchEvent(new Event("input", { bubbles: true }));
+    });
     // Links are plain text to click in; Cmd/Ctrl-click follows one
     rich.addEventListener("click", (e) => {
       const a = e.target.closest && e.target.closest("a[href]");
@@ -1966,6 +1996,7 @@ class HomepageView extends ItemView {
     // Put the cursor (or the selected lines) back
     const blocks = this.noteLines();
     const textEnd = (block) => {
+      if (block.tagName === "HR") return [block.parentNode, Array.from(block.parentNode.childNodes).indexOf(block) + 1];
       const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
       let node = null;
       let t;
@@ -1973,6 +2004,7 @@ class HomepageView extends ItemView {
       return node ? [node, node.nodeValue.length] : [block, 0];
     };
     const textAt = (block, offset) => {
+      if (block.tagName === "HR") return textEnd(block);
       const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
       let left = offset;
       let t;
@@ -1988,7 +2020,8 @@ class HomepageView extends ItemView {
       out.setStart(n, o);
       out.collapse(true);
     } else {
-      out.setStart(blocks[first], 0);
+      if (blocks[first].tagName === "HR") out.setStartBefore(blocks[first]);
+      else out.setStart(blocks[first], 0);
       const [n, o] = textEnd(blocks[last]);
       out.setEnd(n, o);
     }
