@@ -1898,3 +1898,67 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
+
+/* Quick note formatting toolbar */
+.hp-root .note-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 0 0 6px;
+}
+
+#genkan-root .fmt-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  box-sizing: border-box;
+  color: var(--text-2);
+  cursor: pointer;
+  align-items: center;
+  display: flex;
+  font-family: var(--font);
+  font-size: 13px;
+  height: 28px;
+  justify-content: center;
+  line-height: 1;
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+  width: 28px;
+}
+
+#genkan-root .fmt-btn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.hp-root .fmt-bold .fmt-glyph {
+  font-weight: 700;
+}
+
+.hp-root .fmt-italic .fmt-glyph {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.hp-root .fmt-underline .fmt-glyph {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.hp-root .fmt-strike .fmt-glyph {
+  text-decoration: line-through;
+}
+
+.hp-root .fmt-heading .fmt-glyph {
+  font-weight: 700;
+}
+
+/* Bigger touch targets on phones and tablets */
+.is-mobile #genkan-root .fmt-btn {
+  height: 32px;
+  width: 32px;
+}

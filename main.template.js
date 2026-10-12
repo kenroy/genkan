@@ -369,6 +369,124 @@ function parseFavourites(text) {
   return out;
 }
 
+// ─── Quick note formatting ────────────────────────────────────────────────────
+// Pure text edits for the toolbar and shortcuts. formatEdit(text, start, end, action) says
+// what to replace ({ from, to, insert }) and where the selection goes afterwards.
+// Underline has no markdown form, so it is written as <u>…</u>, which Obsidian renders.
+
+const WRAPS = { bold: ["**", "**"], italic: ["*", "*"], underline: ["<u>", "</u>"], strike: ["~~", "~~"] };
+const WORD_CHAR = /[\p{L}\p{N}_]/u;
+
+function formatEdit(text, start, end, action) {
+  if (WRAPS[action]) return wrapEdit(text, start, end, WRAPS[action][0], WRAPS[action][1]);
+  if (action === "link") return linkEdit(text, start, end);
+  if (action === "bullet" || action === "numbered" || action === "heading") return lineEdit(text, start, end, action);
+  return null;
+}
+
+// A lone * is italic; ** belongs to bold, so italic must not treat it as its own marker
+function isSingleStar(open, text, a, b) {
+  return open !== "*" || (text[a - 2] !== "*" && text[b + 1] !== "*");
+}
+
+function wrapEdit(text, s, e, open, close) {
+  if (s === e) {
+    // No selection: format the word at the caret
+    while (s > 0 && WORD_CHAR.test(text[s - 1])) s--;
+    while (e < text.length && WORD_CHAR.test(text[e])) e++;
+    if (s === e) {
+      const at = s;
+      return { from: at, to: at, insert: open + close, selStart: at + open.length, selEnd: at + open.length };
+    }
+  }
+  const sel = text.slice(s, e);
+  if (sel.includes("\n")) {
+    // Markers cannot span lines in markdown, so format each line on its own
+    const lines = sel.split("\n");
+    const filled = lines.filter((l) => l.trim());
+    const wrapped = (l) => l.trim().startsWith(open) && l.trim().endsWith(close) && l.trim().length > open.length + close.length;
+    const allWrapped = filled.length > 0 && filled.every(wrapped);
+    const out = lines.map((l) => {
+      if (!l.trim()) return l;
+      const lead = l.length - l.trimStart().length;
+      const trail = l.length - l.trimEnd().length;
+      const core = l.trim();
+      const next = allWrapped ? core.slice(open.length, core.length - close.length) : wrapped(core) ? core : open + core + close;
+      return l.slice(0, lead) + next + l.slice(l.length - trail);
+    });
+    const insert = out.join("\n");
+    return { from: s, to: e, insert, selStart: s, selEnd: s + insert.length };
+  }
+  // Keep leading/trailing spaces outside the markers (markdown needs the marker beside the text)
+  const lead = sel.length - sel.trimStart().length;
+  const trail = sel.length - sel.trimEnd().length;
+  const a = s + lead;
+  const b = e - trail;
+  if (a >= b) return { from: s, to: e, insert: open + sel + close, selStart: s + open.length, selEnd: s + open.length + sel.length };
+  const inner = text.slice(a, b);
+  // Markers just outside the selection: remove them
+  if (text.slice(a - open.length, a) === open && text.slice(b, b + close.length) === close && isSingleStar(open, text, a, b)) {
+    const from = a - open.length;
+    return { from, to: b + close.length, insert: inner, selStart: from, selEnd: from + inner.length };
+  }
+  // Markers inside the selection: remove them
+  if (
+    inner.length >= open.length + close.length &&
+    inner.startsWith(open) &&
+    inner.endsWith(close) &&
+    (open !== "*" || (inner[1] !== "*" && inner[inner.length - 2] !== "*"))
+  ) {
+    const plain = inner.slice(open.length, inner.length - close.length);
+    return { from: a, to: b, insert: plain, selStart: a, selEnd: a + plain.length };
+  }
+  const selStart = a + open.length;
+  return { from: a, to: b, insert: open + inner + close, selStart, selEnd: selStart + inner.length };
+}
+
+function linkEdit(text, s, e) {
+  const sel = text.slice(s, e);
+  if (/^https?:\/\/\S+$/.test(sel)) {
+    // A pasted address: leave the cursor in the brackets to type the label
+    return { from: s, to: e, insert: `[](${sel})`, selStart: s + 1, selEnd: s + 1 };
+  }
+  if (!sel) return { from: s, to: e, insert: "[](url)", selStart: s + 1, selEnd: s + 1 };
+  const urlStart = s + sel.length + 3;
+  return { from: s, to: e, insert: `[${sel}](url)`, selStart: urlStart, selEnd: urlStart + 3 };
+}
+
+// Bullets, numbering and headings apply to every line the selection touches
+function lineEdit(text, s, e, action) {
+  const from = s === 0 ? 0 : text.lastIndexOf("\n", s - 1) + 1;
+  const last = e > s && text[e - 1] === "\n" ? e - 1 : e;
+  const nl = text.indexOf("\n", last);
+  const to = nl === -1 ? text.length : nl;
+  const lines = text.slice(from, to).split("\n");
+  let on = lines.map((l) => l.trim() !== "");
+  if (!on.some(Boolean)) on = lines.map((_, i) => i === 0); // a blank line still gets its marker
+  const indent = (l) => l.match(/^\s*/)[0];
+  const stripList = (l) => l.replace(/^(\s*)(?:[-*+]|\d+\.)\s+/, "$1");
+  const stripHead = (l) => l.replace(/^(\s*)#{1,6}\s+/, "$1");
+  let out;
+  if (action === "bullet") {
+    const all = lines.every((l, i) => !on[i] || /^\s*[-*+]\s+/.test(l));
+    out = lines.map((l, i) => (!on[i] ? l : all ? stripList(l) : `${indent(l)}- ${stripList(stripHead(l)).trimStart()}`));
+  } else if (action === "numbered") {
+    const all = lines.every((l, i) => !on[i] || /^\s*\d+\.\s+/.test(l));
+    let n = 0;
+    out = lines.map((l, i) => (!on[i] ? l : all ? stripList(l) : `${indent(l)}${++n}. ${stripList(stripHead(l)).trimStart()}`));
+  } else {
+    // heading: none -> # -> ## -> ### -> none, based on the first line
+    const m = lines[on.indexOf(true)].match(/^\s*(#{1,6})\s/);
+    const level = m ? m[1].length : 0;
+    const next = level >= 3 ? 0 : level + 1;
+    out = lines.map((l, i) => (!on[i] ? l : `${indent(l)}${next ? "#".repeat(next) + " " : ""}${stripHead(l).trimStart()}`));
+  }
+  const insert = out.join("\n");
+  if (s !== e) return { from, to, insert, selStart: from, selEnd: from + insert.length };
+  const caret = Math.min(from + out[0].length, Math.max(from, s + (out[0].length - lines[0].length)));
+  return { from, to, insert, selStart: caret, selEnd: caret };
+}
+
 // ─── Ring notes (Pebble Index) ────────────────────────────────────────────────
 // The ring's app appends entries to a note under timestamp headings:
 //   ## 2026-10-05 21:55
@@ -663,6 +781,35 @@ function buildDashboard() {
     ),
   );
 
+  // Formatting toolbar for the quick note (inserts markdown; see formatEdit)
+  const modKey = Platform.isMacOS ? "⌘" : "Ctrl+";
+  const shiftKey = Platform.isMacOS ? "⇧" : "Shift+";
+  const fmtBtn = (action, label, shortcut, content) =>
+    h(
+      "button",
+      {
+        type: "button",
+        cls: `fmt-btn fmt-${action}`,
+        "data-fmt": action,
+        title: shortcut ? `${label} (${modKey}${shortcut})` : label,
+        "aria-label": label,
+      },
+      content,
+    );
+  const glyph = (t) => h("span", { cls: "fmt-glyph", text: t });
+  const noteToolbar = h(
+    "div",
+    { cls: "note-toolbar", role: "toolbar", "aria-label": T("Formatting") },
+    fmtBtn("bold", T("Bold"), "B", glyph("B")),
+    fmtBtn("italic", T("Italic"), "I", glyph("I")),
+    fmtBtn("underline", T("Underline"), "U", glyph("U")),
+    fmtBtn("strike", T("Strikethrough"), `${shiftKey}X`, glyph("S")),
+    fmtBtn("heading", T("Heading"), "", glyph("H")),
+    fmtBtn("bullet", T("Bulleted list"), "", iconNode("list")),
+    fmtBtn("numbered", T("Numbered list"), "", iconNode("list-ordered")),
+    fmtBtn("link", T("Link"), "K", iconNode("link")),
+  );
+
   const tab = (filter, label, active) =>
     h("button", { cls: active ? "tab active" : "tab", "data-filter": filter, role: "tab", "aria-selected": active ? "true" : "false", text: label });
   const right = h(
@@ -697,6 +844,7 @@ function buildDashboard() {
         h("span", { cls: "card-label", text: T("Quick note") }),
         h("span", { cls: "autosave-dot", id: "autosave-dot", title: T("Saved"), "aria-label": T("Saved") }),
       ),
+      noteToolbar,
       h("textarea", { id: "quick-note", placeholder: T("Jot something down…"), spellcheck: "true", "aria-label": T("Quick note") }),
     ),
   );
@@ -1271,6 +1419,23 @@ class HomepageView extends ItemView {
     textarea.addEventListener("blur", () => {
       if (this.noteDirty) this.saveNote();
     });
+
+    // Formatting toolbar. mousedown is cancelled so the click does not take focus (and the
+    // selection) away from the text box.
+    const bar = this.root.querySelector(".note-toolbar");
+    bar.addEventListener("mousedown", (e) => e.preventDefault());
+    bar.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-fmt]");
+      if (btn) this.formatNote(btn.dataset.fmt);
+    });
+    textarea.addEventListener("keydown", (e) => {
+      if (!(e.metaKey || e.ctrlKey) || e.altKey || e.isComposing) return;
+      const k = e.key.toLowerCase();
+      const action = e.shiftKey ? (k === "x" ? "strike" : null) : { b: "bold", i: "italic", u: "underline", k: "link" }[k];
+      if (!action) return;
+      e.preventDefault();
+      this.formatNote(action);
+    });
     this.$("autosave-dot").className = "autosave-dot saved";
   }
 
@@ -1288,6 +1453,28 @@ class HomepageView extends ItemView {
     } catch (err) {
       new Notice(T("Could not save quick note: {error}", { error: err.message }));
     }
+  }
+
+  // Apply a toolbar action to the quick note, through the browser's own text insertion where
+  // possible so undo (Cmd/Ctrl+Z) still steps back through it
+  formatNote(action) {
+    const ta = this.$("quick-note");
+    const r = formatEdit(ta.value, ta.selectionStart, ta.selectionEnd, action);
+    if (!r || !r.insert) return;
+    const expected = ta.value.slice(0, r.from) + r.insert + ta.value.slice(r.to);
+    ta.focus();
+    ta.setSelectionRange(r.from, r.to);
+    let done = false;
+    try {
+      done = document.execCommand("insertText", false, r.insert);
+    } catch {
+      done = false;
+    }
+    if (!done || ta.value !== expected) {
+      ta.value = expected;
+      ta.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    ta.setSelectionRange(r.selStart, r.selEnd);
   }
 
   async loadNote() {
