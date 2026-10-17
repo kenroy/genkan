@@ -22,9 +22,13 @@ Dark and light themes (the dashboard follows Obsidian's theme by default):
 
 ![Genkan dashboard in the light theme](docs/screenshots/dashboard-light.png)
 
-On a phone it becomes a single column with tasks and the quick note first:
+On a phone it becomes a single column with tasks and the quick notes first:
 
 <img src="docs/screenshots/dashboard-phone.png" alt="Genkan on a phone" width="390">
+
+The quick notes card, in light and dark: seven notes, one per colored dot, with formatting as you type and a footer of counts and the last-saved time.
+
+![The Genkan quick notes card in the light and dark themes](docs/screenshots/quick-notes.png)
 
 The screenshots use sample data.
 
