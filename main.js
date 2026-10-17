@@ -408,7 +408,6 @@ const I18N = {
     "Active": "En cours",
     "Done": "Terminées",
     "Clear completed": "Effacer les tâches terminées",
-    "Quick note": "Note rapide",
     "Saved": "Enregistré",
     "Jot something down…": "Notez quelque chose…",
     "Homepage": "Page d’accueil",
@@ -553,7 +552,6 @@ const I18N = {
     "That kind of link isn't supported.": "Ce type de lien n’est pas pris en charge.",
     "This note has formatting the editor can't show, so it appears as plain text.": "Cette note contient une mise en forme que l’éditeur ne peut pas afficher ; elle apparaît donc en texte brut.",
     "Quick notes": "Notes rapides",
-    "Note {n}": "Note {n}",
     "Just now": "À l’instant",
     "{n} line": "{n} ligne",
     "{n} lines": "{n} lignes",
@@ -561,6 +559,10 @@ const I18N = {
     "{n} words": "{n} mots",
     "{n} character": "{n} caractère",
     "{n} characters": "{n} caractères",
+    "Note {n}, has text": "Note {n}, avec du texte",
+    "Note {n}, empty": "Note {n}, vide",
+    "Unsaved changes": "Modifications non enregistrées",
+    "Quick note {n}": "Note rapide {n}",
   },
 
   es: {
@@ -599,7 +601,6 @@ const I18N = {
     "Active": "Activas",
     "Done": "Hechas",
     "Clear completed": "Borrar completadas",
-    "Quick note": "Nota rápida",
     "Saved": "Guardado",
     "Jot something down…": "Anota algo…",
     "Homepage": "Página de inicio",
@@ -744,7 +745,6 @@ const I18N = {
     "That kind of link isn't supported.": "Este tipo de enlace no es compatible.",
     "This note has formatting the editor can't show, so it appears as plain text.": "Esta nota tiene un formato que el editor no puede mostrar, así que aparece como texto sin formato.",
     "Quick notes": "Notas rápidas",
-    "Note {n}": "Nota {n}",
     "Just now": "Ahora mismo",
     "{n} line": "{n} línea",
     "{n} lines": "{n} líneas",
@@ -752,6 +752,10 @@ const I18N = {
     "{n} words": "{n} palabras",
     "{n} character": "{n} carácter",
     "{n} characters": "{n} caracteres",
+    "Note {n}, has text": "Nota {n}, con texto",
+    "Note {n}, empty": "Nota {n}, vacía",
+    "Unsaved changes": "Cambios sin guardar",
+    "Quick note {n}": "Nota rápida {n}",
   },
 
   de: {
@@ -790,7 +794,6 @@ const I18N = {
     "Active": "Offen",
     "Done": "Erledigt",
     "Clear completed": "Erledigte entfernen",
-    "Quick note": "Schnellnotiz",
     "Saved": "Gespeichert",
     "Jot something down…": "Etwas notieren …",
     "Homepage": "Startseite",
@@ -935,7 +938,6 @@ const I18N = {
     "That kind of link isn't supported.": "Diese Art von Link wird nicht unterstützt.",
     "This note has formatting the editor can't show, so it appears as plain text.": "Diese Notiz enthält Formatierungen, die der Editor nicht darstellen kann, daher wird sie als reiner Text angezeigt.",
     "Quick notes": "Schnellnotizen",
-    "Note {n}": "Notiz {n}",
     "Just now": "Gerade eben",
     "{n} line": "{n} Zeile",
     "{n} lines": "{n} Zeilen",
@@ -943,6 +945,10 @@ const I18N = {
     "{n} words": "{n} Wörter",
     "{n} character": "{n} Zeichen",
     "{n} characters": "{n} Zeichen",
+    "Note {n}, has text": "Notiz {n}, mit Text",
+    "Note {n}, empty": "Notiz {n}, leer",
+    "Unsaved changes": "Ungespeicherte Änderungen",
+    "Quick note {n}": "Schnellnotiz {n}",
   },
 
   ja: {
@@ -981,7 +987,6 @@ const I18N = {
     "Active": "未完了",
     "Done": "完了",
     "Clear completed": "完了したタスクを削除",
-    "Quick note": "クイックメモ",
     "Saved": "保存済み",
     "Jot something down…": "メモを書く…",
     "Homepage": "ホームページ",
@@ -1128,7 +1133,6 @@ const I18N = {
     "That kind of link isn't supported.": "この種類のリンクには対応していません。",
     "This note has formatting the editor can't show, so it appears as plain text.": "このメモにはエディタで表示できない書式が含まれているため、プレーンテキストで表示しています。",
     "Quick notes": "クイックメモ",
-    "Note {n}": "メモ {n}",
     "Just now": "たった今",
     "{n} line": "{n} 行",
     "{n} lines": "{n} 行",
@@ -1136,6 +1140,10 @@ const I18N = {
     "{n} words": "{n} 語",
     "{n} character": "{n} 文字",
     "{n} characters": "{n} 文字",
+    "Note {n}, has text": "メモ {n}、入力あり",
+    "Note {n}, empty": "メモ {n}、空",
+    "Unsaved changes": "未保存の変更",
+    "Quick note {n}": "クイックメモ {n}",
   },
 };
 
@@ -2266,32 +2274,46 @@ function buildDashboard() {
         ...Array.from({ length: NOTE_COUNT }, (_, i) =>
           h(
             "button",
-            { type: "button", cls: "note-dot", role: "tab", "data-note": String(i + 1), "aria-label": T("Note {n}", { n: i + 1 }), "aria-selected": "false", tabindex: "-1" },
+            {
+              type: "button",
+              cls: "note-dot",
+              id: `note-tab-${i + 1}`,
+              role: "tab",
+              "data-note": String(i + 1),
+              "aria-label": T("Note {n}, empty", { n: i + 1 }),
+              "aria-controls": "note-panel",
+              "aria-selected": "false",
+              tabindex: "-1",
+            },
             h("span", { cls: "note-dot-num", text: String(i + 1) }),
           ),
         ),
       ),
-      noteToolbar,
       h(
         "div",
-        { cls: "note-link-row hidden" },
-        h("input", { type: "text", id: "note-link-input", inputmode: "url", placeholder: "https://…", "aria-label": T("Link address"), autocomplete: "off", spellcheck: "false" }),
-        h("button", { type: "button", cls: "fmt-text-btn", id: "note-link-apply", text: T("Apply") }),
-        h("button", { type: "button", cls: "fmt-text-btn", id: "note-link-cancel", text: T("Cancel") }),
+        { id: "note-panel", role: "tabpanel", "aria-labelledby": "note-tab-1" },
+        noteToolbar,
+        h(
+          "div",
+          { cls: "note-link-row hidden" },
+          h("input", { type: "text", id: "note-link-input", inputmode: "url", placeholder: "https://…", "aria-label": T("Link address"), autocomplete: "off", spellcheck: "false" }),
+          h("button", { type: "button", cls: "fmt-text-btn", id: "note-link-apply", text: T("Apply") }),
+          h("button", { type: "button", cls: "fmt-text-btn", id: "note-link-cancel", text: T("Cancel") }),
+        ),
+        h("div", {
+          id: "quick-note-rich",
+          cls: "note-editor is-empty",
+          contenteditable: "true",
+          role: "textbox",
+          "aria-multiline": "true",
+          "aria-label": T("Quick note {n}", { n: 1 }),
+          "data-placeholder": T("Jot something down…"),
+          spellcheck: "true",
+        }),
+        h("textarea", { id: "quick-note", cls: "hidden", placeholder: T("Jot something down…"), spellcheck: "true", "aria-label": T("Quick note {n}", { n: 1 }) }),
+        h("div", { cls: "note-hint hidden", id: "note-hint", text: T("This note has formatting the editor can't show, so it appears as plain text.") }),
+        h("div", { cls: "note-footer" }, h("span", { cls: "note-stats", id: "note-stats" }), h("span", { cls: "note-saved", id: "note-saved" })),
       ),
-      h("div", {
-        id: "quick-note-rich",
-        cls: "note-editor is-empty",
-        contenteditable: "true",
-        role: "textbox",
-        "aria-multiline": "true",
-        "aria-label": T("Quick note"),
-        "data-placeholder": T("Jot something down…"),
-        spellcheck: "true",
-      }),
-      h("textarea", { id: "quick-note", cls: "hidden", placeholder: T("Jot something down…"), spellcheck: "true", "aria-label": T("Quick note") }),
-      h("div", { cls: "note-hint hidden", id: "note-hint", text: T("This note has formatting the editor can't show, so it appears as plain text.") }),
-      h("div", { cls: "note-footer" }, h("span", { cls: "note-stats", id: "note-stats" }), h("span", { cls: "note-saved", id: "note-saved" })),
     ),
   );
 
@@ -2925,7 +2947,7 @@ class HomepageView extends ItemView {
 
     const changed = () => {
       this.noteDirty = true;
-      this.$("autosave-dot").className = "autosave-dot unsaved";
+      this.setSaveState(false);
       this.syncNoteEmpty();
       this.later("noteStats", 150, () => this.updateNoteStats());
       this.later("noteSave", 800, () => this.saveNote());
@@ -3012,7 +3034,7 @@ class HomepageView extends ItemView {
         this.closeLinkRow();
       }
     });
-    this.$("autosave-dot").className = "autosave-dot saved";
+    this.setSaveState(true);
   }
 
   async saveNote() {
@@ -3024,7 +3046,7 @@ class HomepageView extends ItemView {
       await this.app.vault.process(file, () => value);
       if (index === this.noteIndex && this.getNoteMd() === value) {
         this.noteDirty = false;
-        this.$("autosave-dot").className = "autosave-dot saved";
+        this.setSaveState(true);
       }
     } catch (err) {
       new Notice(T("Could not save quick note: {error}", { error: err.message }));
@@ -3344,11 +3366,25 @@ class HomepageView extends ItemView {
     this.noteIndex = i;
     this.rememberNoteIndex();
     this.noteDirty = false;
-    this.$("autosave-dot").className = "autosave-dot saved";
+    this.setSaveState(true);
     this.root.querySelector(".note-link-row")?.classList.add("hidden");
     this.renderNoteTabs();
     await this.loadNote();
     if (focus) this.focusNote();
+  }
+
+  // The dot beside the title: green when saved, amber while there are unsaved changes. Its label
+  // follows, so a screen reader hears the real state.
+  setSaveState(saved) {
+    const dot = this.$("autosave-dot");
+    const label = saved ? T("Saved") : T("Unsaved changes");
+    dot.className = saved ? "autosave-dot saved" : "autosave-dot unsaved";
+    dot.title = label;
+    dot.setAttribute("aria-label", label);
+  }
+
+  noteDotLabel(i, hasText) {
+    return T(hasText ? "Note {n}, has text" : "Note {n}, empty", { n: i });
   }
 
   // The dots: the open note is filled and numbered, notes with text have a small centre dot
@@ -3361,7 +3397,13 @@ class HomepageView extends ItemView {
       dot.setAttribute("aria-selected", String(on));
       dot.setAttribute("tabindex", on ? "0" : "-1");
       dot.classList.toggle("has-text", !!this.noteHasText[i - 1]);
+      dot.setAttribute("aria-label", this.noteDotLabel(i, !!this.noteHasText[i - 1]));
     }
+    // The panel and the editor are named for the open note
+    this.$("note-panel").setAttribute("aria-labelledby", `note-tab-${this.noteIndex}`);
+    const name = T("Quick note {n}", { n: this.noteIndex });
+    this.$("quick-note-rich").setAttribute("aria-label", name);
+    this.$("quick-note").setAttribute("aria-label", name);
   }
 
   async refreshNoteTexts() {
@@ -3379,7 +3421,9 @@ class HomepageView extends ItemView {
     const { lines, words, chars } = noteStats(md);
     this.noteHasText[this.noteIndex - 1] = md.trim() !== "";
     this.$("note-stats").textContent = [plural(lines, "{n} line", "{n} lines"), plural(words, "{n} word", "{n} words"), plural(chars, "{n} character", "{n} characters")].join(" · ");
-    this.root.querySelector(`.note-dot[data-note="${this.noteIndex}"]`)?.classList.toggle("has-text", this.noteHasText[this.noteIndex - 1]);
+    const dot = this.root.querySelector(`.note-dot[data-note="${this.noteIndex}"]`);
+    dot?.classList.toggle("has-text", this.noteHasText[this.noteIndex - 1]);
+    dot?.setAttribute("aria-label", this.noteDotLabel(this.noteIndex, this.noteHasText[this.noteIndex - 1]));
   }
 
   updateNoteSaved() {

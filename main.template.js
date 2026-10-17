@@ -1156,32 +1156,46 @@ function buildDashboard() {
         ...Array.from({ length: NOTE_COUNT }, (_, i) =>
           h(
             "button",
-            { type: "button", cls: "note-dot", role: "tab", "data-note": String(i + 1), "aria-label": T("Note {n}", { n: i + 1 }), "aria-selected": "false", tabindex: "-1" },
+            {
+              type: "button",
+              cls: "note-dot",
+              id: `note-tab-${i + 1}`,
+              role: "tab",
+              "data-note": String(i + 1),
+              "aria-label": T("Note {n}, empty", { n: i + 1 }),
+              "aria-controls": "note-panel",
+              "aria-selected": "false",
+              tabindex: "-1",
+            },
             h("span", { cls: "note-dot-num", text: String(i + 1) }),
           ),
         ),
       ),
-      noteToolbar,
       h(
         "div",
-        { cls: "note-link-row hidden" },
-        h("input", { type: "text", id: "note-link-input", inputmode: "url", placeholder: "https://…", "aria-label": T("Link address"), autocomplete: "off", spellcheck: "false" }),
-        h("button", { type: "button", cls: "fmt-text-btn", id: "note-link-apply", text: T("Apply") }),
-        h("button", { type: "button", cls: "fmt-text-btn", id: "note-link-cancel", text: T("Cancel") }),
+        { id: "note-panel", role: "tabpanel", "aria-labelledby": "note-tab-1" },
+        noteToolbar,
+        h(
+          "div",
+          { cls: "note-link-row hidden" },
+          h("input", { type: "text", id: "note-link-input", inputmode: "url", placeholder: "https://…", "aria-label": T("Link address"), autocomplete: "off", spellcheck: "false" }),
+          h("button", { type: "button", cls: "fmt-text-btn", id: "note-link-apply", text: T("Apply") }),
+          h("button", { type: "button", cls: "fmt-text-btn", id: "note-link-cancel", text: T("Cancel") }),
+        ),
+        h("div", {
+          id: "quick-note-rich",
+          cls: "note-editor is-empty",
+          contenteditable: "true",
+          role: "textbox",
+          "aria-multiline": "true",
+          "aria-label": T("Quick note {n}", { n: 1 }),
+          "data-placeholder": T("Jot something down…"),
+          spellcheck: "true",
+        }),
+        h("textarea", { id: "quick-note", cls: "hidden", placeholder: T("Jot something down…"), spellcheck: "true", "aria-label": T("Quick note {n}", { n: 1 }) }),
+        h("div", { cls: "note-hint hidden", id: "note-hint", text: T("This note has formatting the editor can't show, so it appears as plain text.") }),
+        h("div", { cls: "note-footer" }, h("span", { cls: "note-stats", id: "note-stats" }), h("span", { cls: "note-saved", id: "note-saved" })),
       ),
-      h("div", {
-        id: "quick-note-rich",
-        cls: "note-editor is-empty",
-        contenteditable: "true",
-        role: "textbox",
-        "aria-multiline": "true",
-        "aria-label": T("Quick note"),
-        "data-placeholder": T("Jot something down…"),
-        spellcheck: "true",
-      }),
-      h("textarea", { id: "quick-note", cls: "hidden", placeholder: T("Jot something down…"), spellcheck: "true", "aria-label": T("Quick note") }),
-      h("div", { cls: "note-hint hidden", id: "note-hint", text: T("This note has formatting the editor can't show, so it appears as plain text.") }),
-      h("div", { cls: "note-footer" }, h("span", { cls: "note-stats", id: "note-stats" }), h("span", { cls: "note-saved", id: "note-saved" })),
     ),
   );
 
@@ -1815,7 +1829,7 @@ class HomepageView extends ItemView {
 
     const changed = () => {
       this.noteDirty = true;
-      this.$("autosave-dot").className = "autosave-dot unsaved";
+      this.setSaveState(false);
       this.syncNoteEmpty();
       this.later("noteStats", 150, () => this.updateNoteStats());
       this.later("noteSave", 800, () => this.saveNote());
@@ -1902,7 +1916,7 @@ class HomepageView extends ItemView {
         this.closeLinkRow();
       }
     });
-    this.$("autosave-dot").className = "autosave-dot saved";
+    this.setSaveState(true);
   }
 
   async saveNote() {
@@ -1914,7 +1928,7 @@ class HomepageView extends ItemView {
       await this.app.vault.process(file, () => value);
       if (index === this.noteIndex && this.getNoteMd() === value) {
         this.noteDirty = false;
-        this.$("autosave-dot").className = "autosave-dot saved";
+        this.setSaveState(true);
       }
     } catch (err) {
       new Notice(T("Could not save quick note: {error}", { error: err.message }));
@@ -2234,11 +2248,25 @@ class HomepageView extends ItemView {
     this.noteIndex = i;
     this.rememberNoteIndex();
     this.noteDirty = false;
-    this.$("autosave-dot").className = "autosave-dot saved";
+    this.setSaveState(true);
     this.root.querySelector(".note-link-row")?.classList.add("hidden");
     this.renderNoteTabs();
     await this.loadNote();
     if (focus) this.focusNote();
+  }
+
+  // The dot beside the title: green when saved, amber while there are unsaved changes. Its label
+  // follows, so a screen reader hears the real state.
+  setSaveState(saved) {
+    const dot = this.$("autosave-dot");
+    const label = saved ? T("Saved") : T("Unsaved changes");
+    dot.className = saved ? "autosave-dot saved" : "autosave-dot unsaved";
+    dot.title = label;
+    dot.setAttribute("aria-label", label);
+  }
+
+  noteDotLabel(i, hasText) {
+    return T(hasText ? "Note {n}, has text" : "Note {n}, empty", { n: i });
   }
 
   // The dots: the open note is filled and numbered, notes with text have a small centre dot
@@ -2251,7 +2279,13 @@ class HomepageView extends ItemView {
       dot.setAttribute("aria-selected", String(on));
       dot.setAttribute("tabindex", on ? "0" : "-1");
       dot.classList.toggle("has-text", !!this.noteHasText[i - 1]);
+      dot.setAttribute("aria-label", this.noteDotLabel(i, !!this.noteHasText[i - 1]));
     }
+    // The panel and the editor are named for the open note
+    this.$("note-panel").setAttribute("aria-labelledby", `note-tab-${this.noteIndex}`);
+    const name = T("Quick note {n}", { n: this.noteIndex });
+    this.$("quick-note-rich").setAttribute("aria-label", name);
+    this.$("quick-note").setAttribute("aria-label", name);
   }
 
   async refreshNoteTexts() {
@@ -2269,7 +2303,9 @@ class HomepageView extends ItemView {
     const { lines, words, chars } = noteStats(md);
     this.noteHasText[this.noteIndex - 1] = md.trim() !== "";
     this.$("note-stats").textContent = [plural(lines, "{n} line", "{n} lines"), plural(words, "{n} word", "{n} words"), plural(chars, "{n} character", "{n} characters")].join(" · ");
-    this.root.querySelector(`.note-dot[data-note="${this.noteIndex}"]`)?.classList.toggle("has-text", this.noteHasText[this.noteIndex - 1]);
+    const dot = this.root.querySelector(`.note-dot[data-note="${this.noteIndex}"]`);
+    dot?.classList.toggle("has-text", this.noteHasText[this.noteIndex - 1]);
+    dot?.setAttribute("aria-label", this.noteDotLabel(this.noteIndex, this.noteHasText[this.noteIndex - 1]));
   }
 
   updateNoteSaved() {

@@ -2157,7 +2157,7 @@
   margin: 0 0 10px;
 }
 
-.hp-root .note-dot[data-note="1"] { --dot: #ca8a04; --dot-fill: #a16207; }
+.hp-root .note-dot[data-note="1"] { --dot: #b07d00; --dot-fill: #a16207; }
 .hp-root .note-dot[data-note="2"] { --dot: #ea580c; --dot-fill: #c2410c; }
 .hp-root .note-dot[data-note="3"] { --dot: #dc2626; --dot-fill: #b91c1c; }
 .hp-root .note-dot[data-note="4"] { --dot: #7c3aed; --dot-fill: #6d28d9; }
@@ -2209,6 +2209,11 @@
   border-color: var(--dot-fill);
 }
 
+/* On a dark card the dark fill alone is under 3:1, so keep the brighter ring colour as its outline */
+.hp-root[data-theme="dark"] .note-dot[aria-selected="true"]::before {
+  border-color: var(--dot);
+}
+
 .hp-root .note-dot .note-dot-num {
   display: none;
   line-height: 1;
@@ -2245,7 +2250,7 @@
 }
 
 /* The card takes a faint tint of the open note's colour */
-.hp-root #note-card[data-note="1"] { --note-tint: #ca8a04; }
+.hp-root #note-card[data-note="1"] { --note-tint: #b07d00; }
 .hp-root #note-card[data-note="2"] { --note-tint: #ea580c; }
 .hp-root #note-card[data-note="3"] { --note-tint: #dc2626; }
 .hp-root #note-card[data-note="4"] { --note-tint: #7c3aed; }
