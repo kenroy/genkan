@@ -5,7 +5,7 @@ Genkan (玄関) is the entryway of a Japanese home: the place you step in. This 
 - **Clock, greeting and date**, with 12 or 24 hour time
 - **Search** your whole vault from the homepage (press `/` to focus it)
 - **Favourites**: one-click chips for the notes you open most
-- **Tasks** and a **quick note** that sync with the rest of your vault
+- **Tasks** and **seven quick notes** (like Tot) that sync with the rest of your vault
 - **Calendar** that opens (or creates) your daily notes
 - **Web clips** from the Obsidian Web Clipper and your **recent notes**
 - **Quick links** to commands, notes or web pages
@@ -48,7 +48,7 @@ On iPhone and iPad the plugins folder is hidden. The easy route is to install on
 Click **+ Add** and pick a note, click the star in any note's header, right-click inside a note, or run **Genkan: Add or remove current note from homepage favourites**. Click the × on a chip to remove it. Favourites are plain `[[wikilinks]]` in `Favourites.md`, so Obsidian keeps them correct when you rename a note, and you can reorder them by editing the file.
 
 ### Tasks and the quick note
-Tasks are a checklist in `Tasks.md`, written like `- [ ] Buy milk ➕ 2026-10-10 ^id` (compatible with the Tasks plugin). The quick note is `Quick Note.md`. Because they are normal notes, they sync with the rest of your vault, and changes made on another device appear live. You can edit them by hand; tasks typed without an id get one automatically.
+Tasks are a checklist in `Tasks.md`, written like `- [ ] Buy milk ➕ 2026-10-10 ^id` (compatible with the Tasks plugin). There are seven quick notes, shown as colored dots across the top of the card. The open one is filled and numbered, and a small center dot marks a note that has something in it. The first is `Quick Note.md`, and the rest are `Quick Note 2.md` to `Quick Note 7.md`, created when you first type in them. Click a dot, use the arrow keys on the dots, or press Cmd/Ctrl+1 to 7 while the note has focus to switch. The footer shows the lines, words and characters in the open note and when it was last saved. Each device remembers which note you had open. Because they are normal notes, they sync with the rest of your vault, and changes made on another device appear live. You can edit them by hand; tasks typed without an id get one automatically.
 
 The quick note is a small rich-text editor: the toolbar (and Cmd/Ctrl+B, I, U, K and Shift+X) makes text bold, italic, underlined or struck through, turns lines into headings, bullets or numbered lists, and adds links, and you see the styling as you type. Type `---` and press Enter for a horizontal line. The file is still plain markdown: `**bold**`, `*italic*`, `~~strike~~`, `[links](url)`, `#` headings, `-` and `1.` lists, `---` rules, and `<u>underline</u>` (markdown has no underline). Anything else in the note is kept as typed. If a note holds something the editor could not write back unchanged, it opens as plain text with a short notice instead, so nothing is ever altered behind your back.
 

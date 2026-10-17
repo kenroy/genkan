@@ -2147,3 +2147,120 @@
   margin: 10px 0;
   padding: 0;
 }
+
+/* Quick notes: seven of them, each with a colour, like Tot */
+.hp-root .note-tabs {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin: 0 0 10px;
+}
+
+.hp-root .note-dot[data-note="1"] { --dot: #ca8a04; --dot-fill: #a16207; }
+.hp-root .note-dot[data-note="2"] { --dot: #ea580c; --dot-fill: #c2410c; }
+.hp-root .note-dot[data-note="3"] { --dot: #dc2626; --dot-fill: #b91c1c; }
+.hp-root .note-dot[data-note="4"] { --dot: #7c3aed; --dot-fill: #6d28d9; }
+.hp-root .note-dot[data-note="5"] { --dot: #2563eb; --dot-fill: #1d4ed8; }
+.hp-root .note-dot[data-note="6"] { --dot: #0891b2; --dot-fill: #0e7490; }
+.hp-root .note-dot[data-note="7"] { --dot: #16a34a; --dot-fill: #15803d; }
+
+/* The button is a 24px touch target; the ring is drawn smaller inside it */
+#genkan-root .note-dot {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  box-shadow: none;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 700;
+  height: 26px;
+  justify-content: center;
+  line-height: 1;
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+  position: relative;
+  width: 26px;
+}
+
+.hp-root .note-dot::before {
+  border: 2px solid var(--dot);
+  border-radius: 50%;
+  box-sizing: border-box;
+  content: "";
+  height: 18px;
+  left: 4px;
+  position: absolute;
+  top: 4px;
+  transition: background 0.15s;
+  width: 18px;
+}
+
+.hp-root .note-dot[aria-selected="true"]::before {
+  background: var(--dot-fill);
+  border-color: var(--dot-fill);
+}
+
+.hp-root .note-dot .note-dot-num {
+  display: none;
+  position: relative;
+}
+
+.hp-root .note-dot[aria-selected="true"] .note-dot-num {
+  display: block;
+}
+
+/* A small centre dot marks a note that has something in it */
+.hp-root .note-dot.has-text:not([aria-selected="true"])::after {
+  background: var(--dot);
+  border-radius: 50%;
+  content: "";
+  height: 6px;
+  left: 10px;
+  position: absolute;
+  top: 10px;
+  width: 6px;
+}
+
+#genkan-root .note-dot:hover:not([aria-selected="true"])::before {
+  background: color-mix(in srgb, var(--dot) 18%, transparent);
+}
+
+/* The card takes a faint tint of the open note's colour */
+.hp-root #note-card[data-note="1"] { --note-tint: #ca8a04; }
+.hp-root #note-card[data-note="2"] { --note-tint: #ea580c; }
+.hp-root #note-card[data-note="3"] { --note-tint: #dc2626; }
+.hp-root #note-card[data-note="4"] { --note-tint: #7c3aed; }
+.hp-root #note-card[data-note="5"] { --note-tint: #2563eb; }
+.hp-root #note-card[data-note="6"] { --note-tint: #0891b2; }
+.hp-root #note-card[data-note="7"] { --note-tint: #16a34a; }
+
+#genkan-root #note-card[data-note] {
+  background: color-mix(in srgb, var(--note-tint) 6%, var(--surface-1));
+}
+
+/* Footer: counts on the left, when it was last saved on the right */
+.hp-root .note-footer {
+  border-top: 1px solid var(--border);
+  color: var(--text-3);
+  display: flex;
+  font-size: 11px;
+  gap: 8px;
+  justify-content: space-between;
+  line-height: 1.4;
+  margin: 8px 0 0;
+  padding: 8px 0 0;
+}
+
+.hp-root .note-saved {
+  flex-shrink: 0;
+  text-align: right;
+}

@@ -735,6 +735,64 @@ function noteRoundTrips(md) {
   return noteToMarkdown(probe) === md;
 }
 
+// ─── Quick notes: seven of them, like Tot ─────────────────────────────────────
+// Note 1 is the original "Quick Note.md"; the rest are "Quick Note 2.md" … "Quick Note 7.md".
+
+const NOTE_COUNT = 7;
+
+// Plain text of a note's markdown, for the footer counts
+function notePlainText(md) {
+  return md
+    .replace(/\r/g, "")
+    .split("\n")
+    .map((line) => {
+      if (line === "---") return "";
+      return line
+        .replace(/^#{1,6} /, "")
+        .replace(/^- /, "")
+        .replace(/^\d+\. /, "")
+        .replace(/\[([^\]\n]+)\]\([^)\s]+\)/g, "$1")
+        .replace(/<\/?u>/g, "")
+        .replace(/\*\*|~~/g, "")
+        .replace(/\*(\S(?:[^*]*\S)?)\*/g, "$1");
+    })
+    .join("\n");
+}
+
+function noteStats(md) {
+  const text = notePlainText(md);
+  const lines = text === "" ? 0 : text.replace(/\n$/, "").split("\n").length;
+  const chars = text.replace(/\n/g, "").length;
+  let words = 0;
+  if (typeof Intl !== "undefined" && Intl.Segmenter) {
+    for (const part of new Intl.Segmenter(LOCALE, { granularity: "word" }).segment(text)) if (part.isWordLike) words++;
+  } else {
+    words = (text.match(/\S+/g) || []).length;
+  }
+  return { lines, words, chars };
+}
+
+function plural(n, one, other) {
+  try {
+    return T(new Intl.PluralRules(LOCALE).select(n) === "one" ? one : other, { n: fmtNum(n) });
+  } catch {
+    return T(n === 1 ? one : other, { n: fmtNum(n) });
+  }
+}
+
+// "Just now", "5 min. ago", "yesterday", then a date
+function savedAgo(ms) {
+  const mins = Math.floor((Date.now() - ms) / 60000);
+  if (mins < 1) return T("Just now");
+  const rtf = new Intl.RelativeTimeFormat(LOCALE, { numeric: "auto", style: "short" });
+  if (mins < 60) return rtf.format(-mins, "minute");
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return rtf.format(-hours, "hour");
+  const days = Math.floor(hours / 24);
+  if (days < 30) return rtf.format(-days, "day");
+  return fmtDate(new Date(ms), { month: "short", day: "numeric", year: "numeric" });
+}
+
 // ─── Ring notes (Pebble Index) ────────────────────────────────────────────────
 // The ring's app appends entries to a note under timestamp headings:
 //   ## 2026-10-05 21:55
@@ -1089,8 +1147,19 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: T("Quick note") }),
+        h("span", { cls: "card-label", text: T("Quick notes") }),
         h("span", { cls: "autosave-dot", id: "autosave-dot", title: T("Saved"), "aria-label": T("Saved") }),
+      ),
+      h(
+        "div",
+        { cls: "note-tabs", id: "note-tabs", role: "tablist", "aria-label": T("Quick notes") },
+        ...Array.from({ length: NOTE_COUNT }, (_, i) =>
+          h(
+            "button",
+            { type: "button", cls: "note-dot", role: "tab", "data-note": String(i + 1), "aria-label": T("Note {n}", { n: i + 1 }), "aria-selected": "false", tabindex: "-1" },
+            h("span", { cls: "note-dot-num", text: String(i + 1) }),
+          ),
+        ),
       ),
       noteToolbar,
       h(
@@ -1112,6 +1181,7 @@ function buildDashboard() {
       }),
       h("textarea", { id: "quick-note", cls: "hidden", placeholder: T("Jot something down…"), spellcheck: "true", "aria-label": T("Quick note") }),
       h("div", { cls: "note-hint hidden", id: "note-hint", text: T("This note has formatting the editor can't show, so it appears as plain text.") }),
+      h("div", { cls: "note-footer" }, h("span", { cls: "note-stats", id: "note-stats" }), h("span", { cls: "note-saved", id: "note-saved" })),
     ),
   );
 
@@ -1128,6 +1198,8 @@ class HomepageView extends ItemView {
     this.calMonth = new Date().getMonth();
     this.searchToken = 0;
     this.noteDirty = false;
+    this.noteIndex = 1; // which of the seven notes is showing
+    this.noteHasText = Array(NOTE_COUNT).fill(false);
     this.noteMode = "rich"; // "plain" when the note holds markdown the rich editor cannot reproduce
     this.noteComposing = false; // an IME (Japanese, say) is mid-composition
     this.fixingIds = false;
@@ -1153,8 +1225,15 @@ class HomepageView extends ItemView {
   get tasksPath() {
     return joinPath(this.settings.dataFolder, "Tasks.md");
   }
+  notePathFor(i) {
+    return joinPath(this.settings.dataFolder, i === 1 ? "Quick Note.md" : `Quick Note ${i}.md`);
+  }
   get notePath() {
-    return joinPath(this.settings.dataFolder, "Quick Note.md");
+    return this.notePathFor(this.noteIndex);
+  }
+  noteIndexOfPath(path) {
+    for (let i = 1; i <= NOTE_COUNT; i++) if (path === this.notePathFor(i)) return i;
+    return 0;
   }
   get favPath() {
     return this.plugin.favPath;
@@ -1261,6 +1340,14 @@ class HomepageView extends ItemView {
     };
     // (a view only gets a scope if it makes one; Obsidian's own editor views do)
     if (!this.scope && Scope) this.scope = new Scope(this.app.scope);
+    // Cmd/Ctrl+1 to 7 jump between the seven notes (Obsidian uses these for tabs, so only in the note)
+    for (let n = 1; n <= NOTE_COUNT; n++) {
+      this.scope?.register(["Mod"], String(n), () => {
+        if (!inNote()) return true;
+        this.switchNote(n, true);
+        return false;
+      });
+    }
     for (const [modifiers, key, action] of [
       [["Mod"], "b", "bold"],
       [["Mod"], "i", "italic"],
@@ -1337,7 +1424,10 @@ class HomepageView extends ItemView {
   onFileChange(f) {
     const path = f.path;
     if (path === this.tasksPath) this.later("tasks", 150, () => this.loadTasks());
-    else if (path === this.notePath) this.later("note", 150, () => this.loadNote());
+    else if (this.noteIndexOfPath(path)) {
+      if (path === this.notePath) this.later("note", 150, () => this.loadNote());
+      else this.later("noteTabs", 300, () => this.refreshNoteTexts());
+    }
     else if (path === this.favPath) this.later("favs", 150, () => this.renderFavourites());
     else if (this.isRingFile(path)) this.later("ring", 150, () => this.renderRingNotes());
     else this.scheduleLists();
@@ -1428,6 +1518,7 @@ class HomepageView extends ItemView {
     }
     this.$("clock-sec").textContent = `:${pad(now.getSeconds())}`;
 
+    if (now.getSeconds() === 0 && this.noteIndex) this.updateNoteSaved();
     if (force || now.getSeconds() === 0 || !this.$("clock-date").textContent) {
       this.$("clock-date").textContent = fmtDate(now, {
         weekday: "long",
@@ -1706,10 +1797,27 @@ class HomepageView extends ItemView {
     const rich = this.$("quick-note-rich");
     this.setNoteMd(""); // builds the editor's first (empty) line
 
+    this.noteIndex = this.restoreNoteIndex();
+    this.renderNoteTabs();
+    const tabs = this.$("note-tabs");
+    tabs.addEventListener("mousedown", (e) => e.preventDefault()); // keep the cursor in the note
+    tabs.addEventListener("click", (e) => {
+      const dot = e.target.closest("[data-note]");
+      if (dot) this.switchNote(Number(dot.dataset.note), !Platform.isMobile);
+    });
+    tabs.addEventListener("keydown", (e) => {
+      const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+      const to = e.key === "Home" ? 1 : e.key === "End" ? NOTE_COUNT : step ? ((this.noteIndex - 1 + step + NOTE_COUNT) % NOTE_COUNT) + 1 : 0;
+      if (!to) return;
+      e.preventDefault();
+      this.switchNote(to).then(() => this.root.querySelector(`.note-dot[data-note="${to}"]`)?.focus());
+    });
+
     const changed = () => {
       this.noteDirty = true;
       this.$("autosave-dot").className = "autosave-dot unsaved";
       this.syncNoteEmpty();
+      this.later("noteStats", 150, () => this.updateNoteStats());
       this.later("noteSave", 800, () => this.saveNote());
     };
     // Flush on blur so switching tabs right after typing never loses text
@@ -1800,10 +1908,11 @@ class HomepageView extends ItemView {
   async saveNote() {
     clearTimeout(this.timers.noteSave);
     const value = this.getNoteMd();
+    const index = this.noteIndex;
     try {
-      const file = await this.ensureFile(this.notePath);
+      const file = await this.ensureFile(this.notePathFor(index));
       await this.app.vault.process(file, () => value);
-      if (this.getNoteMd() === value) {
+      if (index === this.noteIndex && this.getNoteMd() === value) {
         this.noteDirty = false;
         this.$("autosave-dot").className = "autosave-dot saved";
       }
@@ -2070,6 +2179,108 @@ class HomepageView extends ItemView {
     const f = this.app.vault.getAbstractFileByPath(this.notePath);
     const text = f instanceof TFile ? await this.app.vault.read(f) : "";
     if (!this.noteDirty && !this.noteComposing && this.getNoteMd() !== text) this.setNoteMd(text);
+    this.updateNoteMeta();
+  }
+
+  // ── The seven notes ──
+
+  restoreNoteIndex() {
+    let v = NaN;
+    try {
+      if (typeof this.app.loadLocalStorage === "function") v = Number(this.app.loadLocalStorage("genkan-note-index"));
+    } catch {
+      // fall through to the plugin data
+    }
+    if (!Number.isInteger(v)) v = Number(this.plugin.settings.cache?.noteIndex);
+    return v >= 1 && v <= NOTE_COUNT ? v : 1;
+  }
+
+  // Remembered per device where Obsidian allows it, so your phone and laptop can each keep their place
+  rememberNoteIndex() {
+    try {
+      if (typeof this.app.saveLocalStorage === "function") return this.app.saveLocalStorage("genkan-note-index", this.noteIndex);
+    } catch {
+      // fall through to the plugin data
+    }
+    const s = this.plugin.settings;
+    s.cache = { ...(s.cache ?? {}), noteIndex: this.noteIndex };
+    this.plugin.saveSettings().catch(() => {});
+  }
+
+  focusNote() {
+    if (this.noteMode === "rich") {
+      const rich = this.$("quick-note-rich");
+      rich.focus();
+      const r = document.createRange();
+      r.selectNodeContents(rich);
+      r.collapse(false);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+    } else {
+      const ta = this.$("quick-note");
+      ta.focus();
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+    }
+  }
+
+  async switchNote(i, focus = false) {
+    if (i < 1 || i > NOTE_COUNT) return;
+    if (i === this.noteIndex) {
+      if (focus) this.focusNote();
+      return;
+    }
+    if (this.noteDirty && !this.noteComposing) await this.saveNote(); // keep what you typed in the note you are leaving
+    this.noteIndex = i;
+    this.rememberNoteIndex();
+    this.noteDirty = false;
+    this.$("autosave-dot").className = "autosave-dot saved";
+    this.root.querySelector(".note-link-row")?.classList.add("hidden");
+    this.renderNoteTabs();
+    await this.loadNote();
+    if (focus) this.focusNote();
+  }
+
+  // The dots: the open note is filled and numbered, notes with text have a small centre dot
+  renderNoteTabs() {
+    const card = this.$("note-card");
+    card.setAttribute("data-note", String(this.noteIndex));
+    for (const dot of this.root.querySelectorAll(".note-dot")) {
+      const i = Number(dot.dataset.note);
+      const on = i === this.noteIndex;
+      dot.setAttribute("aria-selected", String(on));
+      dot.setAttribute("tabindex", on ? "0" : "-1");
+      dot.classList.toggle("has-text", !!this.noteHasText[i - 1]);
+    }
+  }
+
+  async refreshNoteTexts() {
+    for (let i = 1; i <= NOTE_COUNT; i++) {
+      if (i === this.noteIndex) continue;
+      const f = this.app.vault.getAbstractFileByPath(this.notePathFor(i));
+      this.noteHasText[i - 1] = f instanceof TFile ? (await this.app.vault.cachedRead(f)).trim() !== "" : false;
+    }
+    this.renderNoteTabs();
+  }
+
+  // Footer: counts for the open note and when it was last saved
+  updateNoteStats() {
+    const md = this.getNoteMd();
+    const { lines, words, chars } = noteStats(md);
+    this.noteHasText[this.noteIndex - 1] = md.trim() !== "";
+    this.$("note-stats").textContent = [plural(lines, "{n} line", "{n} lines"), plural(words, "{n} word", "{n} words"), plural(chars, "{n} character", "{n} characters")].join(" · ");
+    this.root.querySelector(`.note-dot[data-note="${this.noteIndex}"]`)?.classList.toggle("has-text", this.noteHasText[this.noteIndex - 1]);
+  }
+
+  updateNoteSaved() {
+    const f = this.app.vault.getAbstractFileByPath(this.notePath);
+    this.$("note-saved").textContent = f instanceof TFile ? savedAgo(f.stat.mtime) : "";
+  }
+
+  updateNoteMeta() {
+    this.updateNoteStats();
+    this.updateNoteSaved();
+    this.refreshNoteTexts();
   }
 
   // ── Quick Links ──
