@@ -2211,7 +2211,17 @@
 
 .hp-root .note-dot .note-dot-num {
   display: none;
+  line-height: 1;
   position: relative;
+  /* Center on the digit itself, not the font's line box (numerals have no descenders, so the
+     line box sits them about a pixel high) */
+  text-box: trim-both cap alphabetic;
+}
+
+@supports not (text-box: trim-both cap alphabetic) {
+  .hp-root .note-dot .note-dot-num {
+    transform: translateY(1px);
+  }
 }
 
 .hp-root .note-dot[aria-selected="true"] .note-dot-num {
