@@ -941,6 +941,14 @@ class FavouritePicker extends FuzzySuggestModal {
 // The dashboard markup (ids are how the rest of the code finds things)
 function buildDashboard() {
   const refreshBtn = (id, title, aria) => h("button", { cls: "icon-btn sm", id, title, "aria-label": aria });
+  // The centre cards fold away: a -/+ button sits left of the title (see initCards)
+  const cardTitle = (cardId, bodyId, label) =>
+    h(
+      "div",
+      { cls: "card-title" },
+      h("button", { type: "button", cls: "card-toggle", "data-card": cardId, "data-body": bodyId, "data-label": label, "aria-controls": bodyId, "aria-expanded": "true" }),
+      h("span", { cls: "card-label", text: label }),
+    );
   const countRow = (countId, ...extra) =>
     h("div", { cls: "card-header-right" }, h("span", { cls: "badge", id: countId, text: "0" }), ...extra);
 
@@ -1058,7 +1066,7 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: T("Ring notes") }),
+        cardTitle("ring-card", "ring-body", T("Ring notes")),
         countRow("ring-count", h("a", { cls: "card-link", id: "ring-open", href: "#", title: T("Open the notes file"), text: T("Open") })),
       ),
       h("div", { id: "ring-body" }),
@@ -1069,7 +1077,7 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: T("Web clips") }),
+        cardTitle("clips-card", "clips-body", T("Web clips")),
         countRow("clips-count", refreshBtn("refresh-clips", T("Refresh clips"), T("Refresh web clips"))),
       ),
       h("div", { id: "clips-body" }),
@@ -1080,7 +1088,7 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: T("Recent notes") }),
+        cardTitle("recent-card", "recent-body", T("Recent notes")),
         countRow("recent-count", refreshBtn("refresh-recent", T("Refresh recent notes"), T("Refresh recent notes"))),
       ),
       h("div", { id: "recent-body" }),
@@ -1316,6 +1324,7 @@ class HomepageView extends ItemView {
     this.initNote();
     this.initLinks();
     this.initSearch();
+    this.initCards();
   }
 
   // Labels are built once, so a language change rebuilds the dashboard in place
@@ -1801,6 +1810,55 @@ class HomepageView extends ItemView {
           del,
         ),
       );
+    }
+  }
+
+  // ── Collapsible cards ──
+
+  restoreCollapsed() {
+    let v = null;
+    try {
+      if (typeof this.app.loadLocalStorage === "function") v = this.app.loadLocalStorage("genkan-collapsed");
+    } catch {
+      // fall through to the plugin data
+    }
+    if (!Array.isArray(v)) v = this.plugin.settings.cache?.collapsed;
+    return Array.isArray(v) ? v.filter((id) => typeof id === "string") : [];
+  }
+
+  // Remembered per device where Obsidian allows it: a phone and a laptop want different layouts
+  rememberCollapsed() {
+    const ids = Array.from(this.root.querySelectorAll(".card-toggle"))
+      .filter((b) => b.getAttribute("aria-expanded") === "false")
+      .map((b) => b.dataset.card);
+    try {
+      if (typeof this.app.saveLocalStorage === "function") return this.app.saveLocalStorage("genkan-collapsed", ids);
+    } catch {
+      // fall through to the plugin data
+    }
+    const s = this.plugin.settings;
+    s.cache = { ...(s.cache ?? {}), collapsed: ids };
+    this.plugin.saveSettings().catch(() => {});
+  }
+
+  setCollapsed(btn, collapsed) {
+    this.$(btn.dataset.card).classList.toggle("is-collapsed", collapsed);
+    this.$(btn.dataset.body).classList.toggle("hidden", collapsed);
+    const label = T(collapsed ? "Expand {name}" : "Collapse {name}", { name: btn.dataset.label });
+    btn.setAttribute("aria-expanded", String(!collapsed));
+    btn.setAttribute("aria-label", label);
+    btn.title = label;
+    setIconSvg(btn, collapsed ? "plus" : "minus");
+  }
+
+  initCards() {
+    const saved = this.restoreCollapsed();
+    for (const btn of this.root.querySelectorAll(".card-toggle")) {
+      this.setCollapsed(btn, saved.includes(btn.dataset.card));
+      btn.addEventListener("click", () => {
+        this.setCollapsed(btn, btn.getAttribute("aria-expanded") === "true");
+        this.rememberCollapsed();
+      });
     }
   }
 

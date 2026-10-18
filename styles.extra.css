@@ -1003,3 +1003,41 @@
   flex-shrink: 0;
   text-align: right;
 }
+
+/* Collapsible centre cards: a -/+ button left of the title */
+.hp-root .card-title {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+}
+
+#genkan-root .card-toggle {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  box-sizing: border-box;
+  color: var(--text-2);
+  cursor: pointer;
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  height: 24px;
+  justify-content: center;
+  margin: -4px 0 -4px -6px;
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+  width: 24px;
+}
+
+#genkan-root .card-toggle:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.hp-root .card.is-collapsed .card-header {
+  margin-bottom: 0;
+}

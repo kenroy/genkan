@@ -25,6 +25,8 @@ const RING_MAIN_NOTE = "Pebble Index.md"; // the ring app's "one main note" targ
 
 // Icons for the dashboard (fixed SVG source, parsed once at runtime).
 const ICONS = {
+  minus: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  plus: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
   list: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
   "list-ordered": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>`,
   link: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
@@ -563,6 +565,8 @@ const I18N = {
     "Note {n}, empty": "Note {n}, vide",
     "Unsaved changes": "Modifications non enregistrées",
     "Quick note {n}": "Note rapide {n}",
+    "Collapse {name}": "Réduire {name}",
+    "Expand {name}": "Développer {name}",
   },
 
   es: {
@@ -756,6 +760,8 @@ const I18N = {
     "Note {n}, empty": "Nota {n}, vacía",
     "Unsaved changes": "Cambios sin guardar",
     "Quick note {n}": "Nota rápida {n}",
+    "Collapse {name}": "Contraer {name}",
+    "Expand {name}": "Expandir {name}",
   },
 
   de: {
@@ -949,6 +955,8 @@ const I18N = {
     "Note {n}, empty": "Notiz {n}, leer",
     "Unsaved changes": "Ungespeicherte Änderungen",
     "Quick note {n}": "Schnellnotiz {n}",
+    "Collapse {name}": "{name} einklappen",
+    "Expand {name}": "{name} ausklappen",
   },
 
   ja: {
@@ -1144,6 +1152,8 @@ const I18N = {
     "Note {n}, empty": "メモ {n}、空",
     "Unsaved changes": "未保存の変更",
     "Quick note {n}": "クイックメモ {n}",
+    "Collapse {name}": "{name} を折りたたむ",
+    "Expand {name}": "{name} を展開",
   },
 };
 
@@ -2059,6 +2069,14 @@ class FavouritePicker extends FuzzySuggestModal {
 // The dashboard markup (ids are how the rest of the code finds things)
 function buildDashboard() {
   const refreshBtn = (id, title, aria) => h("button", { cls: "icon-btn sm", id, title, "aria-label": aria });
+  // The centre cards fold away: a -/+ button sits left of the title (see initCards)
+  const cardTitle = (cardId, bodyId, label) =>
+    h(
+      "div",
+      { cls: "card-title" },
+      h("button", { type: "button", cls: "card-toggle", "data-card": cardId, "data-body": bodyId, "data-label": label, "aria-controls": bodyId, "aria-expanded": "true" }),
+      h("span", { cls: "card-label", text: label }),
+    );
   const countRow = (countId, ...extra) =>
     h("div", { cls: "card-header-right" }, h("span", { cls: "badge", id: countId, text: "0" }), ...extra);
 
@@ -2176,7 +2194,7 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: T("Ring notes") }),
+        cardTitle("ring-card", "ring-body", T("Ring notes")),
         countRow("ring-count", h("a", { cls: "card-link", id: "ring-open", href: "#", title: T("Open the notes file"), text: T("Open") })),
       ),
       h("div", { id: "ring-body" }),
@@ -2187,7 +2205,7 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: T("Web clips") }),
+        cardTitle("clips-card", "clips-body", T("Web clips")),
         countRow("clips-count", refreshBtn("refresh-clips", T("Refresh clips"), T("Refresh web clips"))),
       ),
       h("div", { id: "clips-body" }),
@@ -2198,7 +2216,7 @@ function buildDashboard() {
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: T("Recent notes") }),
+        cardTitle("recent-card", "recent-body", T("Recent notes")),
         countRow("recent-count", refreshBtn("refresh-recent", T("Refresh recent notes"), T("Refresh recent notes"))),
       ),
       h("div", { id: "recent-body" }),
@@ -2434,6 +2452,7 @@ class HomepageView extends ItemView {
     this.initNote();
     this.initLinks();
     this.initSearch();
+    this.initCards();
   }
 
   // Labels are built once, so a language change rebuilds the dashboard in place
@@ -2919,6 +2938,55 @@ class HomepageView extends ItemView {
           del,
         ),
       );
+    }
+  }
+
+  // ── Collapsible cards ──
+
+  restoreCollapsed() {
+    let v = null;
+    try {
+      if (typeof this.app.loadLocalStorage === "function") v = this.app.loadLocalStorage("genkan-collapsed");
+    } catch {
+      // fall through to the plugin data
+    }
+    if (!Array.isArray(v)) v = this.plugin.settings.cache?.collapsed;
+    return Array.isArray(v) ? v.filter((id) => typeof id === "string") : [];
+  }
+
+  // Remembered per device where Obsidian allows it: a phone and a laptop want different layouts
+  rememberCollapsed() {
+    const ids = Array.from(this.root.querySelectorAll(".card-toggle"))
+      .filter((b) => b.getAttribute("aria-expanded") === "false")
+      .map((b) => b.dataset.card);
+    try {
+      if (typeof this.app.saveLocalStorage === "function") return this.app.saveLocalStorage("genkan-collapsed", ids);
+    } catch {
+      // fall through to the plugin data
+    }
+    const s = this.plugin.settings;
+    s.cache = { ...(s.cache ?? {}), collapsed: ids };
+    this.plugin.saveSettings().catch(() => {});
+  }
+
+  setCollapsed(btn, collapsed) {
+    this.$(btn.dataset.card).classList.toggle("is-collapsed", collapsed);
+    this.$(btn.dataset.body).classList.toggle("hidden", collapsed);
+    const label = T(collapsed ? "Expand {name}" : "Collapse {name}", { name: btn.dataset.label });
+    btn.setAttribute("aria-expanded", String(!collapsed));
+    btn.setAttribute("aria-label", label);
+    btn.title = label;
+    setIconSvg(btn, collapsed ? "plus" : "minus");
+  }
+
+  initCards() {
+    const saved = this.restoreCollapsed();
+    for (const btn of this.root.querySelectorAll(".card-toggle")) {
+      this.setCollapsed(btn, saved.includes(btn.dataset.card));
+      btn.addEventListener("click", () => {
+        this.setCollapsed(btn, btn.getAttribute("aria-expanded") === "true");
+        this.rememberCollapsed();
+      });
     }
   }
 

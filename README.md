@@ -58,6 +58,9 @@ The quick note is a small rich-text editor: the toolbar (and Cmd/Ctrl+B, I, U, K
 
 By default these live in `genkan/data/`. Change the **Data folder** setting to put them elsewhere.
 
+### Collapsing cards
+Click the − beside **Ring notes**, **Web clips** or **Recent notes** to fold a card down to its title (the count stays visible), and the + to open it again. Each device remembers what you collapsed.
+
 ### Calendar and daily notes
 Click a day to open that day's note, creating it if it does not exist. Genkan uses your Daily Notes or Periodic Notes settings for the folder, date format and template, or the **Daily notes folder** setting if you set one. A dot marks days that have a note.
 

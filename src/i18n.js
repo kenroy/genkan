@@ -195,6 +195,8 @@ const I18N = {
     "Note {n}, empty": "Note {n}, vide",
     "Unsaved changes": "Modifications non enregistrées",
     "Quick note {n}": "Note rapide {n}",
+    "Collapse {name}": "Réduire {name}",
+    "Expand {name}": "Développer {name}",
   },
 
   es: {
@@ -388,6 +390,8 @@ const I18N = {
     "Note {n}, empty": "Nota {n}, vacía",
     "Unsaved changes": "Cambios sin guardar",
     "Quick note {n}": "Nota rápida {n}",
+    "Collapse {name}": "Contraer {name}",
+    "Expand {name}": "Expandir {name}",
   },
 
   de: {
@@ -581,6 +585,8 @@ const I18N = {
     "Note {n}, empty": "Notiz {n}, leer",
     "Unsaved changes": "Ungespeicherte Änderungen",
     "Quick note {n}": "Schnellnotiz {n}",
+    "Collapse {name}": "{name} einklappen",
+    "Expand {name}": "{name} ausklappen",
   },
 
   ja: {
@@ -776,5 +782,7 @@ const I18N = {
     "Note {n}, empty": "メモ {n}、空",
     "Unsaved changes": "未保存の変更",
     "Quick note {n}": "クイックメモ {n}",
+    "Collapse {name}": "{name} を折りたたむ",
+    "Expand {name}": "{name} を展開",
   },
 };
