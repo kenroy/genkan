@@ -1676,6 +1676,16 @@
     height: 18px;
 }
 
+/* The round icon buttons: refresh (header, photo, web clips, recent notes), theme and settings */
+#genkan-root #page-refresh,
+#genkan-root #theme-toggle,
+#genkan-root #settings-btn,
+#genkan-root #hero-refresh,
+#genkan-root #refresh-clips,
+#genkan-root #refresh-recent {
+    border-radius: 50%;
+}
+
 .hp-root .task-check svg,
 .hp-root .task-del svg {
     flex-shrink: 0;
@@ -2295,7 +2305,7 @@
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: 50%;
   box-shadow: none;
   box-sizing: border-box;
   color: var(--text-2);
