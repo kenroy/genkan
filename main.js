@@ -567,6 +567,13 @@ const I18N = {
     "Quick note {n}": "Note rapide {n}",
     "Collapse {name}": "Réduire {name}",
     "Expand {name}": "Développer {name}",
+    "On this day": "Ce jour-là",
+    "A week ago": "Il y a une semaine",
+    "A month ago": "Il y a un mois",
+    "A year ago": "Il y a un an",
+    "Nothing was written on this date a week, a month or a year ago.": "Rien n’a été écrit à cette date il y a une semaine, un mois ou un an.",
+    "+ {n} more": "+ {n} de plus",
+    "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Affiche les notes de cette date il y a une semaine, un mois et un an, d’après leur date de création. Rien ne quitte votre appareil.",
   },
 
   es: {
@@ -762,6 +769,13 @@ const I18N = {
     "Quick note {n}": "Nota rápida {n}",
     "Collapse {name}": "Contraer {name}",
     "Expand {name}": "Expandir {name}",
+    "On this day": "Un día como hoy",
+    "A week ago": "Hace una semana",
+    "A month ago": "Hace un mes",
+    "A year ago": "Hace un año",
+    "Nothing was written on this date a week, a month or a year ago.": "No se escribió nada en esta fecha hace una semana, un mes o un año.",
+    "+ {n} more": "+ {n} más",
+    "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Muestra las notas de esta fecha de hace una semana, un mes y un año, según su fecha de creación. Nada sale de tu dispositivo.",
   },
 
   de: {
@@ -957,6 +971,13 @@ const I18N = {
     "Quick note {n}": "Schnellnotiz {n}",
     "Collapse {name}": "{name} einklappen",
     "Expand {name}": "{name} ausklappen",
+    "On this day": "An diesem Tag",
+    "A week ago": "Vor einer Woche",
+    "A month ago": "Vor einem Monat",
+    "A year ago": "Vor einem Jahr",
+    "Nothing was written on this date a week, a month or a year ago.": "An diesem Datum wurde vor einer Woche, einem Monat oder einem Jahr nichts geschrieben.",
+    "+ {n} more": "+ {n} weitere",
+    "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Zeigt Notizen von diesem Datum vor einer Woche, einem Monat und einem Jahr, anhand ihres Erstellungsdatums. Nichts verlässt dein Gerät.",
   },
 
   ja: {
@@ -1154,6 +1175,13 @@ const I18N = {
     "Quick note {n}": "クイックメモ {n}",
     "Collapse {name}": "{name} を折りたたむ",
     "Expand {name}": "{name} を展開",
+    "On this day": "この日",
+    "A week ago": "1週間前",
+    "A month ago": "1か月前",
+    "A year ago": "1年前",
+    "Nothing was written on this date a week, a month or a year ago.": "1週間前、1か月前、1年前のこの日に書かれたノートはありません。",
+    "+ {n} more": "ほか {n} 件",
+    "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "1週間前、1か月前、1年前のこの日付のノートを、作成日をもとに表示します。データがデバイスの外に出ることはありません。",
   },
 };
 
@@ -1294,6 +1322,7 @@ const DEFAULT_SETTINGS = {
   quoteSource: undefined, // zenquotes | echoes | bundled (unset: ZenQuotes in English, else bundled)
   showFavicons: true, // site icons on web clips (Google's favicon service)
   showRingNotes: false, // Pebble Index ring notes card (off unless enabled)
+  showOnThisDay: false, // notes from this date a week, a month and a year ago (off unless enabled)
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
   // "files" = a separate file per note in a folder
   ringMode: "main",
@@ -1921,6 +1950,54 @@ function savedAgo(ms) {
   return fmtDate(new Date(ms), { month: "short", day: "numeric", year: "numeric" });
 }
 
+// ─── On this day ──────────────────────────────────────────────────────────────
+// Notes from today's date a week, a month and a year ago. A note belongs to a day by its
+// created/clipped/date property, else by a date in its name (daily notes), else by the file's
+// own created time, which is ignored on days when a flood of files share it (an import or a
+// first sync stamps hundreds of notes with one day).
+
+const FLOOD = 20;
+const DAY_RE = /(\d{4})-(\d{2})-(\d{2})/;
+const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+function onThisDayDates(today) {
+  const y = today.getFullYear();
+  const m = today.getMonth();
+  const d = today.getDate();
+  // a 31st or 29 February lands on the last day that exists in the earlier month or year
+  const clamp = (yy, mm) => new Date(yy, mm, Math.min(d, new Date(yy, mm + 1, 0).getDate()));
+  return [
+    { key: "week", date: new Date(y, m, d - 7) },
+    { key: "month", date: clamp(m === 0 ? y - 1 : y, (m + 11) % 12) },
+    { key: "year", date: clamp(y - 1, m) },
+  ];
+}
+
+function noteDay(file, fm) {
+  for (const k of ["created", "clipped", "date"]) {
+    const m = fm && fmString(fm[k]).match(DAY_RE);
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  }
+  const m = file.basename.match(DAY_RE);
+  return m ? m[0] : null;
+}
+
+// The first line of text, without markdown markers, for a one-line preview (a first line that
+// only repeats the note's title is skipped)
+function noteExcerpt(text, title) {
+  for (const raw of text.slice(bodyStart(text)).split("\n")) {
+    const line = raw
+      .replace(/^#{1,6}\s+/, "")
+      .replace(/^\s*(?:[-*+]|\d+\.)\s+(?:\[[ xX]\]\s+)?/, "")
+      .replace(/\[\[(?:[^\]|]+\|)?([^\]]+)\]\]/g, "$1")
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+      .replace(/<\/?u>|[*_~`]/g, "")
+      .trim();
+    if (line && line !== "---" && line.toLowerCase() !== (title || "").toLowerCase()) return line.slice(0, 160);
+  }
+  return "";
+}
+
 // ─── Ring notes (Pebble Index) ────────────────────────────────────────────────
 // The ring's app appends entries to a note under timestamp headings:
 //   ## 2026-10-05 21:55
@@ -2220,6 +2297,12 @@ function buildDashboard() {
         countRow("recent-count", refreshBtn("refresh-recent", T("Refresh recent notes"), T("Refresh recent notes"))),
       ),
       h("div", { id: "recent-body" }),
+    ),
+    h(
+      "div",
+      { cls: "card hidden", id: "otd-card" },
+      h("div", { cls: "card-header" }, cardTitle("otd-card", "otd-body", T("On this day")), countRow("otd-count")),
+      h("div", { id: "otd-body" }),
     ),
   );
 
@@ -2533,6 +2616,7 @@ class HomepageView extends ItemView {
     this.registerInterval(
       window.setInterval(() => {
         this.renderCalendar();
+        this.renderOnThisDay();
         this.loadHero(false);
         this.loadQuote();
       }, 5 * 60 * 1000), // both loaders return early when switched off in settings
@@ -2567,6 +2651,7 @@ class HomepageView extends ItemView {
     this.loadNote();
     this.renderClips();
     this.renderRecent();
+    this.renderOnThisDay();
     this.$("hero").classList.toggle("hidden", !this.settings.showHero);
     if (this.settings.showHero) this.loadHero(false);
     this.loadQuote();
@@ -2584,12 +2669,88 @@ class HomepageView extends ItemView {
     else this.scheduleLists();
   }
 
+  // ── On this day ──
+
+  async renderOnThisDay() {
+    const card = this.$("otd-card");
+    const enabled = !!this.settings.showOnThisDay;
+    card.classList.toggle("hidden", !enabled);
+    if (!enabled) return;
+
+    const body = this.$("otd-body");
+    const token = (this.otdToken = (this.otdToken || 0) + 1);
+    const periods = onThisDayDates(new Date());
+    const wanted = new Set(periods.map((p) => isoDay(p.date)));
+    const dated = new Map(); // day -> notes dated by a property or their name
+    const undated = new Map(); // day -> notes known only by the file's created time
+    const undatedPerDay = new Map();
+    const push = (map, key, file) => (map.has(key) ? map.get(key).push(file) : map.set(key, [file]));
+    for (const f of this.app.vault.getMarkdownFiles()) {
+      if (this.isDataFile(f)) continue;
+      const day = noteDay(f, this.app.metadataCache.getFileCache(f)?.frontmatter);
+      if (day) {
+        if (wanted.has(day)) push(dated, day, f);
+        continue;
+      }
+      const created = isoDay(new Date(f.stat.ctime));
+      undatedPerDay.set(created, (undatedPerDay.get(created) || 0) + 1);
+      if (wanted.has(created)) push(undated, created, f);
+    }
+
+    const max = 3;
+    const sections = [];
+    let total = 0;
+    for (const { key, date } of periods) {
+      const day = isoDay(date);
+      let list = dated.get(day) ?? [];
+      if ((undatedPerDay.get(day) || 0) < FLOOD) list = list.concat(undated.get(day) ?? []);
+      if (!list.length) continue;
+      // daily notes (named for the day) first, then the rest in the order they were made
+      list.sort((a, b) => Number(b.basename.includes(day)) - Number(a.basename.includes(day)) || a.stat.ctime - b.stat.ctime);
+      total += list.length;
+      sections.push({ key, date, list });
+    }
+    this.$("otd-count").textContent = fmtNum(total);
+    if (!sections.length) {
+      this.showEmpty(body, T("Nothing was written on this date a week, a month or a year ago."));
+      return;
+    }
+    // Read only the few notes that will show, for their one-line previews
+    for (const s of sections) {
+      s.shown = await Promise.all(s.list.slice(0, max).map(async (f) => ({ f, text: noteExcerpt(await this.app.vault.cachedRead(f), f.basename) })));
+    }
+    if (token !== this.otdToken) return; // a newer render has started
+
+    const now = new Date();
+    const label = { week: "A week ago", month: "A month ago", year: "A year ago" };
+    body.empty();
+    sections.forEach((s, i) => {
+      const withYear = s.key === "year" || s.date.getFullYear() !== now.getFullYear();
+      const when = fmtDate(s.date, { weekday: "short", month: "short", day: "numeric", ...(withYear ? { year: "numeric" } : {}) });
+      body.append(h("div", { cls: i ? "otd-when" : "otd-when first" }, h("span", { cls: "otd-period", text: T(label[s.key]) }), h("span", { cls: "otd-date", text: when })));
+      const list = body.createDiv({ cls: "notes-list" });
+      for (const { f, text } of s.shown) {
+        const folder = f.parent && f.parent.path !== "/" ? f.parent.path : "";
+        list.append(
+          h(
+            "a",
+            { cls: "note-item", href: "#", "data-open": f.path },
+            h("span", { cls: "note-icon", text: "📄" }),
+            h("div", { cls: "note-info" }, h("div", { cls: "note-title-row" }, h("span", { cls: "note-title", text: f.basename })), h("span", { cls: "note-path", text: text || folder })),
+          ),
+        );
+      }
+      if (s.list.length > max) body.append(h("div", { cls: "otd-more", text: T("+ {n} more", { n: fmtNum(s.list.length - max) }) }));
+    });
+  }
+
   scheduleLists() {
     this.later("lists", 1500, () => {
       if (this.ringMode === "files") this.renderRingNotes(); // frontmatter may have changed
       this.renderFavourites();
       this.renderClips();
       this.renderRecent();
+      this.renderOnThisDay();
       this.renderCalendar();
     });
   }
@@ -4335,6 +4496,11 @@ class HomepageSettingTab extends PluginSettingTab {
     startGroup(T("Content"));
     text(T("Max web clips"), "", "maxClips", { number: true });
     text(T("Max recent notes"), "", "maxRecent", { number: true });
+
+    add()
+      .setName(T("On this day"))
+      .setDesc(T("Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device."))
+      .addToggle((t) => t.setValue(s.showOnThisDay).onChange((v) => save("showOnThisDay", v)));
 
     add()
       .setName(T("Pebble ring notes"))

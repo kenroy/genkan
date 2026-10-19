@@ -1054,3 +1054,33 @@
 .hp-root .card.is-collapsed .card-header {
   margin-bottom: 0;
 }
+
+/* On this day */
+.hp-root .otd-when {
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  margin: 14px 0 2px;
+}
+
+.hp-root .otd-when.first {
+  margin-top: 0;
+}
+
+.hp-root .otd-period {
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.hp-root .otd-date {
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+.hp-root .otd-more {
+  color: var(--text-3);
+  font-size: 11px;
+  padding: 2px 10px 0;
+}
