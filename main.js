@@ -571,7 +571,7 @@ const I18N = {
     "A week ago": "Il y a une semaine",
     "A month ago": "Il y a un mois",
     "A year ago": "Il y a un an",
-    "Nothing was written on this date a week, a month or a year ago.": "Rien n’a été écrit à cette date il y a une semaine, un mois ou un an.",
+    "Nothing from this date": "Rien à cette date",
     "+ {n} more": "+ {n} de plus",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Affiche les notes de cette date il y a une semaine, un mois et un an, d’après leur date de création. Rien ne quitte votre appareil.",
   },
@@ -773,7 +773,7 @@ const I18N = {
     "A week ago": "Hace una semana",
     "A month ago": "Hace un mes",
     "A year ago": "Hace un año",
-    "Nothing was written on this date a week, a month or a year ago.": "No se escribió nada en esta fecha hace una semana, un mes o un año.",
+    "Nothing from this date": "Nada de esta fecha",
     "+ {n} more": "+ {n} más",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Muestra las notas de esta fecha de hace una semana, un mes y un año, según su fecha de creación. Nada sale de tu dispositivo.",
   },
@@ -975,7 +975,7 @@ const I18N = {
     "A week ago": "Vor einer Woche",
     "A month ago": "Vor einem Monat",
     "A year ago": "Vor einem Jahr",
-    "Nothing was written on this date a week, a month or a year ago.": "An diesem Datum wurde vor einer Woche, einem Monat oder einem Jahr nichts geschrieben.",
+    "Nothing from this date": "Nichts von diesem Datum",
     "+ {n} more": "+ {n} weitere",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Zeigt Notizen von diesem Datum vor einer Woche, einem Monat und einem Jahr, anhand ihres Erstellungsdatums. Nichts verlässt dein Gerät.",
   },
@@ -1179,7 +1179,7 @@ const I18N = {
     "A week ago": "1週間前",
     "A month ago": "1か月前",
     "A year ago": "1年前",
-    "Nothing was written on this date a week, a month or a year ago.": "1週間前、1か月前、1年前のこの日に書かれたノートはありません。",
+    "Nothing from this date": "この日のノートはありません",
     "+ {n} more": "ほか {n} 件",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "1週間前、1か月前、1年前のこの日付のノートを、作成日をもとに表示します。データがデバイスの外に出ることはありません。",
   },
@@ -2704,17 +2704,12 @@ class HomepageView extends ItemView {
       const day = isoDay(date);
       let list = dated.get(day) ?? [];
       if ((undatedPerDay.get(day) || 0) < FLOOD) list = list.concat(undated.get(day) ?? []);
-      if (!list.length) continue;
       // daily notes (named for the day) first, then the rest in the order they were made
       list.sort((a, b) => Number(b.basename.includes(day)) - Number(a.basename.includes(day)) || a.stat.ctime - b.stat.ctime);
       total += list.length;
       sections.push({ key, date, list });
     }
     this.$("otd-count").textContent = fmtNum(total);
-    if (!sections.length) {
-      this.showEmpty(body, T("Nothing was written on this date a week, a month or a year ago."));
-      return;
-    }
     // Read only the few notes that will show, for their one-line previews
     for (const s of sections) {
       s.shown = await Promise.all(s.list.slice(0, max).map(async (f) => ({ f, text: noteExcerpt(await this.app.vault.cachedRead(f), f.basename) })));
@@ -2728,6 +2723,10 @@ class HomepageView extends ItemView {
       const withYear = s.key === "year" || s.date.getFullYear() !== now.getFullYear();
       const when = fmtDate(s.date, { weekday: "short", month: "short", day: "numeric", ...(withYear ? { year: "numeric" } : {}) });
       body.append(h("div", { cls: i ? "otd-when" : "otd-when first" }, h("span", { cls: "otd-period", text: T(label[s.key]) }), h("span", { cls: "otd-date", text: when })));
+      if (!s.list.length) {
+        body.append(h("div", { cls: "otd-none", text: T("Nothing from this date") }));
+        return;
+      }
       const list = body.createDiv({ cls: "notes-list" });
       for (const { f, text } of s.shown) {
         const folder = f.parent && f.parent.path !== "/" ? f.parent.path : "";

@@ -1548,17 +1548,12 @@ class HomepageView extends ItemView {
       const day = isoDay(date);
       let list = dated.get(day) ?? [];
       if ((undatedPerDay.get(day) || 0) < FLOOD) list = list.concat(undated.get(day) ?? []);
-      if (!list.length) continue;
       // daily notes (named for the day) first, then the rest in the order they were made
       list.sort((a, b) => Number(b.basename.includes(day)) - Number(a.basename.includes(day)) || a.stat.ctime - b.stat.ctime);
       total += list.length;
       sections.push({ key, date, list });
     }
     this.$("otd-count").textContent = fmtNum(total);
-    if (!sections.length) {
-      this.showEmpty(body, T("Nothing was written on this date a week, a month or a year ago."));
-      return;
-    }
     // Read only the few notes that will show, for their one-line previews
     for (const s of sections) {
       s.shown = await Promise.all(s.list.slice(0, max).map(async (f) => ({ f, text: noteExcerpt(await this.app.vault.cachedRead(f), f.basename) })));
@@ -1572,6 +1567,10 @@ class HomepageView extends ItemView {
       const withYear = s.key === "year" || s.date.getFullYear() !== now.getFullYear();
       const when = fmtDate(s.date, { weekday: "short", month: "short", day: "numeric", ...(withYear ? { year: "numeric" } : {}) });
       body.append(h("div", { cls: i ? "otd-when" : "otd-when first" }, h("span", { cls: "otd-period", text: T(label[s.key]) }), h("span", { cls: "otd-date", text: when })));
+      if (!s.list.length) {
+        body.append(h("div", { cls: "otd-none", text: T("Nothing from this date") }));
+        return;
+      }
       const list = body.createDiv({ cls: "notes-list" });
       for (const { f, text } of s.shown) {
         const folder = f.parent && f.parent.path !== "/" ? f.parent.path : "";

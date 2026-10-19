@@ -2360,3 +2360,9 @@
   font-size: 11px;
   padding: 2px 10px 0;
 }
+
+.hp-root .otd-none {
+  color: var(--text-3);
+  font-size: 12px;
+  padding: 2px 10px 6px;
+}
