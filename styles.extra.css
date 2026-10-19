@@ -788,13 +788,16 @@
   padding: 0;
 }
 
+/* Themes colour bold and italic text with their own variables; keep the note's text colour */
 #genkan-root .note-editor strong,
 #genkan-root .note-editor b {
+  color: inherit;
   font-weight: 700;
 }
 
 #genkan-root .note-editor em,
 #genkan-root .note-editor i {
+  color: inherit;
   font-style: italic;
 }
 
