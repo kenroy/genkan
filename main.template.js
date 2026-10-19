@@ -1617,6 +1617,7 @@ class HomepageView extends ItemView {
   // ── Theme ──
 
   applyTheme() {
+    if (this.scrubNoteStyles) this.scrubNoteStyles();
     const t = this.settings.theme;
     const dark =
       t === "system" ? document.body.classList.contains("theme-dark") : t === "dark";
@@ -2016,6 +2017,15 @@ class HomepageView extends ItemView {
       e.preventDefault();
       this.switchNote(to).then(() => this.root.querySelector(`.note-dot[data-note="${to}"]`)?.focus());
     });
+
+    // Joining or splitting lines makes the browser copy the current text colour onto the text as
+    // an inline style; it would stay put after a light/dark switch, so strip it as it appears
+    const scrubStyles = () => {
+      for (const el of rich.querySelectorAll("[style]")) el.removeAttribute("style");
+      for (const el of rich.querySelectorAll("font")) el.replaceWith(...el.childNodes);
+    };
+    this.scrubNoteStyles = scrubStyles;
+    rich.addEventListener("input", scrubStyles);
 
     const changed = () => {
       this.noteDirty = true;
