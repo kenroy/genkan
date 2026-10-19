@@ -1061,11 +1061,15 @@
   display: flex;
   gap: 8px;
   justify-content: space-between;
-  margin: 14px 0 2px;
+  margin: 12px 0 2px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-hi);
 }
 
 .hp-root .otd-when.first {
+  border-top: 0;
   margin-top: 0;
+  padding-top: 0;
 }
 
 .hp-root .otd-period {
