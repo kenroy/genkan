@@ -5,10 +5,11 @@ Genkan (玄関) is the entryway of a Japanese home: the place you step in. This 
 - **Clock, greeting and date**, with 12 or 24 hour time
 - **Search** your whole vault from the homepage (press `/` to focus it)
 - **Favourites**: one-click chips for the notes you open most
-- **Tasks** and **seven quick notes** (like Tot) that sync with the rest of your vault
+- **Tasks** and **seven quick notes** (like Tot): a small rich-text editor, synced with the rest of your vault, with export to a Markdown file
 - **Calendar** that opens (or creates) your daily notes
 - **Web clips** from the Obsidian Web Clipper and your **recent notes**
 - **Quick links** to commands, notes or web pages
+- Cards in the middle column that fold down to their title
 - **On this day**: an optional card with notes from this date a week, a month and a year ago
 - **Ring notes**: an optional card for voice notes from a Pebble Index ring
 - A photo of the day and a daily quote (both optional)
@@ -27,13 +28,15 @@ On a phone it becomes a single column with tasks and the quick notes first:
 
 <img src="docs/screenshots/dashboard-phone.png" alt="Genkan on a phone" width="390">
 
-The quick notes card, in light and dark: seven notes, one per colored dot, with formatting as you type and a footer of counts and the last-saved time.
+The quick notes card, in light and dark: seven notes, one per colored dot, with formatting as you type, an export button at the end of the toolbar, and a footer of counts and the last-saved time.
 
 ![The Genkan quick notes card in the light and dark themes](docs/screenshots/quick-notes.png)
 
-The screenshots use sample data.
+The screenshots use sample data, with the optional Ring notes and On this day cards turned on.
 
 ## Install
+
+Genkan needs Obsidian 1.4.0 or newer.
 
 **With BRAT:** install the BRAT plugin, choose "Add beta plugin", and enter `kenroy/genkan`.
 
@@ -133,7 +136,7 @@ python3 build.py
 - `src/base.css` and `styles.extra.css`: the styles. `build.py` scopes `src/base.css` under `.hp-root`, adds `styles.extra.css`, and writes `styles.css`
 - `main.js` and `styles.css` are generated; edit the sources above instead
 
-To release, set `version` in `manifest.json` (and add it to `versions.json`), run the build, commit and push, then push a tag that matches the version exactly (for example `git tag 0.1.5 && git push origin 0.1.5`, with no "v"). The `Release` workflow in `.github/workflows/` rebuilds `main.js` and `styles.css`, checks they match what is committed, attests their provenance, and publishes the release with `main.js`, `manifest.json` and `styles.css` attached. To verify a downloaded file: `gh attestation verify main.js --repo kenroy/genkan`.
+To release, set `version` in `manifest.json` (and add it to `versions.json`), run the build, commit and push, then push a tag that matches the version exactly (for example `git tag 0.7.1 && git push origin 0.7.1`, with no "v"). The `Release` workflow in `.github/workflows/` rebuilds `main.js` and `styles.css`, checks they match what is committed, attests their provenance, and publishes the release with `main.js`, `manifest.json` and `styles.css` attached. To verify a downloaded file: `gh attestation verify main.js --repo kenroy/genkan`.
 
 ## Credits and licence
 
