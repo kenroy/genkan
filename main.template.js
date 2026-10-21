@@ -842,6 +842,17 @@ function noteExcerpt(text, title) {
   return "";
 }
 
+// A safe file name for an exported note: its first line of text, or "Quick Note N"
+function exportFileName(md, index) {
+  const title = noteExcerpt(md, "")
+    .replace(/[\\/:*?"<>|\u0000-\u001f]/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/^[.\s]+|[.\s]+$/g, "")
+    .slice(0, 60)
+    .trim();
+  return `${title || `Quick Note ${index === 1 ? "" : index}`.trim()}.md`;
+}
+
 // ─── Ring notes (Pebble Index) ────────────────────────────────────────────────
 // The ring's app appends entries to a note under timestamp headings:
 //   ## 2026-10-05 21:55
@@ -1177,6 +1188,7 @@ function buildDashboard() {
     fmtBtn("bullet", T("Bulleted list"), "", iconNode("list")),
     fmtBtn("numbered", T("Numbered list"), "", iconNode("list-ordered")),
     fmtBtn("link", T("Link"), "K", iconNode("link")),
+    h("button", { type: "button", cls: "fmt-btn fmt-export", "data-export": "1", title: T("Export note as Markdown…"), "aria-label": T("Export note as Markdown…") }, iconNode("export")),
   );
 
   const tab = (filter, label, active) =>
@@ -2091,6 +2103,7 @@ class HomepageView extends ItemView {
     bar.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-fmt]");
       if (btn) this.formatNote(btn.dataset.fmt);
+      else if (e.target.closest("[data-export]")) this.exportNote();
     });
     const shortcuts = (e) => {
       if (!(e.metaKey || e.ctrlKey) || e.altKey || e.isComposing) return;
@@ -2136,6 +2149,66 @@ class HomepageView extends ItemView {
   }
 
   // The note as markdown, whichever editor is showing
+  // Save the open note as a Markdown file wherever the user chooses, starting in the vault's folder
+  async exportNote() {
+    if (this.noteDirty && !this.noteComposing) await this.saveNote();
+    const md = this.getNoteMd();
+    if (!md.trim()) {
+      new Notice(T("This note is empty, so there is nothing to export."));
+      return;
+    }
+    const name = exportFileName(md, this.noteIndex);
+    const adapter = this.app.vault.adapter;
+    const base = adapter && typeof adapter.getBasePath === "function" ? adapter.getBasePath() : "";
+    try {
+      // Desktop: a native save dialog that opens in the vault's folder
+      const req = typeof window.require === "function" ? window.require : null;
+      let dialog = null;
+      try {
+        dialog = req && req("electron").remote && req("electron").remote.dialog;
+      } catch {
+        // the dialog is not available in this build
+      }
+      if (dialog && base) {
+        const path = req("path");
+        const res = await dialog.showSaveDialog({
+          title: T("Export note as Markdown…"),
+          defaultPath: path.join(base, name),
+          filters: [{ name: "Markdown", extensions: ["md"] }],
+          properties: ["createDirectory", "showOverwriteConfirmation"],
+        });
+        if (res.canceled || !res.filePath) return;
+        req("fs").writeFileSync(res.filePath, md, "utf8");
+        new Notice(T("Exported to {path}", { path: res.filePath }));
+        return;
+      }
+      // Other browsers and some desktops: the file picker
+      if (typeof window.showSaveFilePicker === "function") {
+        const handle = await window.showSaveFilePicker({ suggestedName: name, types: [{ description: "Markdown", accept: { "text/markdown": [".md"] } }] });
+        const out = await handle.createWritable();
+        await out.write(md);
+        await out.close();
+        new Notice(T("Exported to {path}", { path: handle.name }));
+        return;
+      }
+      // Phones and tablets: the share sheet lets you pick Files, Mail and so on
+      const file = new File([md], name, { type: "text/markdown" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file] });
+        return;
+      }
+      // Last resort: a copy in the vault, under a name that is not taken
+      let target = name;
+      for (let n = 2; this.app.vault.getAbstractFileByPath(normalizePath(target)); n++) target = name.replace(/\.md$/, ` ${n}.md`);
+      await this.app.vault.create(normalizePath(target), md);
+      new Notice(T("Saved a copy in your vault as {name}", { name: target }));
+    } catch (err) {
+      if (err && err.name === "AbortError") return; // the picker or share sheet was closed
+      console.error("Genkan: export failed", err);
+      new Notice(T("Could not export the note."));
+    }
+  }
+
   getNoteMd() {
     return this.noteMode === "rich" ? noteToMarkdown(this.$("quick-note-rich")) : this.$("quick-note").value;
   }

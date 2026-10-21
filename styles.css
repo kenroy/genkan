@@ -1947,6 +1947,10 @@
   width: 28px;
 }
 
+#genkan-root .fmt-btn.fmt-export {
+  margin-left: auto;
+}
+
 #genkan-root .fmt-btn:hover {
   background: var(--surface-2);
   color: var(--text);

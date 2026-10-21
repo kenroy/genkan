@@ -35,6 +35,7 @@ const ICONS = {
   sun: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
   settings: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`,
   refresh: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>`,
+  export: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>`,
   check: `<svg width="10" height="8" viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 3.5 6.5 9 1"/></svg>`,
   trash: `<svg width="12" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`,
   monitor: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`,
@@ -573,6 +574,11 @@ const I18N = {
     "A year ago": "Il y a un an",
     "Nothing from this date": "Rien à cette date",
     "+ {n} more": "+ {n} de plus",
+    "Export note as Markdown…": "Exporter la note en Markdown…",
+    "This note is empty, so there is nothing to export.": "Cette note est vide, il n’y a rien à exporter.",
+    "Exported to {path}": "Exportée vers {path}",
+    "Saved a copy in your vault as {name}": "Copie enregistrée dans votre coffre sous le nom {name}",
+    "Could not export the note.": "Impossible d’exporter la note.",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Affiche les notes de cette date il y a une semaine, un mois et un an, d’après leur date de création. Rien ne quitte votre appareil.",
   },
 
@@ -775,6 +781,11 @@ const I18N = {
     "A year ago": "Hace un año",
     "Nothing from this date": "Nada de esta fecha",
     "+ {n} more": "+ {n} más",
+    "Export note as Markdown…": "Exportar la nota como Markdown…",
+    "This note is empty, so there is nothing to export.": "Esta nota está vacía, no hay nada que exportar.",
+    "Exported to {path}": "Exportada a {path}",
+    "Saved a copy in your vault as {name}": "Copia guardada en tu bóveda como {name}",
+    "Could not export the note.": "No se pudo exportar la nota.",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Muestra las notas de esta fecha de hace una semana, un mes y un año, según su fecha de creación. Nada sale de tu dispositivo.",
   },
 
@@ -977,6 +988,11 @@ const I18N = {
     "A year ago": "Vor einem Jahr",
     "Nothing from this date": "Nichts von diesem Datum",
     "+ {n} more": "+ {n} weitere",
+    "Export note as Markdown…": "Notiz als Markdown exportieren …",
+    "This note is empty, so there is nothing to export.": "Diese Notiz ist leer, es gibt nichts zu exportieren.",
+    "Exported to {path}": "Exportiert nach {path}",
+    "Saved a copy in your vault as {name}": "Kopie im Tresor gespeichert als {name}",
+    "Could not export the note.": "Die Notiz konnte nicht exportiert werden.",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Zeigt Notizen von diesem Datum vor einer Woche, einem Monat und einem Jahr, anhand ihres Erstellungsdatums. Nichts verlässt dein Gerät.",
   },
 
@@ -1181,6 +1197,11 @@ const I18N = {
     "A year ago": "1年前",
     "Nothing from this date": "この日のノートはありません",
     "+ {n} more": "ほか {n} 件",
+    "Export note as Markdown…": "ノートを Markdown として書き出す…",
+    "This note is empty, so there is nothing to export.": "このノートは空のため、書き出すものがありません。",
+    "Exported to {path}": "{path} に書き出しました",
+    "Saved a copy in your vault as {name}": "コピーを Vault に {name} として保存しました",
+    "Could not export the note.": "ノートを書き出せませんでした。",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "1週間前、1か月前、1年前のこの日付のノートを、作成日をもとに表示します。データがデバイスの外に出ることはありません。",
   },
 };
@@ -1998,6 +2019,17 @@ function noteExcerpt(text, title) {
   return "";
 }
 
+// A safe file name for an exported note: its first line of text, or "Quick Note N"
+function exportFileName(md, index) {
+  const title = noteExcerpt(md, "")
+    .replace(/[\\/:*?"<>|\u0000-\u001f]/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/^[.\s]+|[.\s]+$/g, "")
+    .slice(0, 60)
+    .trim();
+  return `${title || `Quick Note ${index === 1 ? "" : index}`.trim()}.md`;
+}
+
 // ─── Ring notes (Pebble Index) ────────────────────────────────────────────────
 // The ring's app appends entries to a note under timestamp headings:
 //   ## 2026-10-05 21:55
@@ -2333,6 +2365,7 @@ function buildDashboard() {
     fmtBtn("bullet", T("Bulleted list"), "", iconNode("list")),
     fmtBtn("numbered", T("Numbered list"), "", iconNode("list-ordered")),
     fmtBtn("link", T("Link"), "K", iconNode("link")),
+    h("button", { type: "button", cls: "fmt-btn fmt-export", "data-export": "1", title: T("Export note as Markdown…"), "aria-label": T("Export note as Markdown…") }, iconNode("export")),
   );
 
   const tab = (filter, label, active) =>
@@ -3247,6 +3280,7 @@ class HomepageView extends ItemView {
     bar.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-fmt]");
       if (btn) this.formatNote(btn.dataset.fmt);
+      else if (e.target.closest("[data-export]")) this.exportNote();
     });
     const shortcuts = (e) => {
       if (!(e.metaKey || e.ctrlKey) || e.altKey || e.isComposing) return;
@@ -3292,6 +3326,66 @@ class HomepageView extends ItemView {
   }
 
   // The note as markdown, whichever editor is showing
+  // Save the open note as a Markdown file wherever the user chooses, starting in the vault's folder
+  async exportNote() {
+    if (this.noteDirty && !this.noteComposing) await this.saveNote();
+    const md = this.getNoteMd();
+    if (!md.trim()) {
+      new Notice(T("This note is empty, so there is nothing to export."));
+      return;
+    }
+    const name = exportFileName(md, this.noteIndex);
+    const adapter = this.app.vault.adapter;
+    const base = adapter && typeof adapter.getBasePath === "function" ? adapter.getBasePath() : "";
+    try {
+      // Desktop: a native save dialog that opens in the vault's folder
+      const req = typeof window.require === "function" ? window.require : null;
+      let dialog = null;
+      try {
+        dialog = req && req("electron").remote && req("electron").remote.dialog;
+      } catch {
+        // the dialog is not available in this build
+      }
+      if (dialog && base) {
+        const path = req("path");
+        const res = await dialog.showSaveDialog({
+          title: T("Export note as Markdown…"),
+          defaultPath: path.join(base, name),
+          filters: [{ name: "Markdown", extensions: ["md"] }],
+          properties: ["createDirectory", "showOverwriteConfirmation"],
+        });
+        if (res.canceled || !res.filePath) return;
+        req("fs").writeFileSync(res.filePath, md, "utf8");
+        new Notice(T("Exported to {path}", { path: res.filePath }));
+        return;
+      }
+      // Other browsers and some desktops: the file picker
+      if (typeof window.showSaveFilePicker === "function") {
+        const handle = await window.showSaveFilePicker({ suggestedName: name, types: [{ description: "Markdown", accept: { "text/markdown": [".md"] } }] });
+        const out = await handle.createWritable();
+        await out.write(md);
+        await out.close();
+        new Notice(T("Exported to {path}", { path: handle.name }));
+        return;
+      }
+      // Phones and tablets: the share sheet lets you pick Files, Mail and so on
+      const file = new File([md], name, { type: "text/markdown" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file] });
+        return;
+      }
+      // Last resort: a copy in the vault, under a name that is not taken
+      let target = name;
+      for (let n = 2; this.app.vault.getAbstractFileByPath(normalizePath(target)); n++) target = name.replace(/\.md$/, ` ${n}.md`);
+      await this.app.vault.create(normalizePath(target), md);
+      new Notice(T("Saved a copy in your vault as {name}", { name: target }));
+    } catch (err) {
+      if (err && err.name === "AbortError") return; // the picker or share sheet was closed
+      console.error("Genkan: export failed", err);
+      new Notice(T("Could not export the note."));
+    }
+  }
+
   getNoteMd() {
     return this.noteMode === "rich" ? noteToMarkdown(this.$("quick-note-rich")) : this.$("quick-note").value;
   }
