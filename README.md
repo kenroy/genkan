@@ -69,7 +69,7 @@ By default these live in `genkan/data/`. Change the **Data folder** setting to p
 Click the − beside **Ring notes**, **Web clips**, **Recent notes** or **On this day** to fold a card down to its title (the count stays visible), and the + to open it again. Each device remembers what you collapsed.
 
 ### Arranging cards
-Click the grid button at the top right to enter arrange mode. Every card gets a bar with a handle, its name and four arrow buttons.
+Click the **Arrange cards** button (the four-squares icon at the top right, between the theme and settings buttons) to enter arrange mode. Handles only appear in this mode, so you never drag a card by accident. Every card gets a bar with a handle, its name and four arrow buttons.
 
 - **Drag** a card by its handle. A dashed slot shows where it will land, and the page scrolls when you drag near the top or bottom edge. Cards can go into any column, or into the full-width row above the columns (where Favourites starts).
 - **Buttons:** the up and down arrows move a card within its column (past the end of a column, up goes to the top row and down goes to the first column); the left and right arrows move it between columns.
@@ -126,7 +126,7 @@ Notes:
 - The Unsplash key is optional. It is stored in this plugin's settings file (`.obsidian/plugins/genkan/data.json`) in your vault. If you use Obsidian Sync with plugin settings, the key syncs with it, so keep your vault private.
 - Quotes from ZenQuotes are credited in the interface, as their free API requires: "Inspirational quotes provided by ZenQuotes API". Echoes quotes are credited the same way. The bundled quotes make no request. If a request fails, a bundled quote is shown.
 - To search, list recent notes, offer the favourites picker and match daily notes, Genkan reads the list of note names and paths in your vault through Obsidian's API. It reads a note's contents only for search snippets, ring notes, web clips and the previews on the On this day card, and none of it leaves your device.
-- Today's photo and quote are cached in the plugin's own settings file, not in browser storage.
+- Today's photo and quote are cached in the plugin's own settings file, not in browser storage. Which note you had open, which cards you folded and your card layout are remembered per device, in Obsidian's local storage for this vault (or in that settings file when local storage isn't available), and none of it leaves your device.
 - Links you click (photographer credits, the ZenQuotes and Echoes links, any `https://` quick link) open in your browser.
 
 ## Settings
