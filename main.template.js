@@ -903,6 +903,10 @@ function normaliseLayout(saved) {
   return out;
 }
 
+function layoutsEqual(a, b) {
+  return ARRANGE_ZONES.every((z) => (a[z] || []).join("|") === (b[z] || []).join("|"));
+}
+
 // One step for a card: up/down within its zone (past the end it crosses to the top row or the
 // first column), left/right between the columns. Returns a new layout, or null when it can't move.
 // Hidden cards (a switched-off card) are skipped over so a step always shows.
@@ -1373,8 +1377,13 @@ function buildDashboard() {
   const banner = h(
     "div",
     { cls: "arrange-banner", id: "arrange-banner", hidden: "" },
-    h("span", { cls: "arrange-help", text: T("Drag a card by its handle, or use the arrow buttons. Press Done when you are finished.") }),
-    h("div", { cls: "arrange-actions" }, h("button", { type: "button", cls: "btn-secondary", id: "arrange-push", text: T("Use on all my devices") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-reset", text: T("Reset layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-done", text: T("Done") })),
+    h(
+      "div",
+      { cls: "arrange-text" },
+      h("span", { cls: "arrange-help", text: T("Drag a card by its handle, or use the arrow buttons. Press Done when you are finished.") }),
+      h("span", { cls: "arrange-status", id: "arrange-status", role: "status", "aria-live": "polite" }),
+    ),
+    h("div", { cls: "arrange-actions" }, h("button", { type: "button", cls: "btn-secondary", id: "arrange-use-shared", hidden: "", text: T("Use the shared layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-push", text: T("Use on all my devices") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-reset", text: T("Reset layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-done", text: T("Done") })),
   );
   const topZone = h("div", { cls: "zone zone-top", "data-zone": "top" }, favs);
   return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, hero, quote, banner, topZone, h("div", { cls: "grid" }, left, center, right)), h("div", { cls: "sr-only", id: "arrange-live", role: "status", "aria-live": "polite" })];
@@ -2139,6 +2148,7 @@ class HomepageView extends ItemView {
       // the file can't be read: use what is loaded
     }
     const shared = this.plugin.settings.sharedLayout;
+    this.updateLayoutStatus();
     if (!shared || shared.version <= this.restoreSharedVersion()) return;
     if (this.arranging || this.drag || this.pick) return;
     const layout = normaliseLayout(shared.layout);
@@ -2156,6 +2166,7 @@ class HomepageView extends ItemView {
     try {
       await this.plugin.saveSettings();
       this.rememberSharedVersion(version);
+      this.updateLayoutStatus();
       const msg = T("Layout saved for all your devices. Other devices pick it up when they next sync.");
       new Notice(msg);
       this.announce(msg);
@@ -2168,6 +2179,7 @@ class HomepageView extends ItemView {
   // restarts its animation and drops focus)
   applyLayout(layout) {
     this.layout = layout;
+    this.updateLayoutStatus();
     for (const z of ARRANGE_ZONES) {
       const zone = this.root.querySelector(`.zone[data-zone="${z}"]`);
       layout[z].forEach((id, i) => {
@@ -2175,6 +2187,34 @@ class HomepageView extends ItemView {
         if (el && zone.children[i] !== el) zone.insertBefore(el, zone.children[i] || null);
       });
     }
+  }
+
+  // Say whether this device is on the shared layout or has one of its own
+  updateLayoutStatus() {
+    const status = this.$("arrange-status");
+    const useShared = this.$("arrange-use-shared");
+    if (!status || !useShared) return;
+    const shared = this.plugin.settings.sharedLayout;
+    let text;
+    let differs = false;
+    if (!shared) text = T("Local layout: only on this device. Use on all my devices shares it.");
+    else if (layoutsEqual(this.layout, normaliseLayout(shared.layout))) text = T("Synced layout: the same on all your devices.");
+    else {
+      text = T("Local layout: this device differs from the shared layout.");
+      differs = true;
+    }
+    status.textContent = text;
+    useShared.hidden = !differs;
+  }
+
+  adoptShared() {
+    const shared = this.plugin.settings.sharedLayout;
+    if (!shared) return;
+    const layout = normaliseLayout(shared.layout);
+    this.applyLayout(layout);
+    this.rememberLayout(layout);
+    this.rememberSharedVersion(shared.version);
+    this.announce(T("Switched to the shared layout."));
   }
 
   announce(msg) {
@@ -2220,6 +2260,7 @@ class HomepageView extends ItemView {
     this.$("arrange-done").addEventListener("click", () => this.setArranging(false));
     this.$("arrange-reset").addEventListener("click", () => this.resetLayout());
     this.$("arrange-push").addEventListener("click", () => this.pushLayout());
+    this.$("arrange-use-shared").addEventListener("click", () => this.adoptShared());
 
     this.root.addEventListener("click", (e) => {
       const btn = e.target.closest?.(".arrange-move");

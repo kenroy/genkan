@@ -2583,3 +2583,24 @@
     display: flex;
   }
 }
+
+.hp-root .arrange-text {
+  display: flex;
+  flex: 1 1 260px;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.hp-root .arrange-status {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.hp-root .arrange-actions {
+  flex-wrap: wrap;
+}
+
+.hp-root .arrange-actions [hidden] {
+  display: none;
+}

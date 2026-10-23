@@ -609,6 +609,11 @@ const I18N = {
     "Layout saved for all your devices. Other devices pick it up when they next sync.": "Disposition enregistrée pour tous vos appareils. Les autres appareils la récupèrent à leur prochaine synchronisation.",
     "Layout updated from another device.": "Disposition mise à jour depuis un autre appareil.",
     "Could not save the layout for your other devices.": "Impossible d’enregistrer la disposition pour vos autres appareils.",
+    "Local layout: only on this device. Use on all my devices shares it.": "Disposition locale : uniquement sur cet appareil. « Utiliser sur tous mes appareils » la partage.",
+    "Synced layout: the same on all your devices.": "Disposition synchronisée : la même sur tous vos appareils.",
+    "Local layout: this device differs from the shared layout.": "Disposition locale : cet appareil diffère de la disposition partagée.",
+    "Use the shared layout": "Utiliser la disposition partagée",
+    "Switched to the shared layout.": "Disposition partagée appliquée.",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Affiche les notes de cette date il y a une semaine, un mois et un an, d’après leur date de création. Rien ne quitte votre appareil.",
   },
 
@@ -840,6 +845,11 @@ const I18N = {
     "Layout saved for all your devices. Other devices pick it up when they next sync.": "Diseño guardado para todos tus dispositivos. Los demás dispositivos lo recibirán en su próxima sincronización.",
     "Layout updated from another device.": "Diseño actualizado desde otro dispositivo.",
     "Could not save the layout for your other devices.": "No se pudo guardar el diseño para tus otros dispositivos.",
+    "Local layout: only on this device. Use on all my devices shares it.": "Diseño local: solo en este dispositivo. «Usar en todos mis dispositivos» lo comparte.",
+    "Synced layout: the same on all your devices.": "Diseño sincronizado: el mismo en todos tus dispositivos.",
+    "Local layout: this device differs from the shared layout.": "Diseño local: este dispositivo difiere del diseño compartido.",
+    "Use the shared layout": "Usar el diseño compartido",
+    "Switched to the shared layout.": "Se cambió al diseño compartido.",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Muestra las notas de esta fecha de hace una semana, un mes y un año, según su fecha de creación. Nada sale de tu dispositivo.",
   },
 
@@ -1071,6 +1081,11 @@ const I18N = {
     "Layout saved for all your devices. Other devices pick it up when they next sync.": "Anordnung für alle deine Geräte gespeichert. Die anderen Geräte übernehmen sie bei der nächsten Synchronisierung.",
     "Layout updated from another device.": "Anordnung von einem anderen Gerät aktualisiert.",
     "Could not save the layout for your other devices.": "Die Anordnung konnte nicht für deine anderen Geräte gespeichert werden.",
+    "Local layout: only on this device. Use on all my devices shares it.": "Lokale Anordnung: nur auf diesem Gerät. „Auf allen meinen Geräten verwenden“ teilt sie.",
+    "Synced layout: the same on all your devices.": "Synchronisierte Anordnung: auf allen deinen Geräten gleich.",
+    "Local layout: this device differs from the shared layout.": "Lokale Anordnung: dieses Gerät weicht von der geteilten Anordnung ab.",
+    "Use the shared layout": "Geteilte Anordnung verwenden",
+    "Switched to the shared layout.": "Zur geteilten Anordnung gewechselt.",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Zeigt Notizen von diesem Datum vor einer Woche, einem Monat und einem Jahr, anhand ihres Erstellungsdatums. Nichts verlässt dein Gerät.",
   },
 
@@ -1304,6 +1319,11 @@ const I18N = {
     "Layout saved for all your devices. Other devices pick it up when they next sync.": "すべてのデバイス用に配置を保存しました。ほかのデバイスは次回の同期で反映されます。",
     "Layout updated from another device.": "別のデバイスから配置を更新しました。",
     "Could not save the layout for your other devices.": "ほかのデバイス用に配置を保存できませんでした。",
+    "Local layout: only on this device. Use on all my devices shares it.": "ローカルの配置：このデバイスのみ。「すべてのデバイスで使う」で共有できます。",
+    "Synced layout: the same on all your devices.": "同期済みの配置：すべてのデバイスで同じです。",
+    "Local layout: this device differs from the shared layout.": "ローカルの配置：このデバイスは共有された配置と異なります。",
+    "Use the shared layout": "共有された配置を使う",
+    "Switched to the shared layout.": "共有された配置に切り替えました。",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "1週間前、1か月前、1年前のこの日付のノートを、作成日をもとに表示します。データがデバイスの外に出ることはありません。",
   },
 };
@@ -2182,6 +2202,10 @@ function normaliseLayout(saved) {
   return out;
 }
 
+function layoutsEqual(a, b) {
+  return ARRANGE_ZONES.every((z) => (a[z] || []).join("|") === (b[z] || []).join("|"));
+}
+
 // One step for a card: up/down within its zone (past the end it crosses to the top row or the
 // first column), left/right between the columns. Returns a new layout, or null when it can't move.
 // Hidden cards (a switched-off card) are skipped over so a step always shows.
@@ -2652,8 +2676,13 @@ function buildDashboard() {
   const banner = h(
     "div",
     { cls: "arrange-banner", id: "arrange-banner", hidden: "" },
-    h("span", { cls: "arrange-help", text: T("Drag a card by its handle, or use the arrow buttons. Press Done when you are finished.") }),
-    h("div", { cls: "arrange-actions" }, h("button", { type: "button", cls: "btn-secondary", id: "arrange-push", text: T("Use on all my devices") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-reset", text: T("Reset layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-done", text: T("Done") })),
+    h(
+      "div",
+      { cls: "arrange-text" },
+      h("span", { cls: "arrange-help", text: T("Drag a card by its handle, or use the arrow buttons. Press Done when you are finished.") }),
+      h("span", { cls: "arrange-status", id: "arrange-status", role: "status", "aria-live": "polite" }),
+    ),
+    h("div", { cls: "arrange-actions" }, h("button", { type: "button", cls: "btn-secondary", id: "arrange-use-shared", hidden: "", text: T("Use the shared layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-push", text: T("Use on all my devices") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-reset", text: T("Reset layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-done", text: T("Done") })),
   );
   const topZone = h("div", { cls: "zone zone-top", "data-zone": "top" }, favs);
   return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, hero, quote, banner, topZone, h("div", { cls: "grid" }, left, center, right)), h("div", { cls: "sr-only", id: "arrange-live", role: "status", "aria-live": "polite" })];
@@ -3418,6 +3447,7 @@ class HomepageView extends ItemView {
       // the file can't be read: use what is loaded
     }
     const shared = this.plugin.settings.sharedLayout;
+    this.updateLayoutStatus();
     if (!shared || shared.version <= this.restoreSharedVersion()) return;
     if (this.arranging || this.drag || this.pick) return;
     const layout = normaliseLayout(shared.layout);
@@ -3435,6 +3465,7 @@ class HomepageView extends ItemView {
     try {
       await this.plugin.saveSettings();
       this.rememberSharedVersion(version);
+      this.updateLayoutStatus();
       const msg = T("Layout saved for all your devices. Other devices pick it up when they next sync.");
       new Notice(msg);
       this.announce(msg);
@@ -3447,6 +3478,7 @@ class HomepageView extends ItemView {
   // restarts its animation and drops focus)
   applyLayout(layout) {
     this.layout = layout;
+    this.updateLayoutStatus();
     for (const z of ARRANGE_ZONES) {
       const zone = this.root.querySelector(`.zone[data-zone="${z}"]`);
       layout[z].forEach((id, i) => {
@@ -3454,6 +3486,34 @@ class HomepageView extends ItemView {
         if (el && zone.children[i] !== el) zone.insertBefore(el, zone.children[i] || null);
       });
     }
+  }
+
+  // Say whether this device is on the shared layout or has one of its own
+  updateLayoutStatus() {
+    const status = this.$("arrange-status");
+    const useShared = this.$("arrange-use-shared");
+    if (!status || !useShared) return;
+    const shared = this.plugin.settings.sharedLayout;
+    let text;
+    let differs = false;
+    if (!shared) text = T("Local layout: only on this device. Use on all my devices shares it.");
+    else if (layoutsEqual(this.layout, normaliseLayout(shared.layout))) text = T("Synced layout: the same on all your devices.");
+    else {
+      text = T("Local layout: this device differs from the shared layout.");
+      differs = true;
+    }
+    status.textContent = text;
+    useShared.hidden = !differs;
+  }
+
+  adoptShared() {
+    const shared = this.plugin.settings.sharedLayout;
+    if (!shared) return;
+    const layout = normaliseLayout(shared.layout);
+    this.applyLayout(layout);
+    this.rememberLayout(layout);
+    this.rememberSharedVersion(shared.version);
+    this.announce(T("Switched to the shared layout."));
   }
 
   announce(msg) {
@@ -3499,6 +3559,7 @@ class HomepageView extends ItemView {
     this.$("arrange-done").addEventListener("click", () => this.setArranging(false));
     this.$("arrange-reset").addEventListener("click", () => this.resetLayout());
     this.$("arrange-push").addEventListener("click", () => this.pushLayout());
+    this.$("arrange-use-shared").addEventListener("click", () => this.adoptShared());
 
     this.root.addEventListener("click", (e) => {
       const btn = e.target.closest?.(".arrange-move");

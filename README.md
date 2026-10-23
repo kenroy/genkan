@@ -81,6 +81,8 @@ Each device remembers its own layout, so a phone and a laptop can differ. On a p
 
 **Sharing a layout between devices.** While arranging, press **Use on all my devices** to save the current layout as a shared one.
 
+- The banner always says which you are on: **Synced layout** (the same as the shared one) or **Local layout** (only on this device, or different from the shared one). When a device differs from the shared layout, **Use the shared layout** switches it back.
+
 - Your other devices take it once, the next time they sync and you open the dashboard, press its refresh button or return to Obsidian. They show a short notice when they do.
 - Nothing changes on other devices until you press the button. After a device has taken a shared layout you can still rearrange it, and it keeps your changes until you push a newer layout.
 - **Reset layout** only affects the device you press it on. To share the default again, reset and then press **Use on all my devices**.
