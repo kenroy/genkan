@@ -150,6 +150,7 @@ function fmtNum(n) {
 
 const DEFAULT_SETTINGS = {
   userName: "",
+  sharedLayout: null, // a card layout pushed to all devices: { layout, version } (see "Use on all my devices")
   clipsFolder: "Clippings",
   dailyNotesFolder: "", // blank = use the Daily Notes / Periodic Notes setting
   dataFolder: "genkan/data", // where Tasks.md and Quick Note.md live
@@ -1373,7 +1374,7 @@ function buildDashboard() {
     "div",
     { cls: "arrange-banner", id: "arrange-banner", hidden: "" },
     h("span", { cls: "arrange-help", text: T("Drag a card by its handle, or use the arrow buttons. Press Done when you are finished.") }),
-    h("div", { cls: "arrange-actions" }, h("button", { type: "button", cls: "btn-secondary", id: "arrange-reset", text: T("Reset layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-done", text: T("Done") })),
+    h("div", { cls: "arrange-actions" }, h("button", { type: "button", cls: "btn-secondary", id: "arrange-push", text: T("Use on all my devices") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-reset", text: T("Reset layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-done", text: T("Done") })),
   );
   const topZone = h("div", { cls: "zone zone-top", "data-zone": "top" }, favs);
   return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, hero, quote, banner, topZone, h("div", { cls: "grid" }, left, center, right)), h("div", { cls: "sr-only", id: "arrange-live", role: "status", "aria-live": "polite" })];
@@ -1473,7 +1474,10 @@ class HomepageView extends ItemView {
       this.app.setting.open();
       this.app.setting.openTabById(this.plugin.manifest.id);
     });
-    this.$("page-refresh").addEventListener("click", () => this.refreshAll(true));
+    this.$("page-refresh").addEventListener("click", () => {
+      this.refreshAll(true);
+      this.syncSharedLayout(true);
+    });
     this.$("refresh-clips").addEventListener("click", () => this.renderClips());
     this.$("refresh-recent").addEventListener("click", () => this.renderRecent());
     this.$("hero-refresh").addEventListener("click", () => this.loadHero(true));
@@ -1524,6 +1528,8 @@ class HomepageView extends ItemView {
     });
 
     this.registerDomEvent(document, "selectionchange", () => this.updateFormatState());
+    // Coming back to Obsidian is when a layout pushed from another device has usually just synced
+    this.registerDomEvent(window, "focus", () => this.syncSharedLayout(true));
 
     // Obsidian claims Cmd/Ctrl+B, I and K (and Shift+X) for its own editor before a page element
     // sees them. A view's scope sits ahead of those global hotkeys while this tab is active, so
@@ -1579,6 +1585,7 @@ class HomepageView extends ItemView {
         this.renderOnThisDay();
         this.loadHero(false);
         this.loadQuote();
+        this.syncSharedLayout(true);
       }, 5 * 60 * 1000), // both loaders return early when switched off in settings
     );
 
@@ -2100,6 +2107,63 @@ class HomepageView extends ItemView {
     this.plugin.saveSettings().catch(() => {});
   }
 
+  // Which pushed layout this device last took, so a layout is only adopted once and a device
+  // can be rearranged afterwards
+  restoreSharedVersion() {
+    let v = NaN;
+    try {
+      if (typeof this.app.loadLocalStorage === "function") v = Number(this.app.loadLocalStorage("genkan-layout-version"));
+    } catch {
+      // fall through to the plugin data
+    }
+    if (!Number.isFinite(v)) v = Number(this.plugin.settings.cache?.layoutVersion);
+    return Number.isFinite(v) ? v : 0;
+  }
+
+  rememberSharedVersion(version) {
+    try {
+      if (typeof this.app.saveLocalStorage === "function") return this.app.saveLocalStorage("genkan-layout-version", version);
+    } catch {
+      // fall through to the plugin data
+    }
+    const st = this.plugin.settings;
+    st.cache = { ...(st.cache ?? {}), layoutVersion: version };
+    this.plugin.saveSettings().catch(() => {});
+  }
+
+  // Adopt a layout another device has pushed. Never moves cards while you are arranging them.
+  async syncSharedLayout(notify) {
+    try {
+      this.plugin.adoptSharedLayout((await this.plugin.loadData())?.sharedLayout);
+    } catch {
+      // the file can't be read: use what is loaded
+    }
+    const shared = this.plugin.settings.sharedLayout;
+    if (!shared || shared.version <= this.restoreSharedVersion()) return;
+    if (this.arranging || this.drag || this.pick) return;
+    const layout = normaliseLayout(shared.layout);
+    this.applyLayout(layout);
+    this.rememberLayout(layout);
+    this.rememberSharedVersion(shared.version);
+    if (notify) new Notice(T("Layout updated from another device."));
+  }
+
+  // Save the current layout as the shared one; other devices take it the next time they look
+  async pushLayout() {
+    const st = this.plugin.settings;
+    const version = Math.max(Date.now(), (st.sharedLayout?.version || 0) + 1);
+    st.sharedLayout = { layout: this.layout, version };
+    try {
+      await this.plugin.saveSettings();
+      this.rememberSharedVersion(version);
+      const msg = T("Layout saved for all your devices. Other devices pick it up when they next sync.");
+      new Notice(msg);
+      this.announce(msg);
+    } catch {
+      new Notice(T("Could not save the layout for your other devices."));
+    }
+  }
+
   // Put each card in its zone, touching only the cards that are out of place (moving a node
   // restarts its animation and drops focus)
   applyLayout(layout) {
@@ -2150,10 +2214,12 @@ class HomepageView extends ItemView {
       );
     }
     this.applyLayout(this.restoreLayout());
+    this.syncSharedLayout(false);
 
     this.$("arrange-btn").addEventListener("click", () => this.setArranging(!this.arranging));
     this.$("arrange-done").addEventListener("click", () => this.setArranging(false));
     this.$("arrange-reset").addEventListener("click", () => this.resetLayout());
+    this.$("arrange-push").addEventListener("click", () => this.pushLayout());
 
     this.root.addEventListener("click", (e) => {
       const btn = e.target.closest?.(".arrange-move");
@@ -4163,7 +4229,24 @@ module.exports = class HomepagePlugin extends Plugin {
   }
 
   async saveSettings() {
+    // Another device may have pushed a newer shared layout since this one loaded its settings;
+    // keep it rather than writing over it
+    try {
+      const disk = await this.loadData();
+      this.adoptSharedLayout(disk && disk.sharedLayout);
+    } catch {
+      // the file can't be read: save as we are
+    }
     await this.saveData(this.settings);
+  }
+
+  // Take a shared layout if it is newer than the one held; true when it was
+  adoptSharedLayout(incoming) {
+    if (!incoming || typeof incoming.version !== "number" || !incoming.layout || typeof incoming.layout !== "object") return false;
+    const cur = this.settings.sharedLayout;
+    if (cur && incoming.version <= cur.version) return false;
+    this.settings.sharedLayout = { layout: normaliseLayout(incoming.layout), version: incoming.version };
+    return true;
   }
 
   async activateView() {

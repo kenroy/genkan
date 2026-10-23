@@ -228,6 +228,10 @@ const I18N = {
     "Left column": "Colonne de gauche",
     "Centre column": "Colonne du centre",
     "Right column": "Colonne de droite",
+    "Use on all my devices": "Utiliser sur tous mes appareils",
+    "Layout saved for all your devices. Other devices pick it up when they next sync.": "Disposition enregistrée pour tous vos appareils. Les autres appareils la récupèrent à leur prochaine synchronisation.",
+    "Layout updated from another device.": "Disposition mise à jour depuis un autre appareil.",
+    "Could not save the layout for your other devices.": "Impossible d’enregistrer la disposition pour vos autres appareils.",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Affiche les notes de cette date il y a une semaine, un mois et un an, d’après leur date de création. Rien ne quitte votre appareil.",
   },
 
@@ -455,6 +459,10 @@ const I18N = {
     "Left column": "Columna izquierda",
     "Centre column": "Columna central",
     "Right column": "Columna derecha",
+    "Use on all my devices": "Usar en todos mis dispositivos",
+    "Layout saved for all your devices. Other devices pick it up when they next sync.": "Diseño guardado para todos tus dispositivos. Los demás dispositivos lo recibirán en su próxima sincronización.",
+    "Layout updated from another device.": "Diseño actualizado desde otro dispositivo.",
+    "Could not save the layout for your other devices.": "No se pudo guardar el diseño para tus otros dispositivos.",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Muestra las notas de esta fecha de hace una semana, un mes y un año, según su fecha de creación. Nada sale de tu dispositivo.",
   },
 
@@ -682,6 +690,10 @@ const I18N = {
     "Left column": "Linke Spalte",
     "Centre column": "Mittlere Spalte",
     "Right column": "Rechte Spalte",
+    "Use on all my devices": "Auf allen meinen Geräten verwenden",
+    "Layout saved for all your devices. Other devices pick it up when they next sync.": "Anordnung für alle deine Geräte gespeichert. Die anderen Geräte übernehmen sie bei der nächsten Synchronisierung.",
+    "Layout updated from another device.": "Anordnung von einem anderen Gerät aktualisiert.",
+    "Could not save the layout for your other devices.": "Die Anordnung konnte nicht für deine anderen Geräte gespeichert werden.",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Zeigt Notizen von diesem Datum vor einer Woche, einem Monat und einem Jahr, anhand ihres Erstellungsdatums. Nichts verlässt dein Gerät.",
   },
 
@@ -911,6 +923,10 @@ const I18N = {
     "Left column": "左の列",
     "Centre column": "中央の列",
     "Right column": "右の列",
+    "Use on all my devices": "すべてのデバイスで使う",
+    "Layout saved for all your devices. Other devices pick it up when they next sync.": "すべてのデバイス用に配置を保存しました。ほかのデバイスは次回の同期で反映されます。",
+    "Layout updated from another device.": "別のデバイスから配置を更新しました。",
+    "Could not save the layout for your other devices.": "ほかのデバイス用に配置を保存できませんでした。",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "1週間前、1か月前、1年前のこの日付のノートを、作成日をもとに表示します。データがデバイスの外に出ることはありません。",
   },
 };
