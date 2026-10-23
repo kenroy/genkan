@@ -96,7 +96,7 @@ function applyLanguage(choice) {
 // Source strings are written in British English; this converts them for American English
 function S(text) {
   const us = spellingChoice === "us" || (spellingChoice === "auto" && US_DETECTED);
-  return us ? text.replace(/favourite/g, "favorite").replace(/Favourite/g, "Favorite") : text;
+  return us ? text.replace(/favourite/g, "favorite").replace(/Favourite/g, "Favorite").replace(/centre/g, "center").replace(/Centre/g, "Center") : text;
 }
 
 // Translate a source string. Tables are keyed by the English text; {name} marks a value.
@@ -853,6 +853,100 @@ function exportFileName(md, index) {
   return `${title || `Quick Note ${index === 1 ? "" : index}`.trim()}.md`;
 }
 
+// ─── Arranging cards ──────────────────────────────────────────────────────────
+// The dashboard's cards live in four zones: a full-width row on top and three columns. A layout is
+// the list of card ids in each zone; it is saved per device and always repaired against this list.
+const ARRANGE_ZONES = ["top", "left", "center", "right"];
+const DEFAULT_LAYOUT = {
+  top: ["favs-card"],
+  left: ["calendar-card", "links-card"],
+  center: ["ring-card", "clips-card", "recent-card", "otd-card"],
+  right: ["tasks-card", "note-card"],
+};
+const CARD_NAMES = {
+  "favs-card": "Favourites",
+  "calendar-card": "Calendar",
+  "links-card": "Quick links",
+  "ring-card": "Ring notes",
+  "clips-card": "Web clips",
+  "recent-card": "Recent notes",
+  "otd-card": "On this day",
+  "tasks-card": "Tasks",
+  "note-card": "Quick notes",
+};
+
+// Drop unknown, duplicate and malformed entries, and put missing cards back in their default zone
+function normaliseLayout(saved) {
+  const known = new Set(Object.values(DEFAULT_LAYOUT).flat());
+  const out = { top: [], left: [], center: [], right: [] };
+  const seen = new Set();
+  if (saved && typeof saved === "object") {
+    for (const z of ARRANGE_ZONES) {
+      if (!Array.isArray(saved[z])) continue;
+      for (const id of saved[z]) {
+        if (known.has(id) && !seen.has(id)) {
+          seen.add(id);
+          out[z].push(id);
+        }
+      }
+    }
+  }
+  for (const z of ARRANGE_ZONES) {
+    for (const id of DEFAULT_LAYOUT[z]) {
+      if (!seen.has(id)) {
+        seen.add(id);
+        out[z].push(id);
+      }
+    }
+  }
+  return out;
+}
+
+// One step for a card: up/down within its zone (past the end it crosses to the top row or the
+// first column), left/right between the columns. Returns a new layout, or null when it can't move.
+// Hidden cards (a switched-off card) are skipped over so a step always shows.
+function moveInLayout(layout, id, dir, isVisible = () => true) {
+  const next = {};
+  for (const z of ARRANGE_ZONES) next[z] = layout[z].slice();
+  const zone = ARRANGE_ZONES.find((z) => next[z].includes(id));
+  if (!zone) return null;
+  const list = next[zone];
+  const i = list.indexOf(id);
+  if (dir === "up") {
+    let j = i - 1;
+    while (j >= 0 && !isVisible(list[j])) j--;
+    if (j >= 0) {
+      list.splice(i, 1);
+      list.splice(j, 0, id);
+      return next;
+    }
+    if (zone === "top") return null;
+    list.splice(i, 1);
+    next.top.push(id);
+    return next;
+  }
+  if (dir === "down") {
+    let j = i + 1;
+    while (j < list.length && !isVisible(list[j])) j++;
+    if (j < list.length) {
+      list.splice(i, 1);
+      list.splice(j, 0, id);
+      return next;
+    }
+    if (zone !== "top") return null;
+    list.splice(i, 1);
+    next.left.unshift(id);
+    return next;
+  }
+  const cols = ["left", "center", "right"];
+  const k = cols.indexOf(zone);
+  const to = k < 0 ? null : cols[k + (dir === "left" ? -1 : 1)];
+  if (!to) return null;
+  list.splice(i, 1);
+  next[to].splice(Math.min(i, next[to].length), 0, id);
+  return next;
+}
+
 // ─── Ring notes (Pebble Index) ────────────────────────────────────────────────
 // The ring's app appends entries to a note under timestamp headings:
 //   ## 2026-10-05 21:55
@@ -1024,6 +1118,7 @@ function buildDashboard() {
         { cls: "header-controls" },
         h("button", { cls: "icon-btn", id: "page-refresh", title: T("Refresh"), "aria-label": T("Refresh") }),
         h("button", { cls: "icon-btn", id: "theme-toggle", title: T("Toggle theme"), "aria-label": T("Toggle theme") }),
+        h("button", { cls: "icon-btn", id: "arrange-btn", title: T("Arrange cards"), "aria-label": T("Arrange cards"), "aria-pressed": "false" }),
         h("button", { cls: "icon-btn", id: "settings-btn", title: T("Settings"), "aria-label": T("Open settings") }),
       ),
     ),
@@ -1090,7 +1185,7 @@ function buildDashboard() {
 
   const left = h(
     "aside",
-    { cls: "col col-left" },
+    { cls: "col col-left zone", "data-zone": "left" },
     h(
       "div",
       { cls: "card", id: "calendar-card" },
@@ -1119,7 +1214,7 @@ function buildDashboard() {
 
   const center = h(
     "main",
-    { cls: "col col-center" },
+    { cls: "col col-center zone", "data-zone": "center" },
     h(
       "div",
       { cls: "card hidden", id: "ring-card" },
@@ -1195,7 +1290,7 @@ function buildDashboard() {
     h("button", { cls: active ? "tab active" : "tab", "data-filter": filter, role: "tab", "aria-selected": active ? "true" : "false", text: label });
   const right = h(
     "aside",
-    { cls: "col col-right" },
+    { cls: "col col-right zone", "data-zone": "right" },
     h(
       "div",
       { cls: "card", id: "tasks-card" },
@@ -1274,7 +1369,14 @@ function buildDashboard() {
     ),
   );
 
-  return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, hero, quote, favs, h("div", { cls: "grid" }, left, center, right))];
+  const banner = h(
+    "div",
+    { cls: "arrange-banner", id: "arrange-banner", hidden: "" },
+    h("span", { cls: "arrange-help", text: T("Drag a card by its handle, or use the arrow buttons. Press Done when you are finished.") }),
+    h("div", { cls: "arrange-actions" }, h("button", { type: "button", cls: "btn-secondary", id: "arrange-reset", text: T("Reset layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-done", text: T("Done") })),
+  );
+  const topZone = h("div", { cls: "zone zone-top", "data-zone": "top" }, favs);
+  return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, hero, quote, banner, topZone, h("div", { cls: "grid" }, left, center, right)), h("div", { cls: "sr-only", id: "arrange-live", role: "status", "aria-live": "polite" })];
 }
 
 class HomepageView extends ItemView {
@@ -1361,6 +1463,7 @@ class HomepageView extends ItemView {
     if (Platform.isMobile) this.$("search-kbd").classList.add("hidden");
 
     setIconSvg(this.$("settings-btn"), "settings");
+    setIconSvg(this.$("arrange-btn"), "arrange");
     setIconSvg(this.$("page-refresh"), "refresh");
     setIconSvg(this.$("refresh-clips"), "refresh");
     setIconSvg(this.$("refresh-recent"), "refresh");
@@ -1392,6 +1495,7 @@ class HomepageView extends ItemView {
     this.initLinks();
     this.initSearch();
     this.initCards();
+    this.initArrange();
   }
 
   // Labels are built once, so a language change rebuilds the dashboard in place
@@ -1955,6 +2059,342 @@ class HomepageView extends ItemView {
           del,
         ),
       );
+    }
+  }
+
+  // ── Arranging cards ──
+
+  cardName(id) {
+    return T(CARD_NAMES[id]);
+  }
+
+  isCardShown(id) {
+    const el = this.$(id);
+    return !!el && !el.classList.contains("hidden");
+  }
+
+  zoneName(zone) {
+    return T({ top: "Top row", left: "Left column", center: "Centre column", right: "Right column" }[zone]);
+  }
+
+  // Remembered per device where Obsidian allows it: a phone and a laptop want different layouts
+  restoreLayout() {
+    let v = null;
+    try {
+      if (typeof this.app.loadLocalStorage === "function") v = this.app.loadLocalStorage("genkan-layout");
+    } catch {
+      // fall through to the plugin data
+    }
+    if (!v || typeof v !== "object") v = this.plugin.settings.cache?.layout;
+    return normaliseLayout(v);
+  }
+
+  rememberLayout(layout) {
+    try {
+      if (typeof this.app.saveLocalStorage === "function") return this.app.saveLocalStorage("genkan-layout", layout);
+    } catch {
+      // fall through to the plugin data
+    }
+    const st = this.plugin.settings;
+    st.cache = { ...(st.cache ?? {}), layout };
+    this.plugin.saveSettings().catch(() => {});
+  }
+
+  // Put each card in its zone, touching only the cards that are out of place (moving a node
+  // restarts its animation and drops focus)
+  applyLayout(layout) {
+    this.layout = layout;
+    for (const z of ARRANGE_ZONES) {
+      const zone = this.root.querySelector(`.zone[data-zone="${z}"]`);
+      layout[z].forEach((id, i) => {
+        const el = this.$(id);
+        if (el && zone.children[i] !== el) zone.insertBefore(el, zone.children[i] || null);
+      });
+    }
+  }
+
+  announce(msg) {
+    const el = this.$("arrange-live");
+    if (!el) return;
+    el.textContent = "";
+    window.setTimeout(() => (el.textContent = msg), 30);
+  }
+
+  positionText(id) {
+    const zone = ARRANGE_ZONES.find((z) => this.layout[z].includes(id));
+    const shown = this.layout[zone].filter((x) => this.isCardShown(x));
+    return T("{name}: {zone}, position {n} of {total}", { name: this.cardName(id), zone: this.zoneName(zone), n: shown.indexOf(id) + 1, total: shown.length });
+  }
+
+  initArrange() {
+    this.arranging = false;
+    this.pick = null;
+    this.drag = null;
+    for (const id of Object.keys(CARD_NAMES)) {
+      const card = this.$(id);
+      if (!card) continue;
+      const name = this.cardName(id);
+      const move = (dir, icon, key) => {
+        const label = T(key, { name });
+        return h("button", { type: "button", cls: "arrange-move", "data-move": dir, title: label, "aria-label": label }, iconNode(icon));
+      };
+      const handleLabel = T("Move {name}", { name });
+      card.prepend(
+        h(
+          "div",
+          { cls: "arrange-bar", hidden: "" },
+          h("button", { type: "button", cls: "arrange-handle", "data-id": id, title: handleLabel, "aria-label": handleLabel, "aria-pressed": "false" }, iconNode("grip")),
+          h("span", { cls: "arrange-name", text: name }),
+          h("div", { cls: "arrange-moves" }, move("up", "arrow-up", "Move {name} up"), move("down", "arrow-down", "Move {name} down"), move("left", "arrow-left", "Move {name} left"), move("right", "arrow-right", "Move {name} right")),
+        ),
+      );
+    }
+    this.applyLayout(this.restoreLayout());
+
+    this.$("arrange-btn").addEventListener("click", () => this.setArranging(!this.arranging));
+    this.$("arrange-done").addEventListener("click", () => this.setArranging(false));
+    this.$("arrange-reset").addEventListener("click", () => this.resetLayout());
+
+    this.root.addEventListener("click", (e) => {
+      const btn = e.target.closest?.(".arrange-move");
+      if (btn) this.moveCard(btn.closest(".card").id, btn.dataset.move, btn);
+    });
+    this.root.addEventListener("keydown", (e) => this.arrangeKey(e));
+    this.root.addEventListener("focusout", (e) => {
+      // Tabbing away from a picked-up card drops it where it is
+      if (this.pick && !this.moving && e.target.classList?.contains("arrange-handle") && e.target.dataset.id === this.pick.id) this.dropPick(e.target, true);
+    });
+    this.root.addEventListener("pointerdown", (e) => this.dragDown(e));
+    this.root.addEventListener("pointermove", (e) => this.dragMove(e));
+    this.root.addEventListener("pointerup", (e) => this.dragUp(e, false));
+    this.root.addEventListener("pointercancel", (e) => this.dragUp(e, true));
+  }
+
+  setArranging(on) {
+    this.cancelDrag();
+    this.pick = null;
+    this.arranging = on;
+    this.root.classList.toggle("arranging", on);
+    this.$("arrange-btn").setAttribute("aria-pressed", String(on));
+    this.$("arrange-banner").hidden = !on;
+    for (const id of Object.keys(CARD_NAMES)) {
+      const card = this.$(id);
+      if (!card) continue;
+      for (const child of card.children) {
+        if (child.classList.contains("arrange-bar")) child.hidden = !on;
+        else child.inert = on;
+      }
+    }
+    this.announce(T(on ? "Arranging cards" : "Done arranging"));
+    if (on) {
+      const first = Array.from(this.root.querySelectorAll(".arrange-handle")).find((b) => this.isCardShown(b.dataset.id));
+      first?.focus();
+    } else {
+      this.$("arrange-btn").focus();
+    }
+  }
+
+  resetLayout() {
+    this.applyLayout(normaliseLayout(null));
+    this.rememberLayout(null);
+    this.announce(T("Layout reset."));
+  }
+
+  moveCard(id, dir, focusEl) {
+    const next = moveInLayout(this.layout, id, dir, (x) => this.isCardShown(x));
+    if (!next) {
+      this.announce(T("{name} can't move any further that way.", { name: this.cardName(id) }));
+      return false;
+    }
+    this.moving = true; // moving the node blurs it; refocus without treating that as a drop
+    this.applyLayout(next);
+    this.rememberLayout(next);
+    focusEl?.focus();
+    this.moving = false;
+    this.announce(this.positionText(id));
+    return true;
+  }
+
+  // Keyboard: Space or Enter picks a card up, the arrow keys move it, Space drops it, Escape cancels
+  arrangeKey(e) {
+    if (e.key === "Escape" && this.drag) {
+      e.preventDefault();
+      this.cancelDrag();
+      return;
+    }
+    const handle = e.target.closest?.(".arrange-handle");
+    if (!handle || e.isComposing || e.metaKey || e.ctrlKey || e.altKey) return;
+    const id = handle.dataset.id;
+    const arrows = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
+    const holding = this.pick && this.pick.id === id;
+    if (e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      if (holding) this.dropPick(handle);
+      else {
+        this.pick = { id, before: this.layout };
+        handle.setAttribute("aria-pressed", "true");
+        this.announce(T("{name} picked up. Use the arrow keys to move it, Space to drop it and Escape to cancel.", { name: this.cardName(id) }));
+      }
+    } else if (holding && arrows[e.key]) {
+      e.preventDefault();
+      this.moveCard(id, arrows[e.key], handle);
+    } else if (holding && e.key === "Escape") {
+      e.preventDefault();
+      e.stopPropagation();
+      this.moving = true;
+      this.applyLayout(this.pick.before);
+      this.rememberLayout(this.pick.before);
+      handle.focus();
+      this.moving = false;
+      handle.setAttribute("aria-pressed", "false");
+      this.pick = null;
+      this.announce(T("Move cancelled."));
+    }
+  }
+
+  dropPick(handle, quiet) {
+    handle.setAttribute("aria-pressed", "false");
+    const id = this.pick.id;
+    this.pick = null;
+    if (!quiet) this.announce(T("Dropped. {position}", { position: this.positionText(id) }));
+  }
+
+  // Pointer dragging, by the handle. A small ghost follows the pointer, a slot shows where the card
+  // will land, and the page scrolls itself near its top and bottom edges.
+  dragDown(e) {
+    const handle = e.target.closest?.(".arrange-handle");
+    if (!handle || !this.arranging || (e.pointerType === "mouse" && e.button !== 0)) return;
+    const card = handle.closest(".card");
+    this.drag = { id: card.id, card, handle, pointerId: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, started: false };
+    try {
+      handle.setPointerCapture(e.pointerId);
+    } catch {
+      // the drag still works without capture
+    }
+    e.preventDefault();
+  }
+
+  dragMove(e) {
+    const d = this.drag;
+    if (!d || e.pointerId !== d.pointerId) return;
+    d.x = e.clientX;
+    d.y = e.clientY;
+    if (!d.started) {
+      if (Math.hypot(d.x - d.x0, d.y - d.y0) < 5) return;
+      d.started = true;
+      const rect = d.card.getBoundingClientRect();
+      d.slot = h("div", { cls: "drop-slot", "aria-hidden": "true" });
+      d.slot.style.height = `${rect.height}px`;
+      d.card.before(d.slot);
+      d.card.classList.add("is-dragging");
+      d.ghost = h("div", { cls: "drag-ghost", text: this.cardName(d.id) });
+      this.root.append(d.ghost);
+      this.root.classList.add("is-dragging-card");
+      this.dragFrame();
+    }
+    this.dragUpdate();
+  }
+
+  dragUpdate() {
+    const d = this.drag;
+    if (!d || !d.started) return;
+    const root = this.root.getBoundingClientRect();
+    d.ghost.style.left = `${d.x - root.left + this.root.scrollLeft}px`;
+    d.ghost.style.top = `${d.y - root.top + this.root.scrollTop}px`;
+    // the zone under the pointer, or the nearest one
+    let best = null;
+    let bestDist = Infinity;
+    for (const zone of this.root.querySelectorAll(".zone")) {
+      if (getComputedStyle(zone).display === "none") continue;
+      const r = zone.getBoundingClientRect();
+      const dx = Math.max(r.left - d.x, 0, d.x - r.right);
+      const dy = Math.max(r.top - d.y, 0, d.y - r.bottom);
+      const dist = Math.hypot(dx, dy);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = zone;
+      }
+    }
+    if (!best) return;
+    const row = getComputedStyle(best).flexDirection === "row";
+    const kids = Array.from(best.children).filter((c) => c !== d.card && c !== d.slot && !c.classList.contains("hidden"));
+    let before = null;
+    for (const c of kids) {
+      const r = c.getBoundingClientRect();
+      if (d.y < r.top || (d.y <= r.bottom && (row ? d.x < r.left + r.width / 2 : d.y < r.top + r.height / 2))) {
+        before = c;
+        break;
+      }
+    }
+    if (before) {
+      if (d.slot.nextSibling !== before) best.insertBefore(d.slot, before);
+    } else if (best.lastChild !== d.slot) best.append(d.slot);
+  }
+
+  dragFrame() {
+    const d = this.drag;
+    if (!d || !d.started) return;
+    const r = this.root.getBoundingClientRect();
+    const edge = 56;
+    const dy = d.y < r.top + edge ? -(r.top + edge - d.y) : d.y > r.bottom - edge ? d.y - (r.bottom - edge) : 0;
+    if (dy) {
+      this.root.scrollTop += Math.max(-18, Math.min(18, dy / 3));
+      this.dragUpdate();
+    }
+    window.requestAnimationFrame(() => this.dragFrame());
+  }
+
+  dragUp(e, cancelled) {
+    const d = this.drag;
+    if (!d || e.pointerId !== d.pointerId) return;
+    if (!d.started) {
+      this.drag = null;
+      return;
+    }
+    if (cancelled) return this.cancelDrag();
+    // The new order is whatever the zones now hold, with the slot standing for the card
+    const next = { top: [], left: [], center: [], right: [] };
+    for (const z of ARRANGE_ZONES) {
+      const zone = this.root.querySelector(`.zone[data-zone="${z}"]`);
+      next[z] = Array.from(zone.children)
+        .map((c) => (c === d.slot ? d.id : c === d.card ? null : c.id))
+        .filter(Boolean);
+    }
+    const { card, handle, id } = d;
+    this.endDrag();
+    const layout = normaliseLayout(next);
+    this.moving = true;
+    this.applyLayout(layout);
+    this.rememberLayout(layout);
+    handle.focus();
+    this.moving = false;
+    this.announce(T("Dropped. {position}", { position: this.positionText(id) }));
+    card.classList.remove("is-dragging");
+  }
+
+  cancelDrag() {
+    if (!this.drag) return;
+    const wasStarted = this.drag.started;
+    const handle = this.drag.handle;
+    this.endDrag();
+    if (wasStarted) {
+      handle.focus();
+      this.announce(T("Move cancelled."));
+    }
+  }
+
+  endDrag() {
+    const d = this.drag;
+    this.drag = null;
+    if (!d) return;
+    d.slot?.remove();
+    d.ghost?.remove();
+    d.card.classList.remove("is-dragging");
+    this.root.classList.remove("is-dragging-card");
+    try {
+      d.handle.releasePointerCapture(d.pointerId);
+    } catch {
+      // already released
     }
   }
 

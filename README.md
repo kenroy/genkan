@@ -10,6 +10,7 @@ Genkan (玄関) is the entryway of a Japanese home: the place you step in. This 
 - **Web clips** from the Obsidian Web Clipper and your **recent notes**
 - **Quick links** to commands, notes or web pages
 - Cards in the middle column that fold down to their title
+- **Arrange cards**: drag the cards into the order and columns you want
 - **On this day**: an optional card with notes from this date a week, a month and a year ago
 - **Ring notes**: an optional card for voice notes from a Pebble Index ring
 - A photo of the day and a daily quote (both optional)
@@ -66,6 +67,15 @@ By default these live in `genkan/data/`. Change the **Data folder** setting to p
 
 ### Collapsing cards
 Click the − beside **Ring notes**, **Web clips**, **Recent notes** or **On this day** to fold a card down to its title (the count stays visible), and the + to open it again. Each device remembers what you collapsed.
+
+### Arranging cards
+Click the grid button at the top right to enter arrange mode. Every card gets a bar with a handle, its name and four arrow buttons.
+
+- **Drag** a card by its handle. A dashed slot shows where it will land, and the page scrolls when you drag near the top or bottom edge. Cards can go into any column, or into the full-width row above the columns (where Favourites starts).
+- **Buttons:** the up and down arrows move a card within its column (past the end of a column, up goes to the top row and down goes to the first column); the left and right arrows move it between columns.
+- **Keyboard:** Tab to a handle, press Space or Enter to pick the card up, move it with the arrow keys, then press Space to drop it or Escape to cancel. Each step is announced to screen readers.
+
+Press **Done** to leave arrange mode, or **Reset layout** to go back to the default. Each device remembers its own layout, so a phone and a laptop can differ. On a phone the columns stack, so a card's column decides its order (the right column comes first by default). Cards you have switched off, such as Ring notes or On this day, keep their place and come back where you left them.
 
 ### Calendar and daily notes
 Click a day to open that day's note, creating it if it does not exist. Genkan uses your Daily Notes or Periodic Notes settings for the folder, date format and template, or the **Daily notes folder** setting if you set one. A dot marks days that have a note.

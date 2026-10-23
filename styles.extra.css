@@ -146,7 +146,6 @@
    Favourites strip
    ============================================================ */
 .hp-root .favs-card {
-    margin-bottom: 16px;
     padding: 14px 20px 16px;
 }
 
@@ -1100,4 +1099,211 @@
   color: var(--text-3);
   font-size: 12px;
   padding: 2px 10px 6px;
+}
+
+/* ============================================================
+   Arranging cards (drag to arrange)
+   ============================================================ */
+.hp-root .sr-only {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* The full-width row above the columns (it holds Favourites by default) */
+.hp-root .zone-top {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.hp-root .zone-top:empty {
+  display: none;
+}
+
+.hp-root .arrange-banner {
+  align-items: center;
+  background: var(--surface-1);
+  border: 1px solid var(--accent-txt);
+  border-radius: var(--radius);
+  color: var(--text-2);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 13px;
+  gap: 8px 16px;
+  justify-content: space-between;
+  margin: 0 0 16px;
+  padding: 12px 16px;
+}
+
+.hp-root .arrange-banner[hidden] {
+  display: none;
+}
+
+.hp-root .arrange-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.hp-root .arrange-bar {
+  align-items: center;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: 8px;
+  margin: -8px -8px 12px;
+  padding: 4px 6px;
+}
+
+.hp-root .arrange-bar[hidden] {
+  display: none;
+}
+
+.hp-root .arrange-name {
+  color: var(--text-2);
+  flex: 1;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hp-root .arrange-moves {
+  display: flex;
+  gap: 2px;
+}
+
+#genkan-root .arrange-handle,
+#genkan-root .arrange-move {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  box-sizing: border-box;
+  color: var(--text-2);
+  cursor: pointer;
+  display: flex;
+  height: 28px;
+  justify-content: center;
+  min-height: 0;
+  min-width: 24px;
+  padding: 0;
+  width: 28px;
+}
+
+#genkan-root .arrange-handle {
+  cursor: grab;
+  touch-action: none; /* so a touch drag moves the card instead of scrolling the page */
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+#genkan-root .arrange-handle:hover,
+#genkan-root .arrange-move:hover {
+  background: var(--surface-1);
+  color: var(--text);
+}
+
+#genkan-root .arrange-handle[aria-pressed="true"] {
+  background: var(--accent-txt);
+  color: var(--surface-1);
+}
+
+.is-mobile #genkan-root .arrange-handle,
+.is-mobile #genkan-root .arrange-move {
+  height: 32px;
+  width: 32px;
+}
+
+/* While arranging, cards show their place rather than their content */
+.hp-root.arranging .card {
+  animation: none;
+  border-style: dashed;
+}
+
+.hp-root.arranging .card > :not(.arrange-bar) {
+  opacity: 0.5;
+}
+
+.hp-root.arranging .zone:empty {
+  border: 2px dashed var(--border-hi);
+  border-radius: var(--radius);
+  display: flex;
+  min-height: 72px;
+}
+
+.hp-root .card.is-dragging {
+  display: none;
+}
+
+.hp-root .drop-slot {
+  background: var(--surface-2);
+  border: 2px dashed var(--accent-txt);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+  flex: none;
+  min-height: 48px;
+}
+
+.hp-root .drag-ghost {
+  background: var(--surface-1);
+  border: 1px solid var(--accent-txt);
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  pointer-events: none;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 60;
+}
+
+.hp-root.is-dragging-card,
+.hp-root.is-dragging-card * {
+  cursor: grabbing;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hp-root .drag-ghost {
+    box-shadow: none;
+  }
+}
+
+/* An empty column leaves no gap on the stacked layouts */
+@container hp (max-width: 1100px) {
+  .hp-root .col-right:empty {
+    display: none;
+  }
+}
+
+@container hp (max-width: 768px) {
+  .hp-root .col:empty {
+    display: none;
+  }
+}
+
+@container hp (max-width: 1100px) {
+  .hp-root.arranging .col-right:empty {
+    display: flex;
+  }
+}
+
+@container hp (max-width: 768px) {
+  .hp-root.arranging .col:empty {
+    display: flex;
+  }
 }
