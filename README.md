@@ -10,7 +10,7 @@ Genkan (玄関) is the entryway of a Japanese home: the place you step in. This 
 - **Web clips** from the Obsidian Web Clipper and your **recent notes**
 - **Quick links** to commands, notes or web pages
 - Cards in the middle column that fold down to their title
-- **Arrange cards**: drag the cards into the order and columns you want
+- **Arrange cards**: drag the cards into the order and columns you want, and share the layout with your other devices
 - **On this day**: an optional card with notes from this date a week, a month and a year ago
 - **Ring notes**: an optional card for voice notes from a Pebble Index ring
 - A photo of the day and a daily quote (both optional)
@@ -75,7 +75,17 @@ Click the **Arrange cards** button (the four-squares icon at the top right, betw
 - **Buttons:** the up and down arrows move a card within its column (past the end of a column, up goes to the top row and down goes to the first column); the left and right arrows move it between columns.
 - **Keyboard:** Tab to a handle, press Space or Enter to pick the card up, move it with the arrow keys, then press Space to drop it or Escape to cancel. Each step is announced to screen readers.
 
-Press **Done** to leave arrange mode, or **Reset layout** to go back to the default. **Use on all my devices** saves the current layout as a shared one: your other devices take it the next time they sync and you open or return to Obsidian (they show a short notice), and you can still rearrange any device afterwards. Nothing changes on other devices until you press it. It travels in the plugin's settings file, so it needs Obsidian Sync (with plugin settings) or whatever else you use to sync your vault's `.obsidian` folder. Each device remembers its own layout, so a phone and a laptop can differ. On a phone the columns stack, so a card's column decides its order (the right column comes first by default). Cards you have switched off, such as Ring notes or On this day, keep their place and come back where you left them.
+Press **Done** to leave arrange mode, or **Reset layout** to go back to the default on this device.
+
+Each device remembers its own layout, so a phone and a laptop can differ. On a phone the columns stack, so a card's column decides its order (the right column comes first by default). Cards you have switched off, such as Ring notes or On this day, keep their place and come back where you left them.
+
+**Sharing a layout between devices.** While arranging, press **Use on all my devices** to save the current layout as a shared one.
+
+- Your other devices take it once, the next time they sync and you open the dashboard, press its refresh button or return to Obsidian. They show a short notice when they do.
+- Nothing changes on other devices until you press the button. After a device has taken a shared layout you can still rearrange it, and it keeps your changes until you push a newer layout.
+- **Reset layout** only affects the device you press it on. To share the default again, reset and then press **Use on all my devices**.
+- The shared layout is stored in the plugin's settings file (`.obsidian/plugins/genkan/data.json`), so it reaches your other devices only if you sync plugin settings: Obsidian Sync with plugin settings turned on, or whatever else you use to sync your vault's `.obsidian` folder. A device that doesn't sync that file never receives it.
+- A device that saves older settings never overwrites a newer shared layout.
 
 ### Calendar and daily notes
 Click a day to open that day's note, creating it if it does not exist. Genkan uses your Daily Notes or Periodic Notes settings for the folder, date format and template, or the **Daily notes folder** setting if you set one. A dot marks days that have a note.
@@ -126,7 +136,7 @@ Notes:
 - The Unsplash key is optional. It is stored in this plugin's settings file (`.obsidian/plugins/genkan/data.json`) in your vault. If you use Obsidian Sync with plugin settings, the key syncs with it, so keep your vault private.
 - Quotes from ZenQuotes are credited in the interface, as their free API requires: "Inspirational quotes provided by ZenQuotes API". Echoes quotes are credited the same way. The bundled quotes make no request. If a request fails, a bundled quote is shown.
 - To search, list recent notes, offer the favourites picker and match daily notes, Genkan reads the list of note names and paths in your vault through Obsidian's API. It reads a note's contents only for search snippets, ring notes, web clips and the previews on the On this day card, and none of it leaves your device.
-- Today's photo and quote are cached in the plugin's own settings file, not in browser storage. Which note you had open, which cards you folded and your card layout are remembered per device, in Obsidian's local storage for this vault (or in that settings file when local storage isn't available), and none of it leaves your device.
+- Today's photo and quote are cached in the plugin's own settings file, not in browser storage. Which note you had open, which cards you folded and your card layout are remembered per device, in Obsidian's local storage for this vault (or in that settings file when local storage isn't available). Genkan sends none of it anywhere; the one thing that can reach your other devices is a layout you push with **Use on all my devices**, which goes into the settings file and travels only through whatever syncs your vault.
 - Links you click (photographer credits, the ZenQuotes and Echoes links, any `https://` quick link) open in your browser.
 
 ## Settings
