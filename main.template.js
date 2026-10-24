@@ -3224,6 +3224,11 @@ class HomepageView extends ItemView {
         new FavouritePicker(this.app, this.plugin).open();
         return;
       }
+      if (e.target.closest("[data-ring-all]")) {
+        e.preventDefault();
+        this.openRingFolder();
+        return;
+      }
       const ring = e.target.closest("[data-ring-line]");
       if (ring) {
         e.preventDefault();
@@ -3307,8 +3312,12 @@ class HomepageView extends ItemView {
 
     if (this.ringMode === "files") {
       // A separate file per note: newest first by timestamp, then read only the ones shown
-      openLink.classList.add("hidden");
       const folder = this.ringFolder;
+      openLink.classList.toggle("hidden", !folder);
+      openLink.removeAttribute("data-open");
+      openLink.dataset.ringAll = "1";
+      openLink.textContent = T("Open folder");
+      openLink.title = T("Show the folder in the file explorer");
       if (!folder) {
         count.textContent = "0";
         this.showEmpty(body, T("Choose the folder your ring saves notes to in Genkan's settings."));
@@ -3339,6 +3348,9 @@ class HomepageView extends ItemView {
       const path = this.ringPath;
       openLink.classList.remove("hidden");
       openLink.dataset.open = path;
+      delete openLink.dataset.ringAll;
+      openLink.textContent = T("Open");
+      openLink.title = T("Open the notes file");
       const f = this.app.vault.getAbstractFileByPath(path);
       if (!(f instanceof TFile)) {
         count.textContent = "0";
@@ -3367,6 +3379,31 @@ class HomepageView extends ItemView {
           h("span", { cls: "ring-text", text: e.text }),
         ),
       );
+    }
+    if (total > entries.length) {
+      const more = h("a", { cls: "ring-more", href: "#", text: T("View all {n}", { n: fmtNum(total) }) });
+      if (this.ringMode === "files") more.dataset.ringAll = "1";
+      else more.dataset.open = this.ringPath;
+      body.append(more);
+    }
+  }
+
+  // Show the ring's notes folder in the file explorer, so the notes beyond the few listed are reachable
+  async openRingFolder() {
+    const folder = this.app.vault.getAbstractFileByPath(this.ringFolder);
+    if (!folder) return;
+    try {
+      const ws = this.app.workspace;
+      let leaf = ws.getLeavesOfType("file-explorer")[0];
+      if (!leaf) {
+        leaf = ws.getLeftLeaf(false);
+        await leaf.setViewState({ type: "file-explorer" });
+      }
+      ws.revealLeaf(leaf);
+      if (typeof leaf.view?.revealInFolder !== "function") throw new Error("no file explorer");
+      leaf.view.revealInFolder(folder);
+    } catch {
+      new Notice(T("Open the file explorer and look in “{folder}”.", { folder: this.ringFolder }));
     }
   }
 

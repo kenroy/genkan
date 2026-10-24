@@ -618,6 +618,10 @@ const I18N = {
     "Use the arrow keys to move between days.": "Utilisez les flèches pour passer d’un jour à l’autre.",
     "{n} result": "{n} résultat",
     "{n} results": "{n} résultats",
+    "Open folder": "Ouvrir le dossier",
+    "Show the folder in the file explorer": "Afficher le dossier dans l’explorateur de fichiers",
+    "View all {n}": "Tout afficher ({n})",
+    "Open the file explorer and look in “{folder}”.": "Ouvrez l’explorateur de fichiers et cherchez dans « {folder} ».",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Affiche les notes de cette date il y a une semaine, un mois et un an, d’après leur date de création. Rien ne quitte votre appareil.",
   },
 
@@ -858,6 +862,10 @@ const I18N = {
     "Use the arrow keys to move between days.": "Usa las flechas para moverte entre los días.",
     "{n} result": "{n} resultado",
     "{n} results": "{n} resultados",
+    "Open folder": "Abrir carpeta",
+    "Show the folder in the file explorer": "Mostrar la carpeta en el explorador de archivos",
+    "View all {n}": "Ver todas ({n})",
+    "Open the file explorer and look in “{folder}”.": "Abre el explorador de archivos y busca en «{folder}».",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Muestra las notas de esta fecha de hace una semana, un mes y un año, según su fecha de creación. Nada sale de tu dispositivo.",
   },
 
@@ -1098,6 +1106,10 @@ const I18N = {
     "Use the arrow keys to move between days.": "Mit den Pfeiltasten wechselst du zwischen den Tagen.",
     "{n} result": "{n} Ergebnis",
     "{n} results": "{n} Ergebnisse",
+    "Open folder": "Ordner öffnen",
+    "Show the folder in the file explorer": "Ordner im Dateiexplorer anzeigen",
+    "View all {n}": "Alle {n} anzeigen",
+    "Open the file explorer and look in “{folder}”.": "Öffne den Dateiexplorer und sieh in „{folder}“ nach.",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Zeigt Notizen von diesem Datum vor einer Woche, einem Monat und einem Jahr, anhand ihres Erstellungsdatums. Nichts verlässt dein Gerät.",
   },
 
@@ -1340,6 +1352,10 @@ const I18N = {
     "Use the arrow keys to move between days.": "矢印キーで日付を移動できます。",
     "{n} result": "{n} 件の結果",
     "{n} results": "{n} 件の結果",
+    "Open folder": "フォルダを開く",
+    "Show the folder in the file explorer": "ファイルエクスプローラーでフォルダを表示",
+    "View all {n}": "すべて表示（{n}）",
+    "Open the file explorer and look in “{folder}”.": "ファイルエクスプローラーを開いて「{folder}」を確認してください。",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "1週間前、1か月前、1年前のこの日付のノートを、作成日をもとに表示します。データがデバイスの外に出ることはありません。",
   },
 };
@@ -4539,6 +4555,11 @@ class HomepageView extends ItemView {
         new FavouritePicker(this.app, this.plugin).open();
         return;
       }
+      if (e.target.closest("[data-ring-all]")) {
+        e.preventDefault();
+        this.openRingFolder();
+        return;
+      }
       const ring = e.target.closest("[data-ring-line]");
       if (ring) {
         e.preventDefault();
@@ -4622,8 +4643,12 @@ class HomepageView extends ItemView {
 
     if (this.ringMode === "files") {
       // A separate file per note: newest first by timestamp, then read only the ones shown
-      openLink.classList.add("hidden");
       const folder = this.ringFolder;
+      openLink.classList.toggle("hidden", !folder);
+      openLink.removeAttribute("data-open");
+      openLink.dataset.ringAll = "1";
+      openLink.textContent = T("Open folder");
+      openLink.title = T("Show the folder in the file explorer");
       if (!folder) {
         count.textContent = "0";
         this.showEmpty(body, T("Choose the folder your ring saves notes to in Genkan's settings."));
@@ -4654,6 +4679,9 @@ class HomepageView extends ItemView {
       const path = this.ringPath;
       openLink.classList.remove("hidden");
       openLink.dataset.open = path;
+      delete openLink.dataset.ringAll;
+      openLink.textContent = T("Open");
+      openLink.title = T("Open the notes file");
       const f = this.app.vault.getAbstractFileByPath(path);
       if (!(f instanceof TFile)) {
         count.textContent = "0";
@@ -4682,6 +4710,31 @@ class HomepageView extends ItemView {
           h("span", { cls: "ring-text", text: e.text }),
         ),
       );
+    }
+    if (total > entries.length) {
+      const more = h("a", { cls: "ring-more", href: "#", text: T("View all {n}", { n: fmtNum(total) }) });
+      if (this.ringMode === "files") more.dataset.ringAll = "1";
+      else more.dataset.open = this.ringPath;
+      body.append(more);
+    }
+  }
+
+  // Show the ring's notes folder in the file explorer, so the notes beyond the few listed are reachable
+  async openRingFolder() {
+    const folder = this.app.vault.getAbstractFileByPath(this.ringFolder);
+    if (!folder) return;
+    try {
+      const ws = this.app.workspace;
+      let leaf = ws.getLeavesOfType("file-explorer")[0];
+      if (!leaf) {
+        leaf = ws.getLeftLeaf(false);
+        await leaf.setViewState({ type: "file-explorer" });
+      }
+      ws.revealLeaf(leaf);
+      if (typeof leaf.view?.revealInFolder !== "function") throw new Error("no file explorer");
+      leaf.view.revealInFolder(folder);
+    } catch {
+      new Notice(T("Open the file explorer and look in “{folder}”.", { folder: this.ringFolder }));
     }
   }
 
