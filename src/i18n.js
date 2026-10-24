@@ -237,6 +237,10 @@ const I18N = {
     "Local layout: this device differs from the shared layout.": "Disposition locale : cet appareil diffère de la disposition partagée.",
     "Use the shared layout": "Utiliser la disposition partagée",
     "Switched to the shared layout.": "Disposition partagée appliquée.",
+    "{date}, has a note": "{date}, a une note",
+    "Use the arrow keys to move between days.": "Utilisez les flèches pour passer d’un jour à l’autre.",
+    "{n} result": "{n} résultat",
+    "{n} results": "{n} résultats",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Affiche les notes de cette date il y a une semaine, un mois et un an, d’après leur date de création. Rien ne quitte votre appareil.",
   },
 
@@ -473,6 +477,10 @@ const I18N = {
     "Local layout: this device differs from the shared layout.": "Diseño local: este dispositivo difiere del diseño compartido.",
     "Use the shared layout": "Usar el diseño compartido",
     "Switched to the shared layout.": "Se cambió al diseño compartido.",
+    "{date}, has a note": "{date}, tiene una nota",
+    "Use the arrow keys to move between days.": "Usa las flechas para moverte entre los días.",
+    "{n} result": "{n} resultado",
+    "{n} results": "{n} resultados",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Muestra las notas de esta fecha de hace una semana, un mes y un año, según su fecha de creación. Nada sale de tu dispositivo.",
   },
 
@@ -709,6 +717,10 @@ const I18N = {
     "Local layout: this device differs from the shared layout.": "Lokale Anordnung: dieses Gerät weicht von der geteilten Anordnung ab.",
     "Use the shared layout": "Geteilte Anordnung verwenden",
     "Switched to the shared layout.": "Zur geteilten Anordnung gewechselt.",
+    "{date}, has a note": "{date}, hat eine Notiz",
+    "Use the arrow keys to move between days.": "Mit den Pfeiltasten wechselst du zwischen den Tagen.",
+    "{n} result": "{n} Ergebnis",
+    "{n} results": "{n} Ergebnisse",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "Zeigt Notizen von diesem Datum vor einer Woche, einem Monat und einem Jahr, anhand ihres Erstellungsdatums. Nichts verlässt dein Gerät.",
   },
 
@@ -947,6 +959,10 @@ const I18N = {
     "Local layout: this device differs from the shared layout.": "ローカルの配置：このデバイスは共有された配置と異なります。",
     "Use the shared layout": "共有された配置を使う",
     "Switched to the shared layout.": "共有された配置に切り替えました。",
+    "{date}, has a note": "{date}、ノートあり",
+    "Use the arrow keys to move between days.": "矢印キーで日付を移動できます。",
+    "{n} result": "{n} 件の結果",
+    "{n} results": "{n} 件の結果",
     "Shows notes from this date a week, a month and a year ago, found from their created date. Nothing leaves your device.": "1週間前、1か月前、1年前のこの日付のノートを、作成日をもとに表示します。データがデバイスの外に出ることはありません。",
   },
 };

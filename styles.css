@@ -437,10 +437,15 @@
     transition: color 0.3s;
 }
 .hp-root .cal-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 4px;
+}
+.hp-root .cal-row {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 3px;
-    margin-top: 4px;
 }
 .hp-root .cal-dow {
     font-size: 10px;
@@ -2502,14 +2507,10 @@
   width: 32px;
 }
 
-/* While arranging, cards show their place rather than their content */
+/* While arranging, cards get a dashed outline and a bar (their content stays fully readable) */
 .hp-root.arranging .card {
   animation: none;
   border-style: dashed;
-}
-
-.hp-root.arranging .card > :not(.arrange-bar) {
-  opacity: 0.5;
 }
 
 .hp-root.arranging .zone:empty {
@@ -2679,4 +2680,32 @@
 
 #genkan-root .clear-btn {
   min-height: 24px;
+}
+
+/* Calendar days are real buttons now: undo Obsidian's button chrome and keep the old look */
+#genkan-root button.cal-day {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--text); /* darker than the out-of-month days, which are only dimmed by colour */
+  font-size: 12px;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+  width: 100%;
+}
+
+#genkan-root button.cal-day:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+#genkan-root button.cal-day.today {
+  background: var(--accent);
+  color: #fff;
+}
+
+.hp-root .cal-cell {
+  display: block;
+  min-width: 0;
 }

@@ -61,7 +61,7 @@ Tasks are a checklist in `Tasks.md`, written like `- [ ] Buy milk ➕ 2026-10-10
 
 The export button at the right end of the note's toolbar saves the open note as a Markdown (`.md`) file. On desktop it opens a save dialog that starts in your vault's folder, and you can pick any other folder or file name; the name starts from the note's first line. On a phone or tablet it opens the share sheet, so you can send it to Files, Mail or another app. If neither is available, a copy is saved in your vault instead. The note itself stays where it is.
 
-The quick note is a small rich-text editor: the toolbar (and Cmd/Ctrl+B, I, U, K and Shift+X) makes text bold, italic, underlined or struck through, turns lines into headings, bullets or numbered lists, and adds links, and you see the styling as you type. Type `---` and press Enter for a horizontal line. The file is still plain markdown: `**bold**`, `*italic*`, `~~strike~~`, `[links](url)`, `#` headings, `-` and `1.` lists, `---` rules, and `<u>underline</u>` (markdown has no underline). Anything else in the note is kept as typed. If a note holds something the editor could not write back unchanged, it opens as plain text with a short notice instead, so nothing is ever altered behind your back.
+The quick note is a small rich-text editor (its toolbar is a single Tab stop: use the Left and Right arrow keys to move between its buttons, and screen readers hear "Note 3, empty" when you switch notes with Cmd/Ctrl+1 to 7 and "Saved" when you leave a note you changed): the toolbar (and Cmd/Ctrl+B, I, U, K and Shift+X) makes text bold, italic, underlined or struck through, turns lines into headings, bullets or numbered lists, and adds links, and you see the styling as you type. Type `---` and press Enter for a horizontal line. The file is still plain markdown: `**bold**`, `*italic*`, `~~strike~~`, `[links](url)`, `#` headings, `-` and `1.` lists, `---` rules, and `<u>underline</u>` (markdown has no underline). Anything else in the note is kept as typed. If a note holds something the editor could not write back unchanged, it opens as plain text with a short notice instead, so nothing is ever altered behind your back.
 
 By default these live in `genkan/data/`. Change the **Data folder** setting to put them elsewhere.
 
@@ -93,7 +93,7 @@ Each device remembers its own layout, so a phone and a laptop can differ. On a p
 - A device that saves older settings never overwrites a newer shared layout.
 
 ### Calendar and daily notes
-Click a day to open that day's note, creating it if it does not exist. Genkan uses your Daily Notes or Periodic Notes settings for the folder, date format and template, or the **Daily notes folder** setting if you set one. A dot marks days that have a note.
+Click a day to open that day's note, creating it if it does not exist. Genkan uses your Daily Notes or Periodic Notes settings for the folder, date format and template, or the **Daily notes folder** setting if you set one. A dot marks days that have a note. With the keyboard, Tab to the month, move between days with the arrow keys (Home and End jump to the first and last day) and press Enter to open one; each day is announced with its full date and whether it has a note.
 
 ### Quick links
 Edit them in settings, one per line: `icon | label | action`, where the action is `command:<command id>`, `open:<note path>`, `daily`, `random` or an `https://` address.
@@ -119,7 +119,7 @@ Newest first. Click an entry to open it. The card updates live as the ring saves
 Genkan aims to meet WCAG 2.2 level AA and is used with a keyboard and screen readers in mind.
 
 - **Structure:** the greeting is the page heading, each card has a heading and is a named region, and On this day's periods are sub-headings, so a screen reader can jump between them. Decorative emoji and icons are hidden from screen readers.
-- **Controls:** everything works from the keyboard and shows a visible focus ring. Tasks are checkboxes named for the task, the Tasks filter and the quick-note dots are tab lists, favourites are two real buttons (open and remove), and the clock is read once a minute rather than every second.
+- **Controls:** everything works from the keyboard and shows a visible focus ring. The calendar is a grid with one Tab stop and arrow-key movement, the quick-note toolbar is one Tab stop, and search announces how many results it found. Tasks are checkboxes named for the task, the Tasks filter and the quick-note dots are tab lists, favourites are two real buttons (open and remove), and the clock is read once a minute rather than every second.
 - **Text and targets:** text meets the 4.5:1 contrast minimum in both themes, and controls are at least 24 by 24 pixels (larger on phones and tablets).
 - **No drag required:** arranging cards also works with buttons and the keyboard, and each step is announced.
 - **Motion:** animations respect your system's reduced-motion setting.

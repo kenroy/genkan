@@ -551,10 +551,16 @@ body {
 }
 
 .cal-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 4px;
+}
+
+.cal-row {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 3px;
-    margin-top: 4px;
 }
 
 .cal-dow {

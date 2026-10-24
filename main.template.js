@@ -1155,7 +1155,8 @@ function buildDashboard() {
         h("button", { type: "button", cls: "search-clear hidden", id: "search-clear", title: T("Clear search"), "aria-label": T("Clear search") }, iconNode("clear")),
         h("kbd", { cls: "search-kbd", id: "search-kbd", "aria-hidden": "true", text: "/" }),
       ),
-      h("div", { cls: "search-results hidden", id: "search-results", role: "listbox", "aria-label": T("Search results") }),
+      h("div", { cls: "search-results hidden", id: "search-results" }),
+      h("div", { cls: "sr-only", id: "search-live", role: "status", "aria-live": "polite" }),
     ),
   );
 
@@ -1206,7 +1207,8 @@ function buildDashboard() {
           h("button", { cls: "cal-btn", id: "cal-next", title: T("Next month"), "aria-label": T("Next month"), text: "›" }),
         ),
       ),
-      h("div", { cls: "cal-grid", id: "cal-grid", role: "grid", "aria-label": T("Calendar") }),
+      h("div", { cls: "cal-grid", id: "cal-grid", role: "grid", "aria-label": T("Calendar"), "aria-describedby": "cal-hint" }),
+      h("span", { cls: "sr-only", id: "cal-hint", text: T("Use the arrow keys to move between days.") }),
       h("button", { cls: "today-btn", id: "cal-today", text: T("Today") }),
     ),
     h("section", { cls: "card", id: "links-card", "aria-labelledby": "links-card-title" },
@@ -1356,6 +1358,7 @@ function buildDashboard() {
         h("textarea", { id: "quick-note", cls: "hidden", placeholder: T("Jot something down…"), spellcheck: "true", "aria-label": T("Quick note {n}", { n: 1 }) }),
         h("div", { cls: "note-hint hidden", id: "note-hint", text: T("This note has formatting the editor can't show, so it appears as plain text.") }),
         h("div", { cls: "note-footer" }, h("span", { cls: "note-stats", id: "note-stats" }), h("span", { cls: "note-saved", id: "note-saved" })),
+        h("div", { cls: "sr-only", id: "note-live", role: "status", "aria-live": "polite" }),
       ),
     ),
   );
@@ -1870,6 +1873,23 @@ class HomepageView extends ItemView {
       }
       this.renderCalendar();
     });
+    this.$("cal-grid").addEventListener("keydown", (e) => {
+      const btn = e.target.closest?.("button.cal-day");
+      if (!btn || e.altKey || e.ctrlKey || e.metaKey) return;
+      const days = [...this.$("cal-grid").querySelectorAll("button.cal-day")];
+      const i = days.indexOf(btn);
+      const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key];
+      const to = e.key === "Home" ? 0 : e.key === "End" ? days.length - 1 : step == null ? null : Math.max(0, Math.min(days.length - 1, i + step));
+      if (to == null) return;
+      e.preventDefault();
+      days.forEach((b, n) => (b.tabIndex = n === to ? 0 : -1));
+      days[to].focus();
+    });
+    this.$("cal-grid").addEventListener("focusin", (e) => {
+      const btn = e.target.closest?.("button.cal-day");
+      if (!btn) return;
+      for (const b of this.$("cal-grid").querySelectorAll("button.cal-day")) b.tabIndex = b === btn ? 0 : -1;
+    });
     this.$("cal-today").addEventListener("click", () => {
       const now = new Date();
       this.calYear = now.getFullYear();
@@ -1887,13 +1907,16 @@ class HomepageView extends ItemView {
 
     const ws = this.settings.weekStart === "auto" ? localeWeekStart() : Number(this.settings.weekStart);
     const grid = this.$("cal-grid");
+    // Keep keyboard focus on the same day across a redraw (opening a new daily note redraws)
+    const focusedDay = grid.contains(document.activeElement) ? document.activeElement.dataset.day : null;
     grid.empty();
+    grid.setAttribute("aria-label", this.$("cal-month-label").textContent);
+    const full = (date) => fmtDate(date, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+    let current = null;
+    const header = grid.appendChild(h("div", { cls: "cal-row", role: "row" }));
     for (let i = 0; i < 7; i++) {
-      const cell = document.createElement("div");
-      cell.className = "cal-dow";
-      // 1 Jan 2023 was a Sunday
-      cell.textContent = fmtDate(new Date(2023, 0, 1 + ((ws + i) % 7)), { weekday: "short" }).slice(0, 2);
-      grid.appendChild(cell);
+      const dow = new Date(2023, 0, 1 + ((ws + i) % 7)); // 1 Jan 2023 was a Sunday
+      header.appendChild(h("div", { cls: "cal-dow", role: "columnheader", "aria-label": fmtDate(dow, { weekday: "long" }), text: fmtDate(dow, { weekday: "short" }).slice(0, 2) }));
     }
 
     const today = new Date();
@@ -1901,32 +1924,43 @@ class HomepageView extends ItemView {
     const days = new Date(year, month + 1, 0).getDate();
     const prevDays = new Date(year, month, 0).getDate();
 
-    const filler = (n) => {
-      const cell = document.createElement("div");
-      cell.className = "cal-day other-month";
-      cell.textContent = n;
-      grid.appendChild(cell);
+    let placed = 0;
+    const place = (el) => {
+      if (placed++ % 7 === 0) current = grid.appendChild(h("div", { cls: "cal-row", role: "row" }));
+      current.appendChild(el);
     };
-    for (let i = first - 1; i >= 0; i--) filler(prevDays - i);
+    // Days outside the month are shown for context but are not controls
+    const filler = (n, date) => place(h("div", { cls: "cal-day other-month", role: "gridcell", "aria-label": full(date), text: String(n) }));
+    for (let i = first - 1; i >= 0; i--) filler(prevDays - i, new Date(year, month - 1, prevDays - i));
 
+    const buttons = [];
     for (let d = 1; d <= days; d++) {
-      const cell = document.createElement("div");
-      cell.className = "cal-day";
       const date = new Date(year, month, d);
-      if (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-        cell.classList.add("today");
-      }
-      if (this.app.vault.getAbstractFileByPath(this.dailyPath(date))) {
-        cell.classList.add("has-note");
-      }
-      cell.textContent = d;
+      const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+      const hasNote = !!this.app.vault.getAbstractFileByPath(this.dailyPath(date));
+      const cell = h("button", {
+        type: "button",
+        cls: `cal-day${isToday ? " today" : ""}${hasNote ? " has-note" : ""}`,
+        "data-day": String(d),
+        "aria-label": hasNote ? T("{date}, has a note", { date: full(date) }) : full(date),
+        tabindex: "-1",
+        text: String(d),
+      });
+      if (isToday) cell.setAttribute("aria-current", "date");
       cell.addEventListener("click", (e) => this.openDailyNote(date, e));
-      grid.appendChild(cell);
+      buttons.push(cell);
+      place(h("div", { role: "gridcell", cls: "cal-cell" }, cell));
     }
 
     const filled = first + days;
     const remaining = filled % 7 === 0 ? 0 : 7 - (filled % 7);
-    for (let d = 1; d <= remaining; d++) filler(d);
+    for (let d = 1; d <= remaining; d++) filler(d, new Date(year, month + 1, d));
+
+    // One Tab stop for the whole month (today, or the 1st); the arrow keys move between days
+    const isThisMonth = month === today.getMonth() && year === today.getFullYear();
+    const stop = buttons[focusedDay ? Number(focusedDay) - 1 : isThisMonth ? today.getDate() - 1 : 0] || buttons[0];
+    stop.tabIndex = 0;
+    if (focusedDay) stop.focus();
   }
 
   // ── Tasks ──
@@ -2211,8 +2245,8 @@ class HomepageView extends ItemView {
     this.announce(T("Switched to the shared layout."));
   }
 
-  announce(msg) {
-    const el = this.$("arrange-live");
+  announce(msg, id = "arrange-live") {
+    const el = this.$(id);
     if (!el) return;
     el.textContent = "";
     window.setTimeout(() => (el.textContent = msg), 30);
@@ -2589,7 +2623,7 @@ class HomepageView extends ItemView {
     };
     // Flush on blur so switching tabs right after typing never loses text
     const flush = () => {
-      if (this.noteDirty && !this.noteComposing) this.saveNote();
+      if (this.noteDirty && !this.noteComposing) this.saveNote().then(() => this.announce(T("Saved"), "note-live"));
     };
     for (const el of [textarea, rich]) {
       el.addEventListener("input", changed);
@@ -2640,6 +2674,22 @@ class HomepageView extends ItemView {
     // Formatting toolbar. mousedown is cancelled so the click does not take focus (and the
     // selection) away from the note.
     const bar = this.root.querySelector(".note-toolbar");
+    const barButtons = () => Array.from(bar.querySelectorAll("button"));
+    const rove = (btn) => barButtons().forEach((b) => (b.tabIndex = b === btn ? 0 : -1));
+    rove(barButtons()[0]);
+    bar.addEventListener("focusin", (e) => {
+      const b = e.target.closest("button");
+      if (b) rove(b);
+    });
+    bar.addEventListener("keydown", (e) => {
+      const list = barButtons();
+      const i = list.indexOf(document.activeElement);
+      if (i < 0 || e.altKey || e.ctrlKey || e.metaKey) return;
+      const to = e.key === "ArrowRight" ? (i + 1) % list.length : e.key === "ArrowLeft" ? (i - 1 + list.length) % list.length : e.key === "Home" ? 0 : e.key === "End" ? list.length - 1 : null;
+      if (to == null) return;
+      e.preventDefault();
+      list[to].focus();
+    });
     bar.addEventListener("mousedown", (e) => e.preventDefault());
     bar.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-fmt]");
@@ -3066,7 +3116,11 @@ class HomepageView extends ItemView {
     this.root.querySelector(".note-link-row")?.classList.add("hidden");
     this.renderNoteTabs();
     await this.loadNote();
-    if (focus) this.focusNote();
+    if (focus) {
+      this.focusNote();
+      // Focus is already in the editor when the shortcut is used, so say which note it now holds
+      this.announce(this.noteDotLabel(i, !!this.getNoteMd().trim()), "note-live");
+    }
   }
 
   // The dot beside the title: green when saved, amber while there are unsaved changes. Its label
@@ -3553,6 +3607,7 @@ class HomepageView extends ItemView {
     const results = this.$("search-results");
     results.classList.add("hidden");
     results.empty();
+    this.$("search-live").textContent = "";
   }
 
   async runSearch(query) {
@@ -3605,6 +3660,7 @@ class HomepageView extends ItemView {
     if (!hits.length) {
       results.empty();
       results.createDiv({ cls: "search-status", text: T("No results for “{query}”", { query }) });
+      this.$("search-live").textContent = T("No results for “{query}”", { query });
       return;
     }
     hits.sort((a, b) => Number(b.titleHit) - Number(a.titleHit));
@@ -3622,11 +3678,12 @@ class HomepageView extends ItemView {
         h(
           "a",
           { cls: "search-result-item", href: "#", "data-open": f.path, tabindex: "0" },
-          h("span", { cls: "search-result-icon", text: "📄" }),
+          h("span", { cls: "search-result-icon", "aria-hidden": "true", text: "📄" }),
           body,
         ),
       );
     }
+    this.$("search-live").textContent = plural(hits.length, "{n} result", "{n} results");
   }
 
   // ── Hero photo & quote ──
