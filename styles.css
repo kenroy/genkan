@@ -477,8 +477,8 @@
     box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
 }
 .hp-root .cal-day.other-month {
+    
     color: var(--text-3);
-    opacity: 0.5;
 }
 .hp-root .today-btn {
     width: 100%;
@@ -1437,7 +1437,7 @@
     align-items: center;
     gap: 6px;
     max-width: 260px;
-    padding: 6px 8px 6px 12px;
+    padding: 0 6px 0 0; /* the open button carries the left padding, so it fills the pill */
     border: 1px solid var(--border);
     border-radius: 99px;
     background: var(--surface-2);
@@ -1474,8 +1474,8 @@
 }
 
 .hp-root .fav-x {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     padding: 0;
     border: none;
     border-radius: 50%;
@@ -1671,8 +1671,8 @@
 }
 
 #genkan-root .fav-x {
-    width: 18px;
-    height: 18px;
+    width: 24px; /* WCAG 2.2 minimum target size */
+    height: 24px;
 }
 
 /* The round icon buttons: refresh (header, photo, web clips, recent notes), theme and settings */
@@ -2603,4 +2603,80 @@
 
 .hp-root .arrange-actions [hidden] {
   display: none;
+}
+
+/* ============================================================
+   Accessibility structure: headings, favourite chips, focus
+   ============================================================ */
+/* The greeting, card titles and On this day periods are real headings; keep Obsidian's heading
+   spacing and fonts off them so they look as they did */
+#genkan-root h1.greeting,
+#genkan-root h2.card-label,
+#genkan-root h3.otd-period {
+  border: 0;
+  font-family: inherit;
+  font-style: normal;
+  line-height: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+/* A favourite is two real buttons (open, remove) inside a pill, so each has its own name */
+#genkan-root .fav-open {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 99px;
+  box-shadow: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  gap: 6px;
+  height: auto;
+  margin: 0;
+  min-height: 0;
+  min-width: 0;
+  padding: 6px 0 6px 12px;
+}
+
+.hp-root .fav-chip:focus-within {
+  border-color: var(--accent);
+  background: var(--accent-lo);
+}
+
+/* A control that only shows on hover must also show when it has keyboard focus */
+.hp-root .task-item:focus-within .task-del {
+  opacity: 1;
+}
+
+/* The opening quote mark is decoration: give it empty alternative text so it is not read aloud */
+.hp-root .quote-content::before {
+  content: "\201C" / "";
+}
+
+/* The task circle is drawn 20px; its hit area is 24px to meet the WCAG 2.2 minimum target size */
+.hp-root .task-check::after {
+  content: "";
+  inset: -2px;
+  position: absolute;
+}
+
+/* A few small controls get a 24px hit area (WCAG 2.2) without changing how they look */
+#genkan-root #search-input {
+  /* the field is 17px of text inside a taller pill; the negative margin keeps the pill's height */
+  margin: -4px 0;
+  min-height: 25px;
+}
+
+.hp-root .card-link {
+  align-items: center;
+  display: inline-flex;
+  margin: -3px 0;
+  min-height: 24px;
+}
+
+#genkan-root .clear-btn {
+  min-height: 24px;
 }

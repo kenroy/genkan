@@ -1884,7 +1884,10 @@ function markdownToBlocks(md) {
     let m = /^(#{1,6}) (.*)$/.exec(raw);
     if (m) {
       list = null;
-      frag.append(line(`h${m[1].length}`, m[2]));
+      const heading = line(`h${m[1].length}`, m[2]);
+      // Inside a card whose title is an h2, a note's own headings start at level 3
+      heading.setAttribute("aria-level", String(Math.min(6, m[1].length + 2)));
+      frag.append(heading);
       continue;
     }
     m = /^- (.*)$/.exec(raw);
@@ -2405,7 +2408,7 @@ function buildDashboard() {
       "div",
       { cls: "card-title" },
       h("button", { type: "button", cls: "card-toggle", "data-card": cardId, "data-body": bodyId, "data-label": label, "aria-controls": bodyId, "aria-expanded": "true" }),
-      h("span", { cls: "card-label", text: label }),
+      h("h2", { cls: "card-label", id: `${cardId}-title`, text: label }),
     );
   const countRow = (countId, ...extra) =>
     h("div", { cls: "card-header-right" }, h("span", { cls: "badge", id: countId, text: "0" }), ...extra);
@@ -2416,7 +2419,7 @@ function buildDashboard() {
     h(
       "div",
       { cls: "header-top" },
-      h("p", { cls: "greeting", id: "greeting", text: "Hello" }),
+      h("h1", { cls: "greeting", id: "greeting", text: "Hello" }),
       h(
         "div",
         { cls: "header-controls" },
@@ -2432,10 +2435,11 @@ function buildDashboard() {
       h(
         "div",
         { cls: "clock", id: "clock" },
-        h("span", { id: "clock-main", text: "12:00" }),
-        h("span", { id: "clock-sec", text: ":00" }),
+        h("span", { id: "clock-main", "aria-hidden": "true", text: "12:00" }),
+        h("span", { id: "clock-sec", "aria-hidden": "true", text: ":00" }),
         " ",
-        h("span", { id: "clock-ampm", text: "AM" }),
+        h("span", { id: "clock-ampm", "aria-hidden": "true", text: "AM" }),
+        h("span", { cls: "sr-only", id: "clock-sr" }),
       ),
       h("div", { cls: "clock-date", id: "clock-date" }),
     ),
@@ -2448,7 +2452,7 @@ function buildDashboard() {
         iconNode("search"),
         h("input", { type: "search", id: "search-input", placeholder: T("Search your vault…"), spellcheck: "false", "aria-label": T("Search your vault") }),
         h("button", { type: "button", cls: "search-clear hidden", id: "search-clear", title: T("Clear search"), "aria-label": T("Clear search") }, iconNode("clear")),
-        h("kbd", { cls: "search-kbd", id: "search-kbd", text: "/" }),
+        h("kbd", { cls: "search-kbd", id: "search-kbd", "aria-hidden": "true", text: "/" }),
       ),
       h("div", { cls: "search-results hidden", id: "search-results", role: "listbox", "aria-label": T("Search results") }),
     ),
@@ -2480,23 +2484,19 @@ function buildDashboard() {
     h("div", { cls: "quote-credit hidden", id: "quote-credit" }),
   );
 
-  const favs = h(
-    "div",
-    { cls: "card favs-card", id: "favs-card" },
-    h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: T("Favourites") })),
+  const favs = h("section", { cls: "card favs-card", id: "favs-card", "aria-labelledby": "favs-card-title" },
+    h("div", { cls: "card-header" }, h("h2", { cls: "card-label", id: "favs-card-title", text: T("Favourites") })),
     h("div", { cls: "favs-list", id: "favs-list" }),
   );
 
   const left = h(
-    "aside",
+    "div",
     { cls: "col col-left zone", "data-zone": "left" },
-    h(
-      "div",
-      { cls: "card", id: "calendar-card" },
+    h("section", { cls: "card", id: "calendar-card", "aria-labelledby": "calendar-card-title" },
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: T("Calendar") }),
+        h("h2", { cls: "card-label", id: "calendar-card-title", text: T("Calendar") }),
         h(
           "div",
           { cls: "cal-nav" },
@@ -2508,20 +2508,16 @@ function buildDashboard() {
       h("div", { cls: "cal-grid", id: "cal-grid", role: "grid", "aria-label": T("Calendar") }),
       h("button", { cls: "today-btn", id: "cal-today", text: T("Today") }),
     ),
-    h(
-      "div",
-      { cls: "card", id: "links-card" },
-      h("div", { cls: "card-header" }, h("span", { cls: "card-label", text: T("Quick links") })),
+    h("section", { cls: "card", id: "links-card", "aria-labelledby": "links-card-title" },
+      h("div", { cls: "card-header" }, h("h2", { cls: "card-label", id: "links-card-title", text: T("Quick links") })),
       h("nav", { id: "quick-links", "aria-label": T("Quick links") }),
     ),
   );
 
   const center = h(
-    "main",
+    "div",
     { cls: "col col-center zone", "data-zone": "center" },
-    h(
-      "div",
-      { cls: "card hidden", id: "ring-card" },
+    h("section", { cls: "card hidden", id: "ring-card", "aria-labelledby": "ring-card-title" },
       h(
         "div",
         { cls: "card-header" },
@@ -2530,9 +2526,7 @@ function buildDashboard() {
       ),
       h("div", { id: "ring-body" }),
     ),
-    h(
-      "div",
-      { cls: "card", id: "clips-card" },
+    h("section", { cls: "card", id: "clips-card", "aria-labelledby": "clips-card-title" },
       h(
         "div",
         { cls: "card-header" },
@@ -2541,9 +2535,7 @@ function buildDashboard() {
       ),
       h("div", { id: "clips-body" }),
     ),
-    h(
-      "div",
-      { cls: "card", id: "recent-card" },
+    h("section", { cls: "card", id: "recent-card", "aria-labelledby": "recent-card-title" },
       h(
         "div",
         { cls: "card-header" },
@@ -2552,9 +2544,7 @@ function buildDashboard() {
       ),
       h("div", { id: "recent-body" }),
     ),
-    h(
-      "div",
-      { cls: "card hidden", id: "otd-card" },
+    h("section", { cls: "card hidden", id: "otd-card", "aria-labelledby": "otd-card-title" },
       h("div", { cls: "card-header" }, cardTitle("otd-card", "otd-body", T("On this day")), countRow("otd-count")),
       h("div", { id: "otd-body" }),
     ),
@@ -2593,15 +2583,13 @@ function buildDashboard() {
   const tab = (filter, label, active) =>
     h("button", { cls: active ? "tab active" : "tab", "data-filter": filter, role: "tab", "aria-selected": active ? "true" : "false", text: label });
   const right = h(
-    "aside",
+    "div",
     { cls: "col col-right zone", "data-zone": "right" },
-    h(
-      "div",
-      { cls: "card", id: "tasks-card" },
+    h("section", { cls: "card", id: "tasks-card", "aria-labelledby": "tasks-card-title" },
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: T("Tasks") }),
+        h("h2", { cls: "card-label", id: "tasks-card-title", text: T("Tasks") }),
         h("span", { cls: "tasks-stats", id: "tasks-stats", "aria-live": "polite", text: "0 / 0" }),
       ),
       h("input", { type: "text", cls: "task-input", id: "task-input", placeholder: T("Add a task and press Enter…"), "aria-label": T("New task") }),
@@ -2615,13 +2603,11 @@ function buildDashboard() {
       h("div", { id: "tasks-list", role: "list" }),
       h("button", { cls: "clear-btn", id: "clear-done", text: T("Clear completed") }),
     ),
-    h(
-      "div",
-      { cls: "card", id: "note-card" },
+    h("section", { cls: "card", id: "note-card", "aria-labelledby": "note-card-title" },
       h(
         "div",
         { cls: "card-header" },
-        h("span", { cls: "card-label", text: T("Quick notes") }),
+        h("h2", { cls: "card-label", id: "note-card-title", text: T("Quick notes") }),
         h("span", { cls: "autosave-dot", id: "autosave-dot", title: T("Saved"), "aria-label": T("Saved") }),
       ),
       h(
@@ -2685,7 +2671,7 @@ function buildDashboard() {
     h("div", { cls: "arrange-actions" }, h("button", { type: "button", cls: "btn-secondary", id: "arrange-use-shared", hidden: "", text: T("Use the shared layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-push", text: T("Use on all my devices") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-reset", text: T("Reset layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-done", text: T("Done") })),
   );
   const topZone = h("div", { cls: "zone zone-top", "data-zone": "top" }, favs);
-  return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, hero, quote, banner, topZone, h("div", { cls: "grid" }, left, center, right)), h("div", { cls: "sr-only", id: "arrange-live", role: "status", "aria-live": "polite" })];
+  return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, hero, quote, banner, topZone, h("main", { cls: "grid" }, left, center, right)), h("div", { cls: "sr-only", id: "arrange-live", role: "status", "aria-live": "polite" })];
 }
 
 class HomepageView extends ItemView {
@@ -2767,7 +2753,7 @@ class HomepageView extends ItemView {
   buildUi() {
     this.root?.remove();
     // The id lets our control resets win over Obsidian's button/input styles without !important
-    this.root = this.contentEl.createDiv({ cls: "hp-root", attr: { id: "genkan-root" } });
+    this.root = this.contentEl.createDiv({ cls: "hp-root", attr: { id: "genkan-root", lang: LANG } });
     this.root.append(...buildDashboard());
     if (Platform.isMobile) this.$("search-kbd").classList.add("hidden");
 
@@ -2997,7 +2983,7 @@ class HomepageView extends ItemView {
     sections.forEach((s, i) => {
       const withYear = s.key === "year" || s.date.getFullYear() !== now.getFullYear();
       const when = fmtDate(s.date, { weekday: "short", month: "short", day: "numeric", ...(withYear ? { year: "numeric" } : {}) });
-      body.append(h("div", { cls: i ? "otd-when" : "otd-when first" }, h("span", { cls: "otd-period", text: T(label[s.key]) }), h("span", { cls: "otd-date", text: when })));
+      body.append(h("div", { cls: i ? "otd-when" : "otd-when first" }, h("h3", { cls: "otd-period", text: T(label[s.key]) }), h("span", { cls: "otd-date", text: when })));
       if (!s.list.length) {
         body.append(h("div", { cls: "otd-none", text: T("Nothing from this date") }));
         return;
@@ -3009,7 +2995,7 @@ class HomepageView extends ItemView {
           h(
             "a",
             { cls: "note-item", href: "#", "data-open": f.path },
-            h("span", { cls: "note-icon", text: "📄" }),
+            h("span", { cls: "note-icon", "aria-hidden": "true", text: "📄" }),
             h("div", { cls: "note-info" }, h("div", { cls: "note-title-row" }, h("span", { cls: "note-title", text: f.basename })), h("span", { cls: "note-path", text: text || folder })),
           ),
         );
@@ -3104,6 +3090,10 @@ class HomepageView extends ItemView {
       ampm.classList.add("hidden");
     }
     this.$("clock-sec").textContent = `:${pad(now.getSeconds())}`;
+    // The visible digits are hidden from screen readers; they get the time once a minute instead
+    const spoken = ampm.classList.contains("hidden") ? main.textContent : `${main.textContent} ${ampm.textContent}`;
+    const sr = this.$("clock-sr");
+    if (sr.textContent !== spoken) sr.textContent = spoken;
 
     if (now.getSeconds() === 0 && this.noteIndex) this.updateNoteSaved();
     if (force || now.getSeconds() === 0 || !this.$("clock-date").textContent) {
@@ -3355,8 +3345,12 @@ class HomepageView extends ItemView {
     list.empty();
     for (const task of filtered) {
       const check = h("button", {
+        type: "button",
         cls: task.done ? "task-check checked" : "task-check",
-        "aria-label": task.done ? T("Mark incomplete") : T("Mark complete"),
+        role: "checkbox",
+        "aria-checked": String(!!task.done),
+        "aria-label": task.text,
+        title: task.done ? T("Mark incomplete") : T("Mark complete"),
       });
       setIconSvg(check, task.done ? "check" : null);
       check.addEventListener("click", () => this.toggleTask(task.id));
@@ -4453,7 +4447,7 @@ class HomepageView extends ItemView {
         h(
           "a",
           { cls: "quick-link", href: "#", "data-ql": String(i) },
-          h("span", { cls: "ql-icon", text: l.icon ?? "" }),
+          h("span", { cls: "ql-icon", "aria-hidden": "true", text: l.icon ?? "" }),
           h("span", { text: quickLinkLabel(l) }),
         ),
       ),
@@ -4644,13 +4638,15 @@ class HomepageView extends ItemView {
           {
             cls: file ? "fav-chip" : "fav-chip missing",
             "data-fav": f.target,
-            title: file ? file.path : T("Not found — click to create"),
-            role: "button",
-            tabindex: "0",
           },
-          h("span", { cls: "fav-star", text: "★" }),
-          h("span", { cls: "fav-name", text: label }),
+          h(
+            "button",
+            { type: "button", cls: "fav-open", title: file ? file.path : T("Not found — click to create") },
+            h("span", { cls: "fav-star", "aria-hidden": "true", text: "★" }),
+            h("span", { cls: "fav-name", text: label }),
+          ),
           h("button", {
+            type: "button",
             cls: "fav-x",
             "data-fav-remove": f.target,
             title: T("Remove from favourites"),
@@ -4669,15 +4665,6 @@ class HomepageView extends ItemView {
         }),
       );
     }
-    // Keyboard: Enter/Space activate a chip
-    list.querySelectorAll(".fav-chip").forEach((chip) =>
-      chip.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          chip.click();
-        }
-      }),
-    );
   }
 
   // ── Web Clips & Recent Notes ──
@@ -4781,7 +4768,7 @@ class HomepageView extends ItemView {
         h("div", { cls: "note-title-row" }, h("span", { cls: "note-title", text: f.basename }), h("span", { cls: "note-date", text: date })),
       );
       if (folder) info.append(h("span", { cls: "note-path", text: folder }));
-      list.append(h("a", { cls: "note-item", href: "#", "data-open": f.path }, h("span", { cls: "note-icon", text: "📄" }), info));
+      list.append(h("a", { cls: "note-item", href: "#", "data-open": f.path }, h("span", { cls: "note-icon", "aria-hidden": "true", text: "📄" }), info));
     }
   }
 

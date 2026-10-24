@@ -114,6 +114,18 @@ Turn on **Pebble ring notes**, then set **Where does the ring save notes?** to m
 
 Newest first. Click an entry to open it. The card updates live as the ring saves notes, and **Max ring notes** sets how many are shown.
 
+## Accessibility
+
+Genkan aims to meet WCAG 2.2 level AA and is used with a keyboard and screen readers in mind.
+
+- **Structure:** the greeting is the page heading, each card has a heading and is a named region, and On this day's periods are sub-headings, so a screen reader can jump between them. Decorative emoji and icons are hidden from screen readers.
+- **Controls:** everything works from the keyboard and shows a visible focus ring. Tasks are checkboxes named for the task, the Tasks filter and the quick-note dots are tab lists, favourites are two real buttons (open and remove), and the clock is read once a minute rather than every second.
+- **Text and targets:** text meets the 4.5:1 contrast minimum in both themes, and controls are at least 24 by 24 pixels (larger on phones and tablets).
+- **No drag required:** arranging cards also works with buttons and the keyboard, and each step is announced.
+- **Motion:** animations respect your system's reduced-motion setting.
+
+Genkan has not been reviewed with every screen reader. If you find a barrier, please open an issue.
+
 ## Languages and regions
 
 Genkan is available in English, French, Spanish, German and Japanese. By default it follows Obsidian's own language setting (Settings → General → Language); the **Language** setting in Genkan overrides it. Other Obsidian languages fall back to English.

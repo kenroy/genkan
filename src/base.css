@@ -596,8 +596,8 @@ body {
 }
 
 .cal-day.other-month {
+    /* a lighter colour rather than opacity: faded text fell below the 4.5:1 contrast minimum */
     color: var(--text-3);
-    opacity: 0.5;
 }
 
 .today-btn {
