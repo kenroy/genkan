@@ -121,10 +121,12 @@ Genkan aims to meet WCAG 2.2 level AA and is used with a keyboard and screen rea
 - **Structure:** the greeting is the page heading, each card has a heading and is a named region, and On this day's periods are sub-headings, so a screen reader can jump between them. Decorative emoji and icons are hidden from screen readers.
 - **Controls:** everything works from the keyboard and shows a visible focus ring. The calendar is a grid with one Tab stop and arrow-key movement, the quick-note toolbar is one Tab stop, and search announces how many results it found. Tasks are checkboxes named for the task, the Tasks filter and the quick-note dots are tab lists, favourites are two real buttons (open and remove), and the clock is read once a minute rather than every second.
 - **Text and targets:** text meets the 4.5:1 contrast minimum in both themes, and controls are at least 24 by 24 pixels (larger on phones and tablets).
+- **Announcements:** switching quick notes with Cmd/Ctrl+1 to 7 says which note you are on, "Saved" is announced when you leave a note you changed, and moving a card or sharing a layout is announced.
 - **No drag required:** arranging cards also works with buttons and the keyboard, and each step is announced.
 - **Motion:** animations respect your system's reduced-motion setting.
+- **Language:** the dashboard is tagged with the language it is shown in, so a screen reader pronounces it correctly even when Genkan's language differs from Obsidian's.
 
-Genkan has not been reviewed with every screen reader. If you find a barrier, please open an issue.
+**Known gaps.** Genkan has not yet been tested with a screen reader or at 200% and 400% zoom, so those results are unconfirmed. Note titles and previews are your own text and are not tagged with their own language. A few small labels are 10 to 11 pixels, which meet the contrast minimum but are hard to read. If you find a barrier, please open an issue.
 
 ## Languages and regions
 
