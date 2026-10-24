@@ -112,7 +112,7 @@ Turn on **Pebble ring notes**, then set **Where does the ring save notes?** to m
 | An existing note | An existing note I choose | The note you pick (with autocomplete). Same heading format; other sections of the note are ignored |
 | A separate file for each note | A separate file for each note | Every note in the folder you pick (default `Pebble Index`; use the subfolder you chose in the app). Each note's time comes from its frontmatter (`created: 2026-10-11T00:21`, also `date`, `timestamp`, …), else its file name (`2026-10-11 0021`, `2026-10-11 09-15`, …), else when it was created |
 
-Newest first. Click an entry to open it. The card updates live as the ring saves notes, and **Max ring notes** sets how many are shown. The count in the corner is the total number of notes, so when more exist than are shown, **View all N** appears under the list. With one note per file, it and **Open folder** show the folder in the file explorer; with one note holding every entry, **Open** (and **View all N**) open that note.
+Newest first. Click an entry to open it. The card updates live as the ring saves notes, and **Max ring notes** sets how many are shown; the count in the corner is that number. When more exist than are shown, **View all N notes** appears under the list: with one note per file it opens your ring notes folder in the file explorer so you can see every note, and with one note holding every entry it opens that note.
 
 ## Accessibility
 
