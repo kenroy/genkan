@@ -12,7 +12,7 @@ Genkan (玄関) is the entryway of a Japanese home: the place you step in. This 
 - Cards in the middle column that fold down to their title
 - **Arrange cards**: drag the cards into the order and columns you want, and share the layout with your other devices
 - **On this day**: an optional card with notes from this date a week, a month and a year ago
-- **Time tracker**: an optional card for timing work on projects and tasks, with time allocations, a weekly summary and CSV, Excel or PDF reports
+- **Time tracker**: an optional card for timing work on projects and tasks, with time allocations, a weekly summary, a running timer in the status bar, and CSV, Excel or PDF reports
 - **Ring notes**: an optional card for voice notes from a Pebble Index ring
 - A photo of the day and a daily quote (both optional)
 
@@ -143,7 +143,7 @@ Genkan aims to meet WCAG 2.2 level AA and is used with a keyboard and screen rea
 - **Text and targets:** text meets the 4.5:1 contrast minimum in both themes, and controls are at least 24 by 24 pixels (larger on phones and tablets).
 - **Announcements:** switching quick notes with Cmd/Ctrl+1 to 7 says which note you are on, "Saved" is announced when you leave a note you changed, and moving a card or sharing a layout is announced.
 - **No drag required:** arranging cards also works with buttons and the keyboard, and each step is announced.
-- **Time tracker:** each view has a heading, projects and tasks are lists, every timer button names its task ("Pause timer: Homepage wireframes"), and starting, pausing and stopping are announced. Budgets are written out as well as drawn, and deleting asks you to confirm.
+- **Time tracker:** each view has a heading, projects and tasks are lists, every timer button names its task ("Pause timer: Homepage wireframes"), and starting, pausing and stopping are announced. The status bar timer is a button you can reach with Tab and open with Enter or Space, named for the task it is timing (the ticking seconds are not read out). Budgets are written out as well as drawn, and deleting asks you to confirm.
 - **Motion:** animations respect your system's reduced-motion setting.
 - **Language:** the dashboard is tagged with the language it is shown in, so a screen reader pronounces it correctly even when Genkan's language differs from Obsidian's.
 
