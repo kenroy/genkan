@@ -3368,3 +3368,34 @@
 #genkan-root[data-theme="dark"] .tt-warn.armed {
   color: #f87171;
 }
+
+.hp-root .tt-manual {
+  margin: 4px 0 8px;
+}
+
+.hp-root .tt-manual summary {
+  color: var(--accent-txt);
+  cursor: pointer;
+  font-size: 12px;
+  min-height: 24px;
+  padding: 3px 0;
+}
+
+.hp-root .tt-manual-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 6px;
+}
+
+.hp-root .tt-msg {
+  min-height: 14px;
+}
+
+#genkan-root[data-theme="light"] .tt-msg {
+  color: #b91c1c;
+}
+
+#genkan-root[data-theme="dark"] .tt-msg {
+  color: #f87171;
+}

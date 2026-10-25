@@ -578,6 +578,12 @@ const I18N = {
     "Unsaved changes": "Modifications non enregistrées",
     "Quick note {n}": "Note rapide {n}",
     "Collapse {name}": "Réduire {name}",
+    "Add time": "Ajouter du temps",
+    "Add time manually": "Ajouter du temps manuellement",
+    "Choose a day, a start time and an end time.": "Choisissez un jour, une heure de début et une heure de fin.",
+    "The end time must be after the start time.": "L’heure de fin doit être postérieure à l’heure de début.",
+    "That time is in the future.": "Cette heure est dans le futur.",
+    "Added {time} to {task}": "{time} ajouté à {task}",
     "Could not save the time tracker's data.": "Impossible d’enregistrer les données du suivi du temps.",
     "Budget, all time": "Budget, tout le temps",
     "Add a task and press Enter": "Ajoutez une tâche et appuyez sur Entrée",
@@ -941,6 +947,12 @@ const I18N = {
     "Unsaved changes": "Cambios sin guardar",
     "Quick note {n}": "Nota rápida {n}",
     "Collapse {name}": "Contraer {name}",
+    "Add time": "Añadir tiempo",
+    "Add time manually": "Añadir tiempo manualmente",
+    "Choose a day, a start time and an end time.": "Elige un día, una hora de inicio y una de fin.",
+    "The end time must be after the start time.": "La hora de fin debe ser posterior a la de inicio.",
+    "That time is in the future.": "Esa hora está en el futuro.",
+    "Added {time} to {task}": "{time} añadido a {task}",
     "Could not save the time tracker's data.": "No se pudieron guardar los datos del control de tiempo.",
     "Budget, all time": "Presupuesto, total acumulado",
     "Add a task and press Enter": "Añade una tarea y pulsa Intro",
@@ -1304,6 +1316,12 @@ const I18N = {
     "Unsaved changes": "Ungespeicherte Änderungen",
     "Quick note {n}": "Schnellnotiz {n}",
     "Collapse {name}": "{name} einklappen",
+    "Add time": "Zeit hinzufügen",
+    "Add time manually": "Zeit manuell hinzufügen",
+    "Choose a day, a start time and an end time.": "Wählen Sie einen Tag sowie eine Start- und eine Endzeit.",
+    "The end time must be after the start time.": "Die Endzeit muss nach der Startzeit liegen.",
+    "That time is in the future.": "Diese Zeit liegt in der Zukunft.",
+    "Added {time} to {task}": "{time} zu {task} hinzugefügt",
     "Could not save the time tracker's data.": "Die Daten der Zeiterfassung konnten nicht gespeichert werden.",
     "Budget, all time": "Budget, gesamte Zeit",
     "Add a task and press Enter": "Aufgabe hinzufügen und Eingabetaste drücken",
@@ -1669,6 +1687,12 @@ const I18N = {
     "Unsaved changes": "未保存の変更",
     "Quick note {n}": "クイックメモ {n}",
     "Collapse {name}": "{name} を折りたたむ",
+    "Add time": "時間を追加",
+    "Add time manually": "手動で時間を追加",
+    "Choose a day, a start time and an end time.": "日付、開始時刻、終了時刻を指定してください。",
+    "The end time must be after the start time.": "終了時刻は開始時刻より後にしてください。",
+    "That time is in the future.": "その時刻は未来です。",
+    "Added {time} to {task}": "{task} に {time} を追加しました",
     "Could not save the time tracker's data.": "タイムトラッカーのデータを保存できませんでした。",
     "Budget, all time": "予算 (累計)",
     "Add a task and press Enter": "タスクを追加して Enter を押す",
@@ -3528,6 +3552,16 @@ class TimeStore {
     this.commit(origin);
   }
 
+  // Time entered by hand for a timer that was never started
+  addSession(tid, from, to, origin) {
+    const t = this.task(tid);
+    if (!t || !(to > from)) return null;
+    const s = this.stamp({ id: newId(), tid, s: from, e: to, u: 0, del: 0 });
+    this.data.sessions.push(s);
+    this.commit(origin);
+    return s;
+  }
+
   closeSession(s, at) {
     s.e = Math.max(s.s, at);
     this.stamp(s);
@@ -4093,6 +4127,7 @@ class TimeTrackerUI {
 
   go(screen, focus = true) {
     this.screen = screen;
+    this.manualOpen = false;
     this.focusHeading = focus;
     this.render();
   }
@@ -4425,7 +4460,7 @@ class TimeTrackerUI {
 
     // Sessions
     const sessions = st.sessions(t.id).sort((a, b) => b.s - a.s);
-    body.append(h("h4", { cls: "tt-sub-head", text: T("Sessions") }));
+    body.append(h("h4", { cls: "tt-sub-head", text: T("Sessions") }), this.manualForm(t));
     const list = h("div", { cls: "tt-list", role: "list", "aria-label": T("Sessions") });
     if (!sessions.length) list.append(h("div", { cls: "hp-empty", text: T("No sessions") }));
     for (const s of sessions.slice(0, 50)) {
@@ -4445,6 +4480,39 @@ class TimeTrackerUI {
       this.say(T("Deleted task {name}", { name: t.name }));
       this.go({ name: "project", pid: t.pid });
     }, true)));
+  }
+
+  // For a forgotten timer: a day, a start and an end
+  manualForm(t) {
+    const day = ttIso(this.now());
+    const date = h("input", { type: "date", cls: "tt-input", id: "tt-md", "data-k": "md", max: day });
+    date.value = day;
+    const from = h("input", { type: "time", cls: "tt-input", id: "tt-ms", "data-k": "ms" });
+    const to = h("input", { type: "time", cls: "tt-input", id: "tt-me", "data-k": "me" });
+    const msg = h("div", { cls: "tt-sub tt-msg", role: "alert" });
+    const when = (d, v) => {
+      const base = ttParseDay(d);
+      const m = /^(\d{2}):(\d{2})$/.exec(v || "");
+      return base == null || !m ? null : new Date(new Date(base).getFullYear(), new Date(base).getMonth(), new Date(base).getDate(), Number(m[1]), Number(m[2])).getTime();
+    };
+    const add = this.btn(T("Add time"), "madd", () => {
+      const a = when(date.value, from.value);
+      const b = when(date.value, to.value);
+      msg.textContent = "";
+      if (a == null || b == null) msg.textContent = T("Choose a day, a start time and an end time.");
+      else if (b <= a) msg.textContent = T("The end time must be after the start time.");
+      else if (b > this.now()) msg.textContent = T("That time is in the future.");
+      else {
+        this.store.addSession(t.id, a, b, this);
+        this.say(T("Added {time} to {task}", { time: ttHM((b - a) / 1000), task: t.name }));
+        this.act("madd", () => {});
+      }
+    }, { cls: "tt-btn tt-text" });
+    const field = (label, control, id) => h("div", { cls: "tt-field" }, h("label", { for: id, text: label }), control);
+    const box = h("details", { cls: "tt-manual" }, h("summary", { text: T("Add time manually") }), h("div", { cls: "tt-manual-body" }, field(T("Date"), date, "tt-md"), h("div", { cls: "tt-dates" }, field(T("Start"), from, "tt-ms"), field(T("End"), to, "tt-me")), msg, add));
+    box.open = !!this.manualOpen; // stays open while you add several
+    box.addEventListener("toggle", () => (this.manualOpen = box.open));
+    return box;
   }
 
   // A button that asks once more before it acts

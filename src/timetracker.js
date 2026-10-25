@@ -329,6 +329,16 @@ class TimeStore {
     this.commit(origin);
   }
 
+  // Time entered by hand for a timer that was never started
+  addSession(tid, from, to, origin) {
+    const t = this.task(tid);
+    if (!t || !(to > from)) return null;
+    const s = this.stamp({ id: newId(), tid, s: from, e: to, u: 0, del: 0 });
+    this.data.sessions.push(s);
+    this.commit(origin);
+    return s;
+  }
+
   closeSession(s, at) {
     s.e = Math.max(s.s, at);
     this.stamp(s);
@@ -894,6 +904,7 @@ class TimeTrackerUI {
 
   go(screen, focus = true) {
     this.screen = screen;
+    this.manualOpen = false;
     this.focusHeading = focus;
     this.render();
   }
@@ -1226,7 +1237,7 @@ class TimeTrackerUI {
 
     // Sessions
     const sessions = st.sessions(t.id).sort((a, b) => b.s - a.s);
-    body.append(h("h4", { cls: "tt-sub-head", text: T("Sessions") }));
+    body.append(h("h4", { cls: "tt-sub-head", text: T("Sessions") }), this.manualForm(t));
     const list = h("div", { cls: "tt-list", role: "list", "aria-label": T("Sessions") });
     if (!sessions.length) list.append(h("div", { cls: "hp-empty", text: T("No sessions") }));
     for (const s of sessions.slice(0, 50)) {
@@ -1246,6 +1257,39 @@ class TimeTrackerUI {
       this.say(T("Deleted task {name}", { name: t.name }));
       this.go({ name: "project", pid: t.pid });
     }, true)));
+  }
+
+  // For a forgotten timer: a day, a start and an end
+  manualForm(t) {
+    const day = ttIso(this.now());
+    const date = h("input", { type: "date", cls: "tt-input", id: "tt-md", "data-k": "md", max: day });
+    date.value = day;
+    const from = h("input", { type: "time", cls: "tt-input", id: "tt-ms", "data-k": "ms" });
+    const to = h("input", { type: "time", cls: "tt-input", id: "tt-me", "data-k": "me" });
+    const msg = h("div", { cls: "tt-sub tt-msg", role: "alert" });
+    const when = (d, v) => {
+      const base = ttParseDay(d);
+      const m = /^(\d{2}):(\d{2})$/.exec(v || "");
+      return base == null || !m ? null : new Date(new Date(base).getFullYear(), new Date(base).getMonth(), new Date(base).getDate(), Number(m[1]), Number(m[2])).getTime();
+    };
+    const add = this.btn(T("Add time"), "madd", () => {
+      const a = when(date.value, from.value);
+      const b = when(date.value, to.value);
+      msg.textContent = "";
+      if (a == null || b == null) msg.textContent = T("Choose a day, a start time and an end time.");
+      else if (b <= a) msg.textContent = T("The end time must be after the start time.");
+      else if (b > this.now()) msg.textContent = T("That time is in the future.");
+      else {
+        this.store.addSession(t.id, a, b, this);
+        this.say(T("Added {time} to {task}", { time: ttHM((b - a) / 1000), task: t.name }));
+        this.act("madd", () => {});
+      }
+    }, { cls: "tt-btn tt-text" });
+    const field = (label, control, id) => h("div", { cls: "tt-field" }, h("label", { for: id, text: label }), control);
+    const box = h("details", { cls: "tt-manual" }, h("summary", { text: T("Add time manually") }), h("div", { cls: "tt-manual-body" }, field(T("Date"), date, "tt-md"), h("div", { cls: "tt-dates" }, field(T("Start"), from, "tt-ms"), field(T("End"), to, "tt-me")), msg, add));
+    box.open = !!this.manualOpen; // stays open while you add several
+    box.addEventListener("toggle", () => (this.manualOpen = box.open));
+    return box;
   }
 
   // A button that asks once more before it acts
