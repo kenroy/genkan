@@ -1241,7 +1241,9 @@ class TimeTrackerUI {
     const list = h("div", { cls: "tt-list", role: "list", "aria-label": T("Sessions") });
     if (!sessions.length) list.append(h("div", { cls: "hp-empty", text: T("No sessions") }));
     for (const s of sessions.slice(0, 50)) {
-      const when = `${fmtDate(new Date(s.s), { month: "short", day: "numeric" })}, ${ttClockOfDay(s.s)}–${s.e == null ? T("now") : ttClockOfDay(s.e)}`;
+      const short = { month: "short", day: "numeric" };
+      const end = s.e == null ? T("now") : ttDayStart(s.e) === ttDayStart(s.s) ? ttClockOfDay(s.e) : `${fmtDate(new Date(s.e), short)}, ${ttClockOfDay(s.e)}`; // a session past midnight names its end day
+      const when = `${fmtDate(new Date(s.s), short)}, ${ttClockOfDay(s.s)}–${end}`;
       const dur = h("span", { cls: "tt-time" });
       this.live.push(() => (dur.textContent = ttClock(((s.e == null ? this.now() : s.e) - s.s) / 1000)));
       const del = this.confirmButton(T("Delete session {when}", { when }), `del-${s.id}`, () => {
@@ -1262,22 +1264,38 @@ class TimeTrackerUI {
   // For a forgotten timer: a day, a start and an end
   manualForm(t) {
     const day = ttIso(this.now());
-    const date = h("input", { type: "date", cls: "tt-input", id: "tt-md", "data-k": "md", max: day });
-    date.value = day;
-    const from = h("input", { type: "time", cls: "tt-input", id: "tt-ms", "data-k": "ms" });
-    const to = h("input", { type: "time", cls: "tt-input", id: "tt-me", "data-k": "me" });
+    const input = (type, id, k, extra = {}) => h("input", { type, cls: "tt-input", id, "data-k": k, ...extra });
+    const fromDate = input("date", "tt-msd", "msd", { max: day });
+    const fromTime = input("time", "tt-mst", "mst");
+    const toDate = input("date", "tt-med", "med", { max: day });
+    const toTime = input("time", "tt-met", "met");
+    fromDate.value = toDate.value = day;
+    let endTouched = false; // until you pick an end date it follows the start date
     const msg = h("div", { cls: "tt-sub tt-msg", role: "alert" });
+    const total = h("div", { cls: "tt-sub", "aria-live": "polite" });
     const when = (d, v) => {
       const base = ttParseDay(d);
       const m = /^(\d{2}):(\d{2})$/.exec(v || "");
-      return base == null || !m ? null : new Date(new Date(base).getFullYear(), new Date(base).getMonth(), new Date(base).getDate(), Number(m[1]), Number(m[2])).getTime();
+      if (base == null || !m) return null;
+      const b = new Date(base);
+      return new Date(b.getFullYear(), b.getMonth(), b.getDate(), Number(m[1]), Number(m[2])).getTime();
     };
+    const range = () => [when(fromDate.value, fromTime.value), when(toDate.value, toTime.value)];
+    const preview = () => {
+      const [a, b] = range();
+      total.textContent = a != null && b != null && b > a ? T("This adds {time}", { time: ttHM((b - a) / 1000) }) : "";
+    };
+    fromDate.addEventListener("change", () => {
+      if (!endTouched) toDate.value = fromDate.value;
+    });
+    toDate.addEventListener("change", () => (endTouched = true));
+    for (const el of [fromDate, fromTime, toDate, toTime]) el.addEventListener("input", preview);
+    for (const el of [fromDate, fromTime, toDate, toTime]) el.addEventListener("change", preview);
     const add = this.btn(T("Add time"), "madd", () => {
-      const a = when(date.value, from.value);
-      const b = when(date.value, to.value);
+      const [a, b] = range();
       msg.textContent = "";
-      if (a == null || b == null) msg.textContent = T("Choose a day, a start time and an end time.");
-      else if (b <= a) msg.textContent = T("The end time must be after the start time.");
+      if (a == null || b == null) msg.textContent = T("Choose a start and an end, each with a day and a time.");
+      else if (b <= a) msg.textContent = T("The end must be after the start. Check the end date.");
       else if (b > this.now()) msg.textContent = T("That time is in the future.");
       else {
         this.store.addSession(t.id, a, b, this);
@@ -1286,7 +1304,15 @@ class TimeTrackerUI {
       }
     }, { cls: "tt-btn tt-text" });
     const field = (label, control, id) => h("div", { cls: "tt-field" }, h("label", { for: id, text: label }), control);
-    const box = h("details", { cls: "tt-manual" }, h("summary", { text: T("Add time manually") }), h("div", { cls: "tt-manual-body" }, field(T("Date"), date, "tt-md"), h("div", { cls: "tt-dates" }, field(T("Start"), from, "tt-ms"), field(T("End"), to, "tt-me")), msg, add));
+    const box = h(
+      "details",
+      { cls: "tt-manual" },
+      h("summary", { text: T("Add time manually") }),
+      h("div", { cls: "tt-manual-body" },
+        h("div", { cls: "tt-dates" }, field(T("Start date"), fromDate, "tt-msd"), field(T("Start time"), fromTime, "tt-mst")),
+        h("div", { cls: "tt-dates" }, field(T("End date"), toDate, "tt-med"), field(T("End time"), toTime, "tt-met")),
+        total, msg, add),
+    );
     box.open = !!this.manualOpen; // stays open while you add several
     box.addEventListener("toggle", () => (this.manualOpen = box.open));
     return box;
