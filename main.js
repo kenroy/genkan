@@ -581,11 +581,9 @@ const I18N = {
     "Collapse {name}": "Réduire {name}",
     "Open in Surfing": "Ouvrir dans Surfing",
     "Open in the default browser": "Ouvrir dans le navigateur par défaut",
-    "Open in {browser}": "Ouvrir dans {browser}",
     "Copy link": "Copier le lien",
     "Link copied.": "Lien copié.",
     "Could not copy the link.": "Impossible de copier le lien.",
-    "Could not open the link.": "Impossible d’ouvrir le lien.",
     "Running timer": "Minuteur en cours",
     "Open {task}": "Ouvrir {task}",
     "Running timer display": "Affichage du minuteur en cours",
@@ -638,7 +636,6 @@ const I18N = {
     "Edit project": "Modifier le projet",
     "End": "Fin",
     "Export": "Exporter",
-    "Export time report…": "Exporter le rapport de temps…",
     "Export {format}": "Exporter en {format}",
     "From": "Du",
     "Generated {date}": "Généré le {date}",
@@ -971,11 +968,9 @@ const I18N = {
     "Collapse {name}": "Contraer {name}",
     "Open in Surfing": "Abrir en Surfing",
     "Open in the default browser": "Abrir en el navegador predeterminado",
-    "Open in {browser}": "Abrir en {browser}",
     "Copy link": "Copiar enlace",
     "Link copied.": "Enlace copiado.",
     "Could not copy the link.": "No se pudo copiar el enlace.",
-    "Could not open the link.": "No se pudo abrir el enlace.",
     "Running timer": "Temporizador en marcha",
     "Open {task}": "Abrir {task}",
     "Running timer display": "Visualización del temporizador en marcha",
@@ -1028,7 +1023,6 @@ const I18N = {
     "Edit project": "Editar proyecto",
     "End": "Fin",
     "Export": "Exportar",
-    "Export time report…": "Exportar informe de tiempo…",
     "Export {format}": "Exportar a {format}",
     "From": "Desde",
     "Generated {date}": "Generado el {date}",
@@ -1361,11 +1355,9 @@ const I18N = {
     "Collapse {name}": "{name} einklappen",
     "Open in Surfing": "In Surfing öffnen",
     "Open in the default browser": "Im Standardbrowser öffnen",
-    "Open in {browser}": "In {browser} öffnen",
     "Copy link": "Link kopieren",
     "Link copied.": "Link kopiert.",
     "Could not copy the link.": "Der Link konnte nicht kopiert werden.",
-    "Could not open the link.": "Der Link konnte nicht geöffnet werden.",
     "Running timer": "Laufender Timer",
     "Open {task}": "{task} öffnen",
     "Running timer display": "Anzeige des laufenden Timers",
@@ -1418,7 +1410,6 @@ const I18N = {
     "Edit project": "Projekt bearbeiten",
     "End": "Ende",
     "Export": "Exportieren",
-    "Export time report…": "Zeitbericht exportieren …",
     "Export {format}": "Als {format} exportieren",
     "From": "Von",
     "Generated {date}": "Erstellt am {date}",
@@ -1753,11 +1744,9 @@ const I18N = {
     "Collapse {name}": "{name} を折りたたむ",
     "Open in Surfing": "Surfing で開く",
     "Open in the default browser": "既定のブラウザで開く",
-    "Open in {browser}": "{browser} で開く",
     "Copy link": "リンクをコピー",
     "Link copied.": "リンクをコピーしました。",
     "Could not copy the link.": "リンクをコピーできませんでした。",
-    "Could not open the link.": "リンクを開けませんでした。",
     "Running timer": "実行中のタイマー",
     "Open {task}": "{task} を開く",
     "Running timer display": "実行中タイマーの表示",
@@ -1810,7 +1799,6 @@ const I18N = {
     "Edit project": "プロジェクトを編集",
     "End": "終了",
     "Export": "書き出し",
-    "Export time report…": "時間レポートを書き出す…",
     "Export {format}": "{format} で書き出す",
     "From": "開始",
     "Generated {date}": "作成日 {date}",
@@ -2770,6 +2758,42 @@ function noteExcerpt(text, title) {
 }
 
 // A safe file name for an exported note: its first line of text, or "Quick Note N"
+// Save a file: the browser's save dialog where it works (it remembers the folder you used last), else
+// the share sheet, else a copy in the vault. Node's file and shell access are deliberately not used.
+// Returns quietly when you close the dialog; throws only when nothing worked.
+async function saveExportFile(app, name, data, mime, label) {
+  const bytes = typeof data === "string" ? new TextEncoder().encode(data) : data;
+  const ext = name.slice(name.lastIndexOf(".") + 1);
+  if (typeof window.showSaveFilePicker === "function") {
+    try {
+      const handle = await window.showSaveFilePicker({ id: "genkan-export", suggestedName: name, types: [{ description: label, accept: { [mime]: [`.${ext}`] } }] });
+      const out = await handle.createWritable();
+      await out.write(bytes);
+      await out.close();
+      new Notice(T("Exported to {path}", { path: handle.name }));
+      return;
+    } catch (err) {
+      if (err && err.name === "AbortError") return; // the dialog was closed
+      console.warn("Genkan: the save dialog is not available here, trying another way", err);
+    }
+  }
+  // Phones and tablets: the share sheet lets you pick Files, Mail and so on
+  try {
+    const file = new File([bytes], name, { type: mime });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file] });
+      return;
+    }
+  } catch (err) {
+    if (err && err.name === "AbortError") return; // the share sheet was closed
+  }
+  // Last resort: a copy in the vault, under a name that is not taken
+  let target = name;
+  for (let n = 2; app.vault.getAbstractFileByPath(normalizePath(target)); n++) target = name.replace(/(\.\w+)$/, ` ${n}$1`);
+  await app.vault.createBinary(normalizePath(target), bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+  new Notice(T("Saved a copy in your vault as {name}", { name: target }));
+}
+
 function exportFileName(md, index) {
   const title = noteExcerpt(md, "")
     .replace(/[\\/:*?"<>|\u0000-\u001f]/g, " ")
@@ -4146,51 +4170,11 @@ function ttPdf(rep, store, pid) {
   return bytes;
 }
 
-// Save a file the way the note export does: the system's save dialog where there is one
+// Save a report with the shared export routine (see saveExportFile)
 async function ttSaveFile(app, name, data, mime, label) {
-  const ext = name.slice(name.lastIndexOf(".") + 1);
-  const adapter = app.vault.adapter;
-  const base = adapter && typeof adapter.getBasePath === "function" ? adapter.getBasePath() : "";
-  const bytes = typeof data === "string" ? new TextEncoder().encode(data) : data;
   try {
-    const req = typeof window.require === "function" ? window.require : null;
-    let dialog = null;
-    try {
-      dialog = req && req("electron").remote && req("electron").remote.dialog;
-    } catch {
-      // the dialog is not available in this build
-    }
-    if (dialog && base) {
-      const res = await dialog.showSaveDialog({
-        title: T("Export time report…"),
-        defaultPath: req("path").join(base, name),
-        filters: [{ name: label, extensions: [ext] }],
-        properties: ["createDirectory", "showOverwriteConfirmation"],
-      });
-      if (res.canceled || !res.filePath) return;
-      req("fs").writeFileSync(res.filePath, bytes);
-      new Notice(T("Exported to {path}", { path: res.filePath }));
-      return;
-    }
-    if (typeof window.showSaveFilePicker === "function") {
-      const handle = await window.showSaveFilePicker({ suggestedName: name, types: [{ description: label, accept: { [mime]: [`.${ext}`] } }] });
-      const out = await handle.createWritable();
-      await out.write(bytes);
-      await out.close();
-      new Notice(T("Exported to {path}", { path: handle.name }));
-      return;
-    }
-    const file = new File([bytes], name, { type: mime });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file] });
-      return;
-    }
-    let target = name;
-    for (let n = 2; app.vault.getAbstractFileByPath(normalizePath(target)); n++) target = name.replace(/(\.\w+)$/, ` ${n}$1`);
-    await app.vault.createBinary(normalizePath(target), bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
-    new Notice(T("Saved a copy in your vault as {name}", { name: target }));
+    await saveExportFile(app, name, data, mime, label);
   } catch (err) {
-    if (err && err.name === "AbortError") return;
     console.error("Genkan: time report export failed", err);
     new Notice(T("Could not export the time report."));
   }
@@ -6295,52 +6279,9 @@ class HomepageView extends ItemView {
       return;
     }
     const name = exportFileName(md, this.noteIndex);
-    const adapter = this.app.vault.adapter;
-    const base = adapter && typeof adapter.getBasePath === "function" ? adapter.getBasePath() : "";
     try {
-      // Desktop: a native save dialog that opens in the vault's folder
-      const req = typeof window.require === "function" ? window.require : null;
-      let dialog = null;
-      try {
-        dialog = req && req("electron").remote && req("electron").remote.dialog;
-      } catch {
-        // the dialog is not available in this build
-      }
-      if (dialog && base) {
-        const path = req("path");
-        const res = await dialog.showSaveDialog({
-          title: T("Export note as Markdown…"),
-          defaultPath: path.join(base, name),
-          filters: [{ name: "Markdown", extensions: ["md"] }],
-          properties: ["createDirectory", "showOverwriteConfirmation"],
-        });
-        if (res.canceled || !res.filePath) return;
-        req("fs").writeFileSync(res.filePath, md, "utf8");
-        new Notice(T("Exported to {path}", { path: res.filePath }));
-        return;
-      }
-      // Other browsers and some desktops: the file picker
-      if (typeof window.showSaveFilePicker === "function") {
-        const handle = await window.showSaveFilePicker({ suggestedName: name, types: [{ description: "Markdown", accept: { "text/markdown": [".md"] } }] });
-        const out = await handle.createWritable();
-        await out.write(md);
-        await out.close();
-        new Notice(T("Exported to {path}", { path: handle.name }));
-        return;
-      }
-      // Phones and tablets: the share sheet lets you pick Files, Mail and so on
-      const file = new File([md], name, { type: "text/markdown" });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file] });
-        return;
-      }
-      // Last resort: a copy in the vault, under a name that is not taken
-      let target = name;
-      for (let n = 2; this.app.vault.getAbstractFileByPath(normalizePath(target)); n++) target = name.replace(/\.md$/, ` ${n}.md`);
-      await this.app.vault.create(normalizePath(target), md);
-      new Notice(T("Saved a copy in your vault as {name}", { name: target }));
+      await saveExportFile(this.app, name, md, "text/markdown", "Markdown");
     } catch (err) {
-      if (err && err.name === "AbortError") return; // the picker or share sheet was closed
       console.error("Genkan: export failed", err);
       new Notice(T("Could not export the note."));
     }
@@ -6527,41 +6468,11 @@ class HomepageView extends ItemView {
     else this.openExternally(url);
   }
 
-  // Browsers installed on this Mac, for the right-click menu
-  installedBrowsers() {
-    if (!Platform.isMacOS || Platform.isMobile || typeof window.require !== "function") return [];
-    try {
-      const fs = window.require("fs");
-      const os = window.require("os");
-      const roots = ["/Applications", `${os.homedir()}/Applications`, "/System/Cryptexes/App/System/Applications"];
-      const names = ["Safari", "Google Chrome", "Firefox", "Arc", "Dia", "Brave Browser", "Microsoft Edge", "Vivaldi", "Opera", "Orion", "Zen", "Chromium"];
-      const found = [];
-      for (const name of names) {
-        const dir = roots.find((r) => fs.existsSync(`${r}/${name}.app`));
-        if (dir) found.push({ name, path: `${dir}/${name}.app` });
-      }
-      return found;
-    } catch {
-      return [];
-    }
-  }
-
-  openInBrowser(url, appPath) {
-    try {
-      window.require("child_process").execFile("open", ["-a", appPath, url], (err) => {
-        if (err) new Notice(T("Could not open the link."));
-      });
-    } catch {
-      new Notice(T("Could not open the link."));
-    }
-  }
-
   noteLinkMenu(url) {
     const menu = new Menu();
     const web = /^https?:/i.test(url);
     if (web && this.surfingOn() && !Platform.isMobile) menu.addItem((i) => i.setTitle(T("Open in Surfing")).setIcon("globe").onClick(() => this.openInSurfing(url)));
     menu.addItem((i) => i.setTitle(T("Open in the default browser")).setIcon("external-link").onClick(() => this.openExternally(url)));
-    if (web) for (const b of this.installedBrowsers()) menu.addItem((i) => i.setTitle(T("Open in {browser}", { browser: b.name })).setIcon("external-link").onClick(() => this.openInBrowser(url, b.path)));
     menu.addSeparator();
     menu.addItem((i) =>
       i.setTitle(T("Copy link")).setIcon("copy").onClick(async () => {

@@ -835,51 +835,11 @@ function ttPdf(rep, store, pid) {
   return bytes;
 }
 
-// Save a file the way the note export does: the system's save dialog where there is one
+// Save a report with the shared export routine (see saveExportFile)
 async function ttSaveFile(app, name, data, mime, label) {
-  const ext = name.slice(name.lastIndexOf(".") + 1);
-  const adapter = app.vault.adapter;
-  const base = adapter && typeof adapter.getBasePath === "function" ? adapter.getBasePath() : "";
-  const bytes = typeof data === "string" ? new TextEncoder().encode(data) : data;
   try {
-    const req = typeof window.require === "function" ? window.require : null;
-    let dialog = null;
-    try {
-      dialog = req && req("electron").remote && req("electron").remote.dialog;
-    } catch {
-      // the dialog is not available in this build
-    }
-    if (dialog && base) {
-      const res = await dialog.showSaveDialog({
-        title: T("Export time report…"),
-        defaultPath: req("path").join(base, name),
-        filters: [{ name: label, extensions: [ext] }],
-        properties: ["createDirectory", "showOverwriteConfirmation"],
-      });
-      if (res.canceled || !res.filePath) return;
-      req("fs").writeFileSync(res.filePath, bytes);
-      new Notice(T("Exported to {path}", { path: res.filePath }));
-      return;
-    }
-    if (typeof window.showSaveFilePicker === "function") {
-      const handle = await window.showSaveFilePicker({ suggestedName: name, types: [{ description: label, accept: { [mime]: [`.${ext}`] } }] });
-      const out = await handle.createWritable();
-      await out.write(bytes);
-      await out.close();
-      new Notice(T("Exported to {path}", { path: handle.name }));
-      return;
-    }
-    const file = new File([bytes], name, { type: mime });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file] });
-      return;
-    }
-    let target = name;
-    for (let n = 2; app.vault.getAbstractFileByPath(normalizePath(target)); n++) target = name.replace(/(\.\w+)$/, ` ${n}$1`);
-    await app.vault.createBinary(normalizePath(target), bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
-    new Notice(T("Saved a copy in your vault as {name}", { name: target }));
+    await saveExportFile(app, name, data, mime, label);
   } catch (err) {
-    if (err && err.name === "AbortError") return;
     console.error("Genkan: time report export failed", err);
     new Notice(T("Could not export the time report."));
   }
