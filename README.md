@@ -40,6 +40,10 @@ The optional Time tracker card: the project list with how much of each budget is
 
 ![The Genkan time tracker card: projects, weekly summary and a task timer](docs/screenshots/time-tracker.png)
 
+On a phone or tablet, which have no status bar, a running timer sits in a bar across the top of the dashboard, with pause and stop buttons, while you work in the card below it.
+
+<img src="docs/screenshots/phone-timer.png" alt="The running timer bar at the top of the Genkan dashboard on a phone, above the Time tracker card" width="390">
+
 ## Install
 
 Genkan needs Obsidian 1.4.0 or newer.
