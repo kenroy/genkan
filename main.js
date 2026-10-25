@@ -579,7 +579,7 @@ const I18N = {
     "Unsaved changes": "Modifications non enregistrées",
     "Quick note {n}": "Note rapide {n}",
     "Collapse {name}": "Réduire {name}",
-    "Open in Surfing": "Ouvrir dans Surfing",
+    "Open in Obsidian (Surfing)": "Ouvrir dans Obsidian (Surfing)",
     "Open in the default browser": "Ouvrir dans le navigateur par défaut",
     "Copy link": "Copier le lien",
     "Link copied.": "Lien copié.",
@@ -966,7 +966,7 @@ const I18N = {
     "Unsaved changes": "Cambios sin guardar",
     "Quick note {n}": "Nota rápida {n}",
     "Collapse {name}": "Contraer {name}",
-    "Open in Surfing": "Abrir en Surfing",
+    "Open in Obsidian (Surfing)": "Abrir en Obsidian (Surfing)",
     "Open in the default browser": "Abrir en el navegador predeterminado",
     "Copy link": "Copiar enlace",
     "Link copied.": "Enlace copiado.",
@@ -1353,7 +1353,7 @@ const I18N = {
     "Unsaved changes": "Ungespeicherte Änderungen",
     "Quick note {n}": "Schnellnotiz {n}",
     "Collapse {name}": "{name} einklappen",
-    "Open in Surfing": "In Surfing öffnen",
+    "Open in Obsidian (Surfing)": "In Obsidian (Surfing) öffnen",
     "Open in the default browser": "Im Standardbrowser öffnen",
     "Copy link": "Link kopieren",
     "Link copied.": "Link kopiert.",
@@ -1742,7 +1742,7 @@ const I18N = {
     "Unsaved changes": "未保存の変更",
     "Quick note {n}": "クイックメモ {n}",
     "Collapse {name}": "{name} を折りたたむ",
-    "Open in Surfing": "Surfing で開く",
+    "Open in Obsidian (Surfing)": "Obsidian (Surfing) で開く",
     "Open in the default browser": "既定のブラウザで開く",
     "Copy link": "リンクをコピー",
     "Link copied.": "リンクをコピーしました。",
@@ -6471,7 +6471,7 @@ class HomepageView extends ItemView {
   noteLinkMenu(url) {
     const menu = new Menu();
     const web = /^https?:/i.test(url);
-    if (web && this.surfingOn() && !Platform.isMobile) menu.addItem((i) => i.setTitle(T("Open in Surfing")).setIcon("globe").onClick(() => this.openInSurfing(url)));
+    if (web && this.surfingOn() && !Platform.isMobile) menu.addItem((i) => i.setTitle(T("Open in Obsidian (Surfing)")).setIcon("globe").onClick(() => this.openInSurfing(url)));
     menu.addItem((i) => i.setTitle(T("Open in the default browser")).setIcon("external-link").onClick(() => this.openExternally(url)));
     menu.addSeparator();
     menu.addItem((i) =>

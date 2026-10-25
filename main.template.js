@@ -2997,7 +2997,7 @@ class HomepageView extends ItemView {
   noteLinkMenu(url) {
     const menu = new Menu();
     const web = /^https?:/i.test(url);
-    if (web && this.surfingOn() && !Platform.isMobile) menu.addItem((i) => i.setTitle(T("Open in Surfing")).setIcon("globe").onClick(() => this.openInSurfing(url)));
+    if (web && this.surfingOn() && !Platform.isMobile) menu.addItem((i) => i.setTitle(T("Open in Obsidian (Surfing)")).setIcon("globe").onClick(() => this.openInSurfing(url)));
     menu.addItem((i) => i.setTitle(T("Open in the default browser")).setIcon("external-link").onClick(() => this.openExternally(url)));
     menu.addSeparator();
     menu.addItem((i) =>
