@@ -2724,3 +2724,647 @@
 .hp-root .ring-more:hover {
   text-decoration: underline;
 }
+
+/* ── Time tracker ── */
+.hp-root .tt-nav {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+#genkan-root .tt-chip {
+  background: none;
+  border: 1px solid var(--border-hi);
+  border-radius: 20px;
+  box-shadow: none;
+  color: var(--text-2);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  min-height: 24px;
+  padding: 3px 12px;
+}
+
+#genkan-root .tt-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent-txt);
+}
+
+#genkan-root .tt-chip[aria-pressed="true"] {
+  background: var(--accent-lo);
+  border-color: var(--accent);
+  color: var(--accent-txt);
+}
+
+.hp-root .tt-title {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.hp-root .tt-title:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.hp-root .tt-head {
+  align-items: center;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 28px 1fr auto;
+  margin-bottom: 8px;
+}
+
+.hp-root .tt-head .tt-title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hp-root .tt-head-right {
+  display: flex;
+  gap: 4px;
+}
+
+#genkan-root .tt-icon,
+#genkan-root .tt-ctl {
+  align-items: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  color: var(--text-2);
+  cursor: pointer;
+  display: inline-flex;
+  height: 28px;
+  justify-content: center;
+  min-height: 28px;
+  min-width: 28px;
+  padding: 0;
+  width: 28px;
+}
+
+#genkan-root .tt-icon:hover,
+#genkan-root .tt-ctl:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+#genkan-root .tt-ctl {
+  border-color: var(--border-hi);
+}
+
+#genkan-root .tt-btn {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 500;
+  gap: 6px;
+  justify-content: center;
+  min-height: 28px;
+  padding: 4px 12px;
+}
+
+#genkan-root .tt-btn:hover {
+  border-color: var(--accent);
+}
+
+#genkan-root .tt-btn:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+#genkan-root .tt-btn.tt-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+#genkan-root .tt-warn {
+  color: var(--text-2);
+}
+
+#genkan-root .tt-warn:hover,
+#genkan-root .tt-warn.armed {
+  color: var(--danger);
+}
+
+#genkan-root .tt-warn.armed {
+  border-color: var(--danger);
+}
+
+.hp-root .tt-add {
+  margin-bottom: 8px;
+}
+
+#genkan-root .tt-input {
+  background: var(--surface-2);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  color: var(--text);
+  font-size: 13px;
+  min-height: 28px;
+  padding: 5px 10px;
+  width: 100%;
+}
+
+#genkan-root .tt-input:focus {
+  border-color: var(--accent);
+}
+
+#genkan-root textarea.tt-notes {
+  resize: vertical;
+}
+
+#genkan-root .tt-num {
+  text-align: right;
+  width: 64px;
+}
+
+.hp-root .tt-list {
+  display: flex;
+  flex-direction: column;
+}
+
+#genkan-root .tt-row {
+  align-items: center;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  box-shadow: none;
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  gap: 2px 10px;
+  grid-template-columns: 6px 1fr auto 14px;
+  padding: 8px 4px;
+  text-align: left;
+  width: 100%;
+}
+
+#genkan-root .tt-row:hover {
+  background: var(--surface-2);
+}
+
+.hp-root .tt-swatch {
+  align-self: stretch;
+  background: var(--tt-c, var(--accent));
+  border-radius: 3px;
+  display: block;
+  min-height: 28px;
+  width: 6px;
+}
+
+.hp-root .tt-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hp-root .tt-name {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hp-root .tt-sub,
+.hp-root .tt-crumb {
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+.hp-root .tt-sub.is-running {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.hp-root .tt-time {
+  color: var(--text-2);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.hp-root .tt-row > svg {
+  color: var(--text-3);
+}
+
+/* Budget: a bar plus words, so colour is never the only cue */
+.hp-root .tt-budget {
+  display: block;
+  grid-column: 2 / -1;
+}
+
+.hp-root .tt-bar-track {
+  background: var(--border-hi);
+  border-radius: 3px;
+  display: block;
+  height: 5px;
+  overflow: hidden;
+}
+
+.hp-root .tt-bar-fill {
+  background: var(--tt-c, var(--success));
+  border-radius: 3px;
+  display: block;
+  height: 100%;
+  transition: width 0.3s;
+}
+
+.hp-root .tt-budget[data-state="ok"] .tt-bar-fill {
+  background: var(--success);
+}
+
+.hp-root .tt-budget[data-state="warn"] .tt-bar-fill {
+  background: var(--warning);
+}
+
+.hp-root .tt-budget[data-state="over"] .tt-bar-fill {
+  background: var(--danger);
+}
+
+.hp-root .tt-budget.is-empty .tt-bar-track {
+  display: none;
+}
+
+.hp-root .tt-budget-text {
+  color: var(--text-2);
+  display: flex;
+  font-size: 11px;
+  gap: 8px;
+  justify-content: space-between;
+  margin-top: 3px;
+}
+
+.hp-root .tt-budget[data-state="warn"] .tt-left,
+.hp-root .tt-budget[data-state="over"] .tt-left {
+  font-weight: 700;
+}
+
+.hp-root .tt-budget[data-state="over"] .tt-left {
+  color: var(--danger);
+}
+
+.hp-root .tt-summary {
+  margin-bottom: 10px;
+}
+
+.hp-root .tt-summary .tt-budget {
+  grid-column: auto;
+}
+
+.hp-root .tt-foot {
+  color: var(--text-3);
+  font-size: 11px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* A task row */
+.hp-root .tt-task {
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 24px 1fr auto auto;
+  padding: 7px 4px;
+}
+
+.hp-root .tt-task.done .tt-name {
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+
+.hp-root .tt-task[data-pri="3"] {
+  box-shadow: inset 3px 0 0 var(--danger);
+}
+
+.hp-root .tt-task[data-pri="2"] {
+  box-shadow: inset 3px 0 0 var(--warning);
+}
+
+#genkan-root .tt-open {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  min-height: 24px;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+#genkan-root .tt-open:hover .tt-name {
+  color: var(--accent-txt);
+}
+
+.hp-root .tt-badge {
+  background: var(--surface-2);
+  border-radius: 20px;
+  color: var(--text-2);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  padding: 2px 9px;
+}
+
+.hp-root .tt-badge.is-running {
+  background: var(--accent);
+  color: #fff;
+}
+
+.hp-root .tt-controls {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* One task */
+.hp-root .tt-clock-box {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 14px 8px 10px;
+  text-align: center;
+}
+
+.hp-root .tt-clock {
+  font-size: 34px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 300;
+  line-height: 1.1;
+}
+
+.hp-root .tt-session {
+  color: var(--text-2);
+  font-size: 12px;
+  min-height: 16px;
+}
+
+.hp-root .tt-stats {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 8px 0;
+  text-align: center;
+}
+
+.hp-root .tt-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.hp-root .tt-stat-l {
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+.hp-root .tt-stat-v {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hp-root .tt-big-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 8px 0 10px;
+}
+
+.hp-root .tt-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.hp-root .tt-field label,
+.hp-root .tt-label {
+  color: var(--text-2);
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.hp-root .tt-alloc {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.hp-root .tt-unit {
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+.hp-root .tt-dates {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.hp-root .tt-sub-head {
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin: 14px 0 4px;
+  text-transform: uppercase;
+}
+
+.hp-root .tt-session-row {
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr auto 28px;
+  padding: 4px;
+}
+
+.hp-root .tt-danger {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.hp-root .tt-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#genkan-root .tt-swatch-btn {
+  background: var(--tt-c);
+  border: 2px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 24px;
+  min-height: 24px;
+  min-width: 24px;
+  padding: 0;
+  width: 24px;
+}
+
+#genkan-root .tt-swatch-btn[aria-checked="true"] {
+  border-color: var(--text);
+  box-shadow: inset 0 0 0 2px var(--surface-1);
+}
+
+/* Week and report */
+.hp-root .tt-range {
+  align-items: center;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 28px 1fr 28px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.hp-root .tt-range-label {
+  color: var(--text-2);
+  font-size: 12px;
+}
+
+.hp-root .tt-week {
+  align-items: stretch;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(7, 1fr);
+  height: 120px;
+  margin: 10px 0;
+}
+
+.hp-root .tt-day {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hp-root .tt-day-col {
+  align-items: flex-end;
+  display: flex;
+  flex: 1;
+  width: 100%;
+}
+
+.hp-root .tt-day-bar {
+  background: var(--accent);
+  border-radius: 3px 3px 0 0;
+  margin: 0 auto;
+  max-width: 28px;
+  width: 70%;
+}
+
+.hp-root .tt-cap {
+  margin: 0 4px 2px 18px;
+}
+
+.hp-root .tt-day-v {
+  color: var(--text-2);
+  font-size: 10px;
+  min-height: 13px;
+}
+
+.hp-root .tt-day-l {
+  color: var(--text-3);
+  font-size: 10px;
+}
+
+.hp-root .tt-week-row {
+  align-items: center;
+  display: grid;
+  gap: 4px 8px;
+  grid-template-columns: 6px 1fr auto auto;
+  padding: 6px 4px 2px;
+}
+
+.hp-root .tt-week-row .tt-swatch {
+  min-height: 14px;
+}
+
+.hp-root .tt-week-row .tt-bar-track {
+  grid-column: 2 / -1;
+}
+
+.hp-root .tt-share {
+  color: var(--text-3);
+  font-size: 11px;
+  min-width: 32px;
+  text-align: right;
+}
+
+.hp-root .tt-total {
+  align-items: baseline;
+  border-top: 1px solid var(--border-hi);
+  display: flex;
+  font-size: 12px;
+  gap: 8px;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 8px;
+}
+
+.hp-root .tt-rep-proj {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.hp-root .tt-rep-proj .tt-budget {
+  margin: 0 4px 4px 18px;
+}
+
+.hp-root .tt-rep-task {
+  color: var(--text-2);
+  display: flex;
+  font-size: 12px;
+  gap: 8px;
+  justify-content: space-between;
+  padding: 2px 4px 2px 18px;
+}
+
+.hp-root .tt-exports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.hp-root .tt-result {
+  margin-top: 12px;
+}
+
+/* Text colours that keep 4.5:1 on each theme (the bar colours are only the second cue) */
+#genkan-root[data-theme="light"] .tt-sub.is-running {
+  color: #15803d;
+}
+
+#genkan-root[data-theme="dark"] .tt-sub.is-running {
+  color: #4ade80;
+}
+
+#genkan-root[data-theme="light"] .tt-budget[data-state="over"] .tt-left,
+#genkan-root[data-theme="light"] .tt-warn:hover,
+#genkan-root[data-theme="light"] .tt-warn.armed {
+  color: #b91c1c;
+}
+
+#genkan-root[data-theme="dark"] .tt-budget[data-state="over"] .tt-left,
+#genkan-root[data-theme="dark"] .tt-warn:hover,
+#genkan-root[data-theme="dark"] .tt-warn.armed {
+  color: #f87171;
+}

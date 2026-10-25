@@ -12,6 +12,7 @@ Genkan (玄関) is the entryway of a Japanese home: the place you step in. This 
 - Cards in the middle column that fold down to their title
 - **Arrange cards**: drag the cards into the order and columns you want, and share the layout with your other devices
 - **On this day**: an optional card with notes from this date a week, a month and a year ago
+- **Time tracker**: an optional card for timing work on projects and tasks, with time allocations, a weekly summary and CSV, Excel or PDF reports
 - **Ring notes**: an optional card for voice notes from a Pebble Index ring
 - A photo of the day and a daily quote (both optional)
 
@@ -34,6 +35,10 @@ The quick notes card, in light and dark: seven notes, one per colored dot, with 
 ![The Genkan quick notes card in the light and dark themes](docs/screenshots/quick-notes.png)
 
 The screenshots use sample data, with the optional Ring notes and On this day cards turned on.
+
+The optional Time tracker card: the project list with how much of each budget is left, the weekly summary, and a task with its running timer.
+
+![The Genkan time tracker card: projects, weekly summary and a task timer](docs/screenshots/time-tracker.png)
 
 ## Install
 
@@ -103,6 +108,17 @@ Off by default. Turn on **On this day** in settings to add a card that looks bac
 
 A note's date comes from its `created`, `clipped` or `date` property, then from a date in its file name (like `2026-10-11`), then from when the file was created. If more than 20 notes without a date property were created on the same day, as happens after an import or a first sync, that day is ignored so it does not flood the card. Genkan's own data folder is left out. A month ago uses the same day of the previous month (or its last day), and a year ago the same date last year.
 
+### Time tracker
+Off by default. Turn on **Time tracker** in settings to add a card for timing your work. It has three views, chosen with the buttons at the top: **Projects**, **Week** and **Report**.
+
+- **Projects and tasks.** Type a client or project name and press Enter, open it, and add tasks the same way. A task has a name, notes, a priority (none, low, medium or high) and an optional allocated time; tick it off when it is done. Edit a project (the gear icon) to rename it, pick its colour, set its own allocated time or delete it.
+- **Timers.** Press play on a task to start timing it. **Pause** and **Resume** keep one running total, and **Stop** ends the run. Only one timer runs at a time: starting another pauses the first. Each run is saved as a session with a start and an end, so the task's total is always the sum of its sessions, and you can delete a session from the task's page. A timer keeps counting while the dashboard is closed. If Obsidian is closed or the computer sleeps while a timer runs, the timer is stopped at the last moment Genkan saw it running (a few minutes can be lost) and a notice says so.
+- **Allocated time.** Give a task, or a whole project, a number of hours and minutes. A project with no time of its own uses its tasks' allocations added together. A bar shows how much is used, turning amber from 80% and red once the time is over, and the words next to it say how much is left ("5h 13m left", "2h 17m over") so colour is never the only cue.
+- **Weekly summary.** The **Week** view shows each day of the week as a bar, then each project's time and share of the week, with arrows to move between weeks. The week starts on the day set in settings.
+- **Reports and export.** The **Report** view totals the time for one project or all projects over this week, last week, this month, last month or a range you choose, with each task's time under its project. **Export CSV**, **Export Excel** or **Export PDF** saves the report with the system save dialog, which opens in your vault folder and lets you choose another. The CSV and Excel files list every session (split at midnight, so each row falls on one day) and Excel adds a summary sheet with allocated, tracked and remaining hours. The PDF has the summary with budget bars, then the sessions. The PDF uses a standard font, so characters outside Western European languages (Japanese task names, say) print as "?" there; the CSV and Excel files keep them.
+
+The time itself is kept in its own file, `Time Tracking.json`, in the Genkan data folder (`genkan/data` by default, next to your tasks and quick notes), apart from the plugin settings. It is a plain JSON file you can back up or read. Obsidian Sync only syncs `.json` files if **Sync all other types** is turned on in its settings; without it, each device keeps its own time. When the file does sync, changes from two devices are merged record by record, so a task renamed on one and a timer started on another both survive, and the card updates when the file changes. The tracker's data is never sent anywhere.
+
 ### Ring notes (Pebble Index)
 Turn on **Pebble ring notes**, then set **Where does the ring save notes?** to match the Obsidian setting in the Pebble app:
 
@@ -123,6 +139,7 @@ Genkan aims to meet WCAG 2.2 level AA and is used with a keyboard and screen rea
 - **Text and targets:** text meets the 4.5:1 contrast minimum in both themes, and controls are at least 24 by 24 pixels (larger on phones and tablets).
 - **Announcements:** switching quick notes with Cmd/Ctrl+1 to 7 says which note you are on, "Saved" is announced when you leave a note you changed, and moving a card or sharing a layout is announced.
 - **No drag required:** arranging cards also works with buttons and the keyboard, and each step is announced.
+- **Time tracker:** each view has a heading, projects and tasks are lists, every timer button names its task ("Pause timer: Homepage wireframes"), and starting, pausing and stopping are announced. Budgets are written out as well as drawn, and deleting asks you to confirm.
 - **Motion:** animations respect your system's reduced-motion setting.
 - **Language:** the dashboard is tagged with the language it is shown in, so a screen reader pronounces it correctly even when Genkan's language differs from Obsidian's.
 
@@ -155,12 +172,12 @@ Notes:
 - The Unsplash key is optional. It is stored in this plugin's settings file (`.obsidian/plugins/genkan/data.json`) in your vault. If you use Obsidian Sync with plugin settings, the key syncs with it, so keep your vault private.
 - Quotes from ZenQuotes are credited in the interface, as their free API requires: "Inspirational quotes provided by ZenQuotes API". Echoes quotes are credited the same way. The bundled quotes make no request. If a request fails, a bundled quote is shown.
 - To search, list recent notes, offer the favourites picker and match daily notes, Genkan reads the list of note names and paths in your vault through Obsidian's API. It reads a note's contents only for search snippets, ring notes, web clips and the previews on the On this day card, and none of it leaves your device.
-- Today's photo and quote are cached in the plugin's own settings file, not in browser storage. Which note you had open, which cards you folded and your card layout are remembered per device, in Obsidian's local storage for this vault (or in that settings file when local storage isn't available). Genkan sends none of it anywhere; the one thing that can reach your other devices is a layout you push with **Use on all my devices**, which goes into the settings file and travels only through whatever syncs your vault.
+- Today's photo and quote are cached in the plugin's own settings file, not in browser storage. Tracked time is not in that file; it has its own (see Time tracker above). Which note you had open, which cards you folded and your card layout are remembered per device, in Obsidian's local storage for this vault (or in that settings file when local storage isn't available). Genkan sends none of it anywhere; the one thing that can reach your other devices is a layout you push with **Use on all my devices**, which goes into the settings file and travels only through whatever syncs your vault.
 - Links you click (photographer credits, the ZenQuotes and Echoes links, any `https://` quick link) open in your browser.
 
 ## Settings
 
-Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, the Pebble ring options, photo of the day and Unsplash key, daily quote, site icons, and quick links.
+Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker, the Pebble ring options, photo of the day and Unsplash key, daily quote, site icons, and quick links.
 
 ## Development
 
@@ -172,6 +189,7 @@ python3 build.py
 
 - `main.template.js`: the plugin source
 - `src/icons.js`, `src/quotes.js`, `src/i18n.js`: the icon, built-in quote and translation data
+- `src/timetracker.js`: the time tracker (data and merging, timers, reports, the CSV, Excel and PDF writers, and its card)
 - `src/base.css` and `styles.extra.css`: the styles. `build.py` scopes `src/base.css` under `.hp-root`, adds `styles.extra.css`, and writes `styles.css`
 - `main.js` and `styles.css` are generated; edit the sources above instead
 

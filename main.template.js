@@ -96,7 +96,7 @@ function applyLanguage(choice) {
 // Source strings are written in British English; this converts them for American English
 function S(text) {
   const us = spellingChoice === "us" || (spellingChoice === "auto" && US_DETECTED);
-  return us ? text.replace(/favourite/g, "favorite").replace(/Favourite/g, "Favorite").replace(/centre/g, "center").replace(/Centre/g, "Center") : text;
+  return us ? text.replace(/favourite/g, "favorite").replace(/Favourite/g, "Favorite").replace(/centre/g, "center").replace(/Centre/g, "Center").replace(/colour/g, "color").replace(/Colour/g, "Color") : text;
 }
 
 // Translate a source string. Tables are keyed by the English text; {name} marks a value.
@@ -168,6 +168,7 @@ const DEFAULT_SETTINGS = {
   showFavicons: true, // site icons on web clips (Google's favicon service)
   showRingNotes: false, // Pebble Index ring notes card (off unless enabled)
   showOnThisDay: false, // notes from this date a week, a month and a year ago (off unless enabled)
+  showTimeTracker: false, // projects, tasks and timers (off unless enabled); the time lives in its own file
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
   // "files" = a separate file per note in a folder
   ringMode: "main",
@@ -864,7 +865,7 @@ const ARRANGE_ZONES = ["top", "left", "center", "right"];
 const DEFAULT_LAYOUT = {
   top: ["favs-card"],
   left: ["calendar-card", "links-card"],
-  center: ["ring-card", "clips-card", "recent-card", "otd-card"],
+  center: ["ring-card", "clips-card", "recent-card", "otd-card", "tt-card"],
   right: ["tasks-card", "note-card"],
 };
 const CARD_NAMES = {
@@ -875,6 +876,7 @@ const CARD_NAMES = {
   "clips-card": "Web clips",
   "recent-card": "Recent notes",
   "otd-card": "On this day",
+  "tt-card": "Time tracker",
   "tasks-card": "Tasks",
   "note-card": "Quick notes",
 };
@@ -1251,6 +1253,11 @@ function buildDashboard() {
       h("div", { cls: "card-header" }, cardTitle("otd-card", "otd-body", T("On this day")), countRow("otd-count")),
       h("div", { id: "otd-body" }),
     ),
+    h("section", { cls: "card hidden", id: "tt-card", "aria-labelledby": "tt-card-title" },
+      h("div", { cls: "card-header" }, cardTitle("tt-card", "tt-body", T("Time tracker"))),
+      h("div", { id: "tt-body" }),
+      h("div", { cls: "sr-only", id: "tt-live", role: "status", "aria-live": "polite" }),
+    ),
   );
 
   // Formatting toolbar for the quick note (inserts markdown; see formatEdit)
@@ -1378,6 +1385,8 @@ function buildDashboard() {
   return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, hero, quote, banner, topZone, h("main", { cls: "grid" }, left, center, right)), h("div", { cls: "sr-only", id: "arrange-live", role: "status", "aria-live": "polite" })];
 }
 
+/*__TIMETRACKER__*/
+
 class HomepageView extends ItemView {
   constructor(leaf, plugin) {
     super(leaf);
@@ -1473,6 +1482,7 @@ class HomepageView extends ItemView {
       this.app.setting.openTabById(this.plugin.manifest.id);
     });
     this.$("page-refresh").addEventListener("click", () => {
+      this.plugin.time?.reload();
       this.refreshAll(true);
       this.syncSharedLayout(true);
     });
@@ -1498,6 +1508,8 @@ class HomepageView extends ItemView {
     this.initSearch();
     this.initCards();
     this.initArrange();
+    this.tt?.destroy();
+    this.tt = new TimeTrackerUI(this);
   }
 
   // Labels are built once, so a language change rebuilds the dashboard in place
@@ -1591,6 +1603,7 @@ class HomepageView extends ItemView {
   }
 
   async onClose() {
+    this.tt?.destroy();
     Object.values(this.timers).forEach(clearTimeout);
     this.searchToken++;
   }
@@ -1617,6 +1630,7 @@ class HomepageView extends ItemView {
     this.renderClips();
     this.renderRecent();
     this.renderOnThisDay();
+    this.tt?.render();
     this.$("hero").classList.toggle("hidden", !this.settings.showHero);
     if (this.settings.showHero) this.loadHero(false);
     this.loadQuote();
@@ -1762,6 +1776,7 @@ class HomepageView extends ItemView {
   // ── Clock ──
 
   tickClock(force) {
+    this.tt?.tickRunning();
     const now = new Date();
     const hour = now.getHours();
     const pad = (n) => String(n).padStart(2, "0");
@@ -4055,6 +4070,11 @@ class HomepageSettingTab extends PluginSettingTab {
       .addToggle((t) => t.setValue(s.showOnThisDay).onChange((v) => save("showOnThisDay", v)));
 
     add()
+      .setName(T("Time tracker"))
+      .setDesc(T("Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own file, Time Tracking.json, in the Genkan data folder."))
+      .addToggle((t) => t.setValue(s.showTimeTracker).onChange((v) => save("showTimeTracker", v)));
+
+    add()
       .setName(T("Pebble ring notes"))
       .setDesc(T("Show the latest voice notes from your Pebble Index ring."))
       .addToggle((t) => t.setValue(s.showRingNotes).onChange((v) => save("showRingNotes", v)));
@@ -4145,6 +4165,17 @@ class HomepageSettingTab extends PluginSettingTab {
 module.exports = class HomepagePlugin extends Plugin {
   async onload() {
     await this.loadSettings();
+    this.time = new TimeStore(this);
+    // The time data is read once the vault is ready; a minute's beat catches a computer that slept
+    this.app.workspace.onLayoutReady(() => this.time.load());
+    this.registerInterval(window.setInterval(() => this.time.beat(), 60 * 1000));
+    const onTime = (f) => {
+      if (f.path !== this.time.path) return;
+      clearTimeout(this.timeLoadTimer);
+      this.timeLoadTimer = setTimeout(() => this.time.load(), 300); // another device saved it
+    };
+    this.registerEvent(this.app.vault.on("modify", onTime));
+    this.registerEvent(this.app.vault.on("create", onTime));
     this.registerView(VIEW_TYPE, (leaf) => new HomepageView(leaf, this));
     this.addRibbonIcon("home", T("Open homepage"), () => this.activateView());
     this.addCommand({
@@ -4251,6 +4282,7 @@ module.exports = class HomepagePlugin extends Plugin {
   }
 
   onunload() {
+    this.time?.flush();
     for (const el of this.stars?.values() ?? []) el.remove();
     this.stars?.clear();
     clearTimeout(this.favCacheTimer);

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Assemble main.js and styles.css from the sources in this repo.
 
-main.template.js + src/icons.js + src/quotes.js + src/i18n.js   -> main.js
+main.template.js + src/icons.js + src/quotes.js + src/i18n.js + src/timetracker.js   -> main.js
 src/base.css, scoped under .hp-root               -> styles.css
 (plus plugin-only additions from styles.extra.css)
 """
@@ -12,8 +12,9 @@ src = here / "src"
 icons = (src / "icons.js").read_text().rstrip("\n")
 quotes = (src / "quotes.js").read_text().rstrip("\n")
 i18n = (src / "i18n.js").read_text().rstrip("\n")
+timetracker = (src / "timetracker.js").read_text().rstrip("\n")
 tpl = (here / "main.template.js").read_text()
-main = tpl.replace("/*__ICONS__*/", icons).replace("/*__QUOTES__*/", quotes).replace("/*__I18N__*/", i18n)
+main = tpl.replace("/*__ICONS__*/", icons).replace("/*__QUOTES__*/", quotes).replace("/*__I18N__*/", i18n).replace("/*__TIMETRACKER__*/", timetracker)
 (here / "main.js").write_text(main)
 
 # ---- CSS: scope everything under .hp-root ----
