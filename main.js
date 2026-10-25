@@ -18,6 +18,7 @@ const {
   requestUrl,
   moment,
   Scope,
+  Menu,
 } = obsidian;
 
 const VIEW_TYPE = "genkan-view";
@@ -578,13 +579,22 @@ const I18N = {
     "Unsaved changes": "Modifications non enregistrées",
     "Quick note {n}": "Note rapide {n}",
     "Collapse {name}": "Réduire {name}",
+    "Open in Surfing": "Ouvrir dans Surfing",
+    "Open in the default browser": "Ouvrir dans le navigateur par défaut",
+    "Open in {browser}": "Ouvrir dans {browser}",
+    "Copy link": "Copier le lien",
+    "Link copied.": "Lien copié.",
+    "Could not copy the link.": "Impossible de copier le lien.",
+    "Could not open the link.": "Impossible d’ouvrir le lien.",
+    "Running timer": "Minuteur en cours",
+    "Open {task}": "Ouvrir {task}",
+    "Running timer display": "Affichage du minuteur en cours",
+    "Show the running timer where you can always see it: in Obsidian's status bar on desktop, or at the top of the dashboard on phones and tablets. Click it to open the task. Needs the Time tracker.": "Affiche le minuteur en cours là où vous le voyez toujours : dans la barre d’état d’Obsidian sur ordinateur, ou en haut du tableau de bord sur téléphone et tablette. Cliquez dessus pour ouvrir la tâche. Nécessite le suivi du temps.",
     "Pause or resume the time tracker timer": "Mettre en pause ou reprendre le minuteur du suivi du temps",
     "Stop the time tracker timer": "Arrêter le minuteur du suivi du temps",
     "Timer running: {task}. Open it in the time tracker.": "Minuteur en cours : {task}. L’ouvrir dans le suivi du temps.",
     "No timer to resume. Start one from the Time tracker card.": "Aucun minuteur à reprendre. Démarrez-en un depuis la carte Suivi du temps.",
     "No timer is running.": "Aucun minuteur en cours.",
-    "Timer in the status bar": "Minuteur dans la barre d’état",
-    "Show the running timer in Obsidian's status bar on desktop, so you can see it from any note. Click it to open the task. Needs the Time tracker.": "Affiche le minuteur en cours dans la barre d’état d’Obsidian sur ordinateur, pour le voir depuis n’importe quelle note. Cliquez dessus pour ouvrir la tâche. Nécessite le suivi du temps.",
     "Start date": "Date de début",
     "Start time": "Heure de début",
     "End date": "Date de fin",
@@ -959,13 +969,22 @@ const I18N = {
     "Unsaved changes": "Cambios sin guardar",
     "Quick note {n}": "Nota rápida {n}",
     "Collapse {name}": "Contraer {name}",
+    "Open in Surfing": "Abrir en Surfing",
+    "Open in the default browser": "Abrir en el navegador predeterminado",
+    "Open in {browser}": "Abrir en {browser}",
+    "Copy link": "Copiar enlace",
+    "Link copied.": "Enlace copiado.",
+    "Could not copy the link.": "No se pudo copiar el enlace.",
+    "Could not open the link.": "No se pudo abrir el enlace.",
+    "Running timer": "Temporizador en marcha",
+    "Open {task}": "Abrir {task}",
+    "Running timer display": "Visualización del temporizador en marcha",
+    "Show the running timer where you can always see it: in Obsidian's status bar on desktop, or at the top of the dashboard on phones and tablets. Click it to open the task. Needs the Time tracker.": "Muestra el temporizador en marcha donde siempre lo veas: en la barra de estado de Obsidian en el escritorio, o en la parte superior del panel en teléfonos y tabletas. Haz clic para abrir la tarea. Requiere el control de tiempo.",
     "Pause or resume the time tracker timer": "Pausar o reanudar el temporizador del control de tiempo",
     "Stop the time tracker timer": "Detener el temporizador del control de tiempo",
     "Timer running: {task}. Open it in the time tracker.": "Temporizador en marcha: {task}. Abrir en el control de tiempo.",
     "No timer to resume. Start one from the Time tracker card.": "No hay temporizador que reanudar. Inicia uno desde la tarjeta Control de tiempo.",
     "No timer is running.": "No hay ningún temporizador en marcha.",
-    "Timer in the status bar": "Temporizador en la barra de estado",
-    "Show the running timer in Obsidian's status bar on desktop, so you can see it from any note. Click it to open the task. Needs the Time tracker.": "Muestra el temporizador en marcha en la barra de estado de Obsidian en el escritorio, para verlo desde cualquier nota. Haz clic para abrir la tarea. Requiere el control de tiempo.",
     "Start date": "Fecha de inicio",
     "Start time": "Hora de inicio",
     "End date": "Fecha de fin",
@@ -1340,13 +1359,22 @@ const I18N = {
     "Unsaved changes": "Ungespeicherte Änderungen",
     "Quick note {n}": "Schnellnotiz {n}",
     "Collapse {name}": "{name} einklappen",
+    "Open in Surfing": "In Surfing öffnen",
+    "Open in the default browser": "Im Standardbrowser öffnen",
+    "Open in {browser}": "In {browser} öffnen",
+    "Copy link": "Link kopieren",
+    "Link copied.": "Link kopiert.",
+    "Could not copy the link.": "Der Link konnte nicht kopiert werden.",
+    "Could not open the link.": "Der Link konnte nicht geöffnet werden.",
+    "Running timer": "Laufender Timer",
+    "Open {task}": "{task} öffnen",
+    "Running timer display": "Anzeige des laufenden Timers",
+    "Show the running timer where you can always see it: in Obsidian's status bar on desktop, or at the top of the dashboard on phones and tablets. Click it to open the task. Needs the Time tracker.": "Zeigt den laufenden Timer dort an, wo Sie ihn immer sehen: in der Statusleiste von Obsidian am Desktop oder oben im Dashboard auf Smartphones und Tablets. Ein Klick öffnet die Aufgabe. Erfordert die Zeiterfassung.",
     "Pause or resume the time tracker timer": "Timer der Zeiterfassung anhalten oder fortsetzen",
     "Stop the time tracker timer": "Timer der Zeiterfassung stoppen",
     "Timer running: {task}. Open it in the time tracker.": "Timer läuft: {task}. In der Zeiterfassung öffnen.",
     "No timer to resume. Start one from the Time tracker card.": "Kein Timer zum Fortsetzen. Starten Sie einen über die Karte Zeiterfassung.",
     "No timer is running.": "Es läuft kein Timer.",
-    "Timer in the status bar": "Timer in der Statusleiste",
-    "Show the running timer in Obsidian's status bar on desktop, so you can see it from any note. Click it to open the task. Needs the Time tracker.": "Zeigt den laufenden Timer in der Statusleiste von Obsidian am Desktop an, sodass Sie ihn in jeder Notiz sehen. Ein Klick öffnet die Aufgabe. Erfordert die Zeiterfassung.",
     "Start date": "Startdatum",
     "Start time": "Startzeit",
     "End date": "Enddatum",
@@ -1723,13 +1751,22 @@ const I18N = {
     "Unsaved changes": "未保存の変更",
     "Quick note {n}": "クイックメモ {n}",
     "Collapse {name}": "{name} を折りたたむ",
+    "Open in Surfing": "Surfing で開く",
+    "Open in the default browser": "既定のブラウザで開く",
+    "Open in {browser}": "{browser} で開く",
+    "Copy link": "リンクをコピー",
+    "Link copied.": "リンクをコピーしました。",
+    "Could not copy the link.": "リンクをコピーできませんでした。",
+    "Could not open the link.": "リンクを開けませんでした。",
+    "Running timer": "実行中のタイマー",
+    "Open {task}": "{task} を開く",
+    "Running timer display": "実行中タイマーの表示",
+    "Show the running timer where you can always see it: in Obsidian's status bar on desktop, or at the top of the dashboard on phones and tablets. Click it to open the task. Needs the Time tracker.": "実行中のタイマーを常に見える場所に表示します。デスクトップ版では Obsidian のステータスバー、スマートフォンやタブレットではダッシュボードの上部です。クリックするとタスクが開きます。タイムトラッカーが必要です。",
     "Pause or resume the time tracker timer": "タイムトラッカーのタイマーを一時停止または再開",
     "Stop the time tracker timer": "タイムトラッカーのタイマーを停止",
     "Timer running: {task}. Open it in the time tracker.": "タイマー実行中: {task}。タイムトラッカーで開く。",
     "No timer to resume. Start one from the Time tracker card.": "再開するタイマーがありません。タイムトラッカーのカードから開始してください。",
     "No timer is running.": "実行中のタイマーはありません。",
-    "Timer in the status bar": "ステータスバーのタイマー",
-    "Show the running timer in Obsidian's status bar on desktop, so you can see it from any note. Click it to open the task. Needs the Time tracker.": "実行中のタイマーをデスクトップ版 Obsidian のステータスバーに表示し、どのノートからでも確認できます。クリックするとタスクが開きます。タイムトラッカーが必要です。",
     "Start date": "開始日",
     "Start time": "開始時刻",
     "End date": "終了日",
@@ -3267,7 +3304,9 @@ function buildDashboard() {
     h("div", { cls: "arrange-actions" }, h("button", { type: "button", cls: "btn-secondary", id: "arrange-use-shared", hidden: "", text: T("Use the shared layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-push", text: T("Use on all my devices") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-reset", text: T("Reset layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-done", text: T("Done") })),
   );
   const topZone = h("div", { cls: "zone zone-top", "data-zone": "top" }, favs);
-  return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, hero, quote, banner, topZone, h("main", { cls: "grid" }, left, center, right)), h("div", { cls: "sr-only", id: "arrange-live", role: "status", "aria-live": "polite" })];
+  // On phones and tablets there is no status bar, so a running timer shows here instead
+  const running = h("div", { cls: "tt-running hidden", id: "tt-running", role: "region", "aria-label": T("Running timer") });
+  return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, running, hero, quote, banner, topZone, h("main", { cls: "grid" }, left, center, right)), h("div", { cls: "sr-only", id: "arrange-live", role: "status", "aria-live": "polite" })];
 }
 
 // ─── Time tracker ─────────────────────────────────────────────────────────────
@@ -4217,10 +4256,43 @@ class TimeTrackerUI {
 
   // Called every second by the dashboard; only a running timer changes anything
   tickRunning() {
-    if (this.store.running()) this.tick();
+    if (!this.store.running()) return;
+    this.updateRunning();
+    this.tick();
+  }
+
+  // A running timer across the top of the dashboard, on phones and tablets (no status bar there)
+  updateRunning() {
+    const el = this.view.$("tt-running");
+    if (!el) return;
+    const set = this.view.settings;
+    const task = Platform.isMobile && set.showTimeTracker && set.showTimerStatus ? this.store.runningTask() : null;
+    el.classList.toggle("hidden", !task);
+    if (!task) {
+      this.runId = null;
+      return;
+    }
+    if (this.runId !== task.id) {
+      this.runId = task.id;
+      el.empty();
+      const open = h("button", { type: "button", cls: "tt-run-open", "aria-label": T("Open {task}", { task: task.name }) }, h("span", { cls: "tt-run-dot", "aria-hidden": "true" }), h("span", { cls: "tt-run-name", text: task.name }));
+      open.addEventListener("click", () => {
+        this.go({ name: "task", pid: task.pid, tid: task.id });
+        this.view.$("tt-card")?.scrollIntoView?.({ block: "start" });
+      });
+      this.runTime = h("span", { cls: "tt-run-time", "aria-hidden": "true" });
+      el.append(
+        open,
+        this.runTime,
+        this.btn(T("Pause timer: {task}", { task: task.name }), "run-pause", () => this.pauseTask(task), { cls: "tt-ctl", icon: "pause" }),
+        this.btn(T("Stop timer: {task}", { task: task.name }), "run-stop", () => this.stopTask(task), { cls: "tt-ctl", icon: "stop" }),
+      );
+    }
+    this.runTime.textContent = ttClock(this.store.taskSecs(task.id, 0, Infinity, this.now()));
   }
 
   render() {
+    this.updateRunning();
     const card = this.view.$("tt-card");
     if (!card) return;
     const enabled = !!this.view.settings.showTimeTracker;
@@ -6102,6 +6174,7 @@ class HomepageView extends ItemView {
       el.addEventListener("input", changed);
       el.addEventListener("blur", flush);
     }
+    this.initNoteLinks(rich);
     rich.addEventListener("compositionstart", () => (this.noteComposing = true));
     rich.addEventListener("compositionend", () => (this.noteComposing = false));
     // Paste and drop as plain text, so no foreign styling ever enters the note
@@ -6394,6 +6467,113 @@ class HomepageView extends ItemView {
     } else {
       document.execCommand("createLink", false, url);
     }
+  }
+
+  // ── Links in the quick note ──
+  // A link in an editable area does nothing when clicked, so Genkan opens it: in Surfing when that
+  // plugin is on, otherwise in the default browser. Right-click offers other places to open it.
+
+  initNoteLinks(rich) {
+    const linkAt = (target) => {
+      const a = target instanceof Element ? target.closest("a[href]") : null;
+      const href = a && a.getAttribute("href");
+      return href && SAFE_HREF.test(href) ? href : null;
+    };
+    rich.addEventListener("click", (e) => {
+      const href = linkAt(e.target);
+      const sel = window.getSelection();
+      if (!href || e.button !== 0 || (sel && !sel.isCollapsed)) return; // dragging a selection over a link is editing
+      e.preventDefault();
+      this.openNoteLink(href);
+    });
+    rich.addEventListener("contextmenu", (e) => {
+      const href = linkAt(e.target);
+      if (!href) return;
+      e.preventDefault();
+      this.noteLinkMenu(href).showAtMouseEvent(e);
+    });
+    // From the keyboard: Ctrl/Cmd+Enter opens the link the cursor is in
+    rich.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" || !(e.metaKey || e.ctrlKey) || e.isComposing) return;
+      const sel = window.getSelection();
+      const href = sel && sel.anchorNode ? linkAt(sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement) : null;
+      if (!href) return;
+      e.preventDefault();
+      this.openNoteLink(href);
+    });
+  }
+
+  surfingOn() {
+    return !!this.app.plugins?.plugins?.surfing;
+  }
+
+  async openInSurfing(url) {
+    try {
+      const leaf = this.app.workspace.getLeaf("tab");
+      await leaf.setViewState({ type: "surfing-view", active: true, state: { url } });
+      this.app.workspace.revealLeaf(leaf);
+    } catch {
+      this.openExternally(url);
+    }
+  }
+
+  // The system's default browser (the "external" hint stops Surfing taking it over)
+  openExternally(url) {
+    window.open(url, "_blank", "external");
+  }
+
+  openNoteLink(url) {
+    if (/^https?:/i.test(url) && this.surfingOn() && !Platform.isMobile) this.openInSurfing(url);
+    else this.openExternally(url);
+  }
+
+  // Browsers installed on this Mac, for the right-click menu
+  installedBrowsers() {
+    if (!Platform.isMacOS || Platform.isMobile || typeof window.require !== "function") return [];
+    try {
+      const fs = window.require("fs");
+      const os = window.require("os");
+      const roots = ["/Applications", `${os.homedir()}/Applications`, "/System/Cryptexes/App/System/Applications"];
+      const names = ["Safari", "Google Chrome", "Firefox", "Arc", "Dia", "Brave Browser", "Microsoft Edge", "Vivaldi", "Opera", "Orion", "Zen", "Chromium"];
+      const found = [];
+      for (const name of names) {
+        const dir = roots.find((r) => fs.existsSync(`${r}/${name}.app`));
+        if (dir) found.push({ name, path: `${dir}/${name}.app` });
+      }
+      return found;
+    } catch {
+      return [];
+    }
+  }
+
+  openInBrowser(url, appPath) {
+    try {
+      window.require("child_process").execFile("open", ["-a", appPath, url], (err) => {
+        if (err) new Notice(T("Could not open the link."));
+      });
+    } catch {
+      new Notice(T("Could not open the link."));
+    }
+  }
+
+  noteLinkMenu(url) {
+    const menu = new Menu();
+    const web = /^https?:/i.test(url);
+    if (web && this.surfingOn() && !Platform.isMobile) menu.addItem((i) => i.setTitle(T("Open in Surfing")).setIcon("globe").onClick(() => this.openInSurfing(url)));
+    menu.addItem((i) => i.setTitle(T("Open in the default browser")).setIcon("external-link").onClick(() => this.openExternally(url)));
+    if (web) for (const b of this.installedBrowsers()) menu.addItem((i) => i.setTitle(T("Open in {browser}", { browser: b.name })).setIcon("external-link").onClick(() => this.openInBrowser(url, b.path)));
+    menu.addSeparator();
+    menu.addItem((i) =>
+      i.setTitle(T("Copy link")).setIcon("copy").onClick(async () => {
+        try {
+          await navigator.clipboard.writeText(url);
+          new Notice(T("Link copied."));
+        } catch {
+          new Notice(T("Could not copy the link."));
+        }
+      }),
+    );
+    return menu;
   }
 
   // Which line (counting like the markdown does) a point in the editor falls on, and how far
@@ -7533,8 +7713,8 @@ class HomepageSettingTab extends PluginSettingTab {
       .addToggle((t) => t.setValue(s.showTimeTracker).onChange((v) => save("showTimeTracker", v)));
 
     add()
-      .setName(T("Timer in the status bar"))
-      .setDesc(T("Show the running timer in Obsidian's status bar on desktop, so you can see it from any note. Click it to open the task. Needs the Time tracker."))
+      .setName(T("Running timer display"))
+      .setDesc(T("Show the running timer where you can always see it: in Obsidian's status bar on desktop, or at the top of the dashboard on phones and tablets. Click it to open the task. Needs the Time tracker."))
       .addToggle((t) => t.setValue(s.showTimerStatus).onChange((v) => save("showTimerStatus", v)));
 
     add()

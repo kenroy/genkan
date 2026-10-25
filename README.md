@@ -12,7 +12,7 @@ Genkan (玄関) is the entryway of a Japanese home: the place you step in. This 
 - Cards in the middle column that fold down to their title
 - **Arrange cards**: drag the cards into the order and columns you want, and share the layout with your other devices
 - **On this day**: an optional card with notes from this date a week, a month and a year ago
-- **Time tracker**: an optional card for timing work on projects and tasks, with time allocations, a weekly summary, a running timer in the status bar, and CSV, Excel or PDF reports
+- **Time tracker**: an optional card for timing work on projects and tasks, with time allocations, a weekly summary, a running timer in the status bar or at the top of the dashboard on a phone, and CSV, Excel or PDF reports
 - **Ring notes**: an optional card for voice notes from a Pebble Index ring
 - A photo of the day and a daily quote (both optional)
 
@@ -72,6 +72,9 @@ The quick note is a small rich-text editor (its toolbar is a single Tab stop: us
 
 By default these live in `genkan/data/`. Change the **Data folder** setting to put them elsewhere.
 
+### Links in quick notes
+Click a link in a quick note to open it: in Surfing if that plugin is installed (on desktop), otherwise in your default browser. Right-click a link to choose where it opens: Surfing, the default browser, or, on a Mac, any of Safari, Chrome, Firefox, Arc, Dia, Brave, Edge, Vivaldi, Opera, Orion, Zen or Chromium that are installed, plus **Copy link**. With the cursor inside a link, Ctrl or Cmd+Enter opens it. Selecting text across a link does not open it, and to edit a link's text, move into it with the arrow keys. On a phone or tablet, a tap opens the link with the system. On Windows and Linux the menu offers Surfing, the default browser and Copy link only.
+
 ### Collapsing cards
 Click the − beside **Ring notes**, **Web clips**, **Recent notes** or **On this day** to fold a card down to its title (the count stays visible), and the + to open it again. Each device remembers what you collapsed.
 
@@ -119,7 +122,7 @@ Off by default. Turn on **Time tracker** in settings to add a card for timing yo
 - **Weekly summary.** The **Week** view shows each day of the week as a bar, then each project's time and share of the week, with arrows to move between weeks. The week starts on the day set in settings.
 - **Reports and export.** The **Report** view totals the time for one project or all projects over this week, last week, this month, last month or a range you choose, with each task's time under its project. **Export CSV**, **Export Excel** or **Export PDF** saves the report with the system save dialog, which opens in your vault folder and lets you choose another. The CSV and Excel files list every session (split at midnight, so each row falls on one day) and Excel adds a summary sheet with allocated, tracked and remaining hours. The PDF has the summary with budget bars, then the sessions. The PDF uses a standard font, so characters outside Western European languages (Japanese task names, say) print as "?" there; the CSV and Excel files keep them.
 
-- **Status bar and shortcuts.** On desktop, a running timer shows in Obsidian's status bar (a dot, the task and its total time) so you can see it from any note; click it, or press Enter on it, to open the task. Turn it off with **Timer in the status bar** in settings. Two commands, **Pause or resume the time tracker timer** and **Stop the time tracker timer**, can be given hotkeys: pause stops what is running, and resume restarts the task you paused last. Phones and tablets have no status bar.
+- **Status bar and shortcuts.** On desktop, a running timer shows in Obsidian's status bar (a dot, the task and its total time) so you can see it from any note; click it, or press Enter on it, to open the task. Turn it off with **Running timer display** in settings. Two commands, **Pause or resume the time tracker timer** and **Stop the time tracker timer**, can be given hotkeys: pause stops what is running, and resume restarts the task you paused last. Phones and tablets have no status bar, so there a running timer shows in a bar across the top of the dashboard instead, with the task, its total time and pause and stop buttons; tap the task to open it.
 
 The time itself is kept in its own file, `Time Tracking.json`, in the Genkan data folder (`genkan/data` by default, next to your tasks and quick notes), apart from the plugin settings. It is a plain JSON file you can back up or read. Obsidian Sync only syncs `.json` files if **Sync all other types** is turned on in its settings; without it, each device keeps its own time. When the file does sync, changes from two devices are merged record by record, so a task renamed on one and a timer started on another both survive, and the card updates when the file changes. The tracker's data is never sent anywhere.
 
@@ -143,7 +146,7 @@ Genkan aims to meet WCAG 2.2 level AA and is used with a keyboard and screen rea
 - **Text and targets:** text meets the 4.5:1 contrast minimum in both themes, and controls are at least 24 by 24 pixels (larger on phones and tablets).
 - **Announcements:** switching quick notes with Cmd/Ctrl+1 to 7 says which note you are on, "Saved" is announced when you leave a note you changed, and moving a card or sharing a layout is announced.
 - **No drag required:** arranging cards also works with buttons and the keyboard, and each step is announced.
-- **Time tracker:** each view has a heading, projects and tasks are lists, every timer button names its task ("Pause timer: Homepage wireframes"), and starting, pausing and stopping are announced. The status bar timer is a button you can reach with Tab and open with Enter or Space, named for the task it is timing (the ticking seconds are not read out). Budgets are written out as well as drawn, and deleting asks you to confirm.
+- **Time tracker:** each view has a heading, projects and tasks are lists, every timer button names its task ("Pause timer: Homepage wireframes"), and starting, pausing and stopping are announced. On a phone, the bar at the top of the dashboard is a labelled region whose task, pause and stop controls name the task. The status bar timer is a button you can reach with Tab and open with Enter or Space, named for the task it is timing (the ticking seconds are not read out). Budgets are written out as well as drawn, and deleting asks you to confirm.
 - **Motion:** animations respect your system's reduced-motion setting.
 - **Language:** the dashboard is tagged with the language it is shown in, so a screen reader pronounces it correctly even when Genkan's language differs from Obsidian's.
 
@@ -181,7 +184,7 @@ Notes:
 
 ## Settings
 
-Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker (and its status bar timer), the Pebble ring options, photo of the day and Unsplash key, daily quote, site icons, and quick links.
+Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker (and its running timer display), the Pebble ring options, photo of the day and Unsplash key, daily quote, site icons, and quick links.
 
 ## Development
 

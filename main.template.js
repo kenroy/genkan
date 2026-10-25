@@ -18,6 +18,7 @@ const {
   requestUrl,
   moment,
   Scope,
+  Menu,
 } = obsidian;
 
 const VIEW_TYPE = "genkan-view";
@@ -1383,7 +1384,9 @@ function buildDashboard() {
     h("div", { cls: "arrange-actions" }, h("button", { type: "button", cls: "btn-secondary", id: "arrange-use-shared", hidden: "", text: T("Use the shared layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-push", text: T("Use on all my devices") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-reset", text: T("Reset layout") }), h("button", { type: "button", cls: "btn-secondary", id: "arrange-done", text: T("Done") })),
   );
   const topZone = h("div", { cls: "zone zone-top", "data-zone": "top" }, favs);
-  return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, hero, quote, banner, topZone, h("main", { cls: "grid" }, left, center, right)), h("div", { cls: "sr-only", id: "arrange-live", role: "status", "aria-live": "polite" })];
+  // On phones and tablets there is no status bar, so a running timer shows here instead
+  const running = h("div", { cls: "tt-running hidden", id: "tt-running", role: "region", "aria-label": T("Running timer") });
+  return [h("div", { cls: "bg-glow" }), h("div", { id: "app" }, header, running, hero, quote, banner, topZone, h("main", { cls: "grid" }, left, center, right)), h("div", { cls: "sr-only", id: "arrange-live", role: "status", "aria-live": "polite" })];
 }
 
 /*__TIMETRACKER__*/
@@ -2645,6 +2648,7 @@ class HomepageView extends ItemView {
       el.addEventListener("input", changed);
       el.addEventListener("blur", flush);
     }
+    this.initNoteLinks(rich);
     rich.addEventListener("compositionstart", () => (this.noteComposing = true));
     rich.addEventListener("compositionend", () => (this.noteComposing = false));
     // Paste and drop as plain text, so no foreign styling ever enters the note
@@ -2937,6 +2941,113 @@ class HomepageView extends ItemView {
     } else {
       document.execCommand("createLink", false, url);
     }
+  }
+
+  // ── Links in the quick note ──
+  // A link in an editable area does nothing when clicked, so Genkan opens it: in Surfing when that
+  // plugin is on, otherwise in the default browser. Right-click offers other places to open it.
+
+  initNoteLinks(rich) {
+    const linkAt = (target) => {
+      const a = target instanceof Element ? target.closest("a[href]") : null;
+      const href = a && a.getAttribute("href");
+      return href && SAFE_HREF.test(href) ? href : null;
+    };
+    rich.addEventListener("click", (e) => {
+      const href = linkAt(e.target);
+      const sel = window.getSelection();
+      if (!href || e.button !== 0 || (sel && !sel.isCollapsed)) return; // dragging a selection over a link is editing
+      e.preventDefault();
+      this.openNoteLink(href);
+    });
+    rich.addEventListener("contextmenu", (e) => {
+      const href = linkAt(e.target);
+      if (!href) return;
+      e.preventDefault();
+      this.noteLinkMenu(href).showAtMouseEvent(e);
+    });
+    // From the keyboard: Ctrl/Cmd+Enter opens the link the cursor is in
+    rich.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" || !(e.metaKey || e.ctrlKey) || e.isComposing) return;
+      const sel = window.getSelection();
+      const href = sel && sel.anchorNode ? linkAt(sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement) : null;
+      if (!href) return;
+      e.preventDefault();
+      this.openNoteLink(href);
+    });
+  }
+
+  surfingOn() {
+    return !!this.app.plugins?.plugins?.surfing;
+  }
+
+  async openInSurfing(url) {
+    try {
+      const leaf = this.app.workspace.getLeaf("tab");
+      await leaf.setViewState({ type: "surfing-view", active: true, state: { url } });
+      this.app.workspace.revealLeaf(leaf);
+    } catch {
+      this.openExternally(url);
+    }
+  }
+
+  // The system's default browser (the "external" hint stops Surfing taking it over)
+  openExternally(url) {
+    window.open(url, "_blank", "external");
+  }
+
+  openNoteLink(url) {
+    if (/^https?:/i.test(url) && this.surfingOn() && !Platform.isMobile) this.openInSurfing(url);
+    else this.openExternally(url);
+  }
+
+  // Browsers installed on this Mac, for the right-click menu
+  installedBrowsers() {
+    if (!Platform.isMacOS || Platform.isMobile || typeof window.require !== "function") return [];
+    try {
+      const fs = window.require("fs");
+      const os = window.require("os");
+      const roots = ["/Applications", `${os.homedir()}/Applications`, "/System/Cryptexes/App/System/Applications"];
+      const names = ["Safari", "Google Chrome", "Firefox", "Arc", "Dia", "Brave Browser", "Microsoft Edge", "Vivaldi", "Opera", "Orion", "Zen", "Chromium"];
+      const found = [];
+      for (const name of names) {
+        const dir = roots.find((r) => fs.existsSync(`${r}/${name}.app`));
+        if (dir) found.push({ name, path: `${dir}/${name}.app` });
+      }
+      return found;
+    } catch {
+      return [];
+    }
+  }
+
+  openInBrowser(url, appPath) {
+    try {
+      window.require("child_process").execFile("open", ["-a", appPath, url], (err) => {
+        if (err) new Notice(T("Could not open the link."));
+      });
+    } catch {
+      new Notice(T("Could not open the link."));
+    }
+  }
+
+  noteLinkMenu(url) {
+    const menu = new Menu();
+    const web = /^https?:/i.test(url);
+    if (web && this.surfingOn() && !Platform.isMobile) menu.addItem((i) => i.setTitle(T("Open in Surfing")).setIcon("globe").onClick(() => this.openInSurfing(url)));
+    menu.addItem((i) => i.setTitle(T("Open in the default browser")).setIcon("external-link").onClick(() => this.openExternally(url)));
+    if (web) for (const b of this.installedBrowsers()) menu.addItem((i) => i.setTitle(T("Open in {browser}", { browser: b.name })).setIcon("external-link").onClick(() => this.openInBrowser(url, b.path)));
+    menu.addSeparator();
+    menu.addItem((i) =>
+      i.setTitle(T("Copy link")).setIcon("copy").onClick(async () => {
+        try {
+          await navigator.clipboard.writeText(url);
+          new Notice(T("Link copied."));
+        } catch {
+          new Notice(T("Could not copy the link."));
+        }
+      }),
+    );
+    return menu;
   }
 
   // Which line (counting like the markdown does) a point in the editor falls on, and how far
@@ -4076,8 +4187,8 @@ class HomepageSettingTab extends PluginSettingTab {
       .addToggle((t) => t.setValue(s.showTimeTracker).onChange((v) => save("showTimeTracker", v)));
 
     add()
-      .setName(T("Timer in the status bar"))
-      .setDesc(T("Show the running timer in Obsidian's status bar on desktop, so you can see it from any note. Click it to open the task. Needs the Time tracker."))
+      .setName(T("Running timer display"))
+      .setDesc(T("Show the running timer where you can always see it: in Obsidian's status bar on desktop, or at the top of the dashboard on phones and tablets. Click it to open the task. Needs the Time tracker."))
       .addToggle((t) => t.setValue(s.showTimerStatus).onChange((v) => save("showTimerStatus", v)));
 
     add()

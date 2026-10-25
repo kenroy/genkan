@@ -945,10 +945,43 @@ class TimeTrackerUI {
 
   // Called every second by the dashboard; only a running timer changes anything
   tickRunning() {
-    if (this.store.running()) this.tick();
+    if (!this.store.running()) return;
+    this.updateRunning();
+    this.tick();
+  }
+
+  // A running timer across the top of the dashboard, on phones and tablets (no status bar there)
+  updateRunning() {
+    const el = this.view.$("tt-running");
+    if (!el) return;
+    const set = this.view.settings;
+    const task = Platform.isMobile && set.showTimeTracker && set.showTimerStatus ? this.store.runningTask() : null;
+    el.classList.toggle("hidden", !task);
+    if (!task) {
+      this.runId = null;
+      return;
+    }
+    if (this.runId !== task.id) {
+      this.runId = task.id;
+      el.empty();
+      const open = h("button", { type: "button", cls: "tt-run-open", "aria-label": T("Open {task}", { task: task.name }) }, h("span", { cls: "tt-run-dot", "aria-hidden": "true" }), h("span", { cls: "tt-run-name", text: task.name }));
+      open.addEventListener("click", () => {
+        this.go({ name: "task", pid: task.pid, tid: task.id });
+        this.view.$("tt-card")?.scrollIntoView?.({ block: "start" });
+      });
+      this.runTime = h("span", { cls: "tt-run-time", "aria-hidden": "true" });
+      el.append(
+        open,
+        this.runTime,
+        this.btn(T("Pause timer: {task}", { task: task.name }), "run-pause", () => this.pauseTask(task), { cls: "tt-ctl", icon: "pause" }),
+        this.btn(T("Stop timer: {task}", { task: task.name }), "run-stop", () => this.stopTask(task), { cls: "tt-ctl", icon: "stop" }),
+      );
+    }
+    this.runTime.textContent = ttClock(this.store.taskSecs(task.id, 0, Infinity, this.now()));
   }
 
   render() {
+    this.updateRunning();
     const card = this.view.$("tt-card");
     if (!card) return;
     const enabled = !!this.view.settings.showTimeTracker;
