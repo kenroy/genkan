@@ -1422,7 +1422,7 @@ class TimeTrackerUI {
     const box = h(
       "details",
       { cls: "tt-manual" },
-      h("summary", { text: T("Add time manually") }),
+      h("summary", { text: T("Add time manually"), "data-k": "manual" }),
       h("div", { cls: "tt-manual-body" },
         h("div", { cls: "tt-dates" }, field(T("Start date"), fromDate, "tt-msd"), field(T("Start time"), fromTime, "tt-mst")),
         h("div", { cls: "tt-dates" }, field(T("End date"), toDate, "tt-med"), field(T("End time"), toTime, "tt-met")),

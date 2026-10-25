@@ -566,7 +566,7 @@
 }
 
 /* Keyboard focus: one visible ring on every control (WCAG 2.4.7 / 1.4.11) */
-#genkan-root :is(button, a, input, select, textarea, [tabindex]):focus-visible,
+#genkan-root :is(button, a, input, select, textarea, summary, [tabindex]):focus-visible,
 #genkan-root .search-wrap:focus-within,
 #genkan-root #note-card:focus-within {
   outline: 2px solid var(--accent-txt);
@@ -2093,11 +2093,12 @@
 }
 
 .hp-root .tt-manual summary {
+  border-radius: 4px;
   color: var(--accent-txt);
   cursor: pointer;
   font-size: 12px;
   min-height: 24px;
-  padding: 3px 0;
+  padding: 3px 4px;
 }
 
 .hp-root .tt-manual-body {
