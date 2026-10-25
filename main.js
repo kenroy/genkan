@@ -578,6 +578,13 @@ const I18N = {
     "Unsaved changes": "Modifications non enregistrées",
     "Quick note {n}": "Note rapide {n}",
     "Collapse {name}": "Réduire {name}",
+    "Pause or resume the time tracker timer": "Mettre en pause ou reprendre le minuteur du suivi du temps",
+    "Stop the time tracker timer": "Arrêter le minuteur du suivi du temps",
+    "Timer running: {task}. Open it in the time tracker.": "Minuteur en cours : {task}. L’ouvrir dans le suivi du temps.",
+    "No timer to resume. Start one from the Time tracker card.": "Aucun minuteur à reprendre. Démarrez-en un depuis la carte Suivi du temps.",
+    "No timer is running.": "Aucun minuteur en cours.",
+    "Timer in the status bar": "Minuteur dans la barre d’état",
+    "Show the running timer in Obsidian's status bar on desktop, so you can see it from any note. Click it to open the task. Needs the Time tracker.": "Affiche le minuteur en cours dans la barre d’état d’Obsidian sur ordinateur, pour le voir depuis n’importe quelle note. Cliquez dessus pour ouvrir la tâche. Nécessite le suivi du temps.",
     "Start date": "Date de début",
     "Start time": "Heure de début",
     "End date": "Date de fin",
@@ -952,6 +959,13 @@ const I18N = {
     "Unsaved changes": "Cambios sin guardar",
     "Quick note {n}": "Nota rápida {n}",
     "Collapse {name}": "Contraer {name}",
+    "Pause or resume the time tracker timer": "Pausar o reanudar el temporizador del control de tiempo",
+    "Stop the time tracker timer": "Detener el temporizador del control de tiempo",
+    "Timer running: {task}. Open it in the time tracker.": "Temporizador en marcha: {task}. Abrir en el control de tiempo.",
+    "No timer to resume. Start one from the Time tracker card.": "No hay temporizador que reanudar. Inicia uno desde la tarjeta Control de tiempo.",
+    "No timer is running.": "No hay ningún temporizador en marcha.",
+    "Timer in the status bar": "Temporizador en la barra de estado",
+    "Show the running timer in Obsidian's status bar on desktop, so you can see it from any note. Click it to open the task. Needs the Time tracker.": "Muestra el temporizador en marcha en la barra de estado de Obsidian en el escritorio, para verlo desde cualquier nota. Haz clic para abrir la tarea. Requiere el control de tiempo.",
     "Start date": "Fecha de inicio",
     "Start time": "Hora de inicio",
     "End date": "Fecha de fin",
@@ -1326,6 +1340,13 @@ const I18N = {
     "Unsaved changes": "Ungespeicherte Änderungen",
     "Quick note {n}": "Schnellnotiz {n}",
     "Collapse {name}": "{name} einklappen",
+    "Pause or resume the time tracker timer": "Timer der Zeiterfassung anhalten oder fortsetzen",
+    "Stop the time tracker timer": "Timer der Zeiterfassung stoppen",
+    "Timer running: {task}. Open it in the time tracker.": "Timer läuft: {task}. In der Zeiterfassung öffnen.",
+    "No timer to resume. Start one from the Time tracker card.": "Kein Timer zum Fortsetzen. Starten Sie einen über die Karte Zeiterfassung.",
+    "No timer is running.": "Es läuft kein Timer.",
+    "Timer in the status bar": "Timer in der Statusleiste",
+    "Show the running timer in Obsidian's status bar on desktop, so you can see it from any note. Click it to open the task. Needs the Time tracker.": "Zeigt den laufenden Timer in der Statusleiste von Obsidian am Desktop an, sodass Sie ihn in jeder Notiz sehen. Ein Klick öffnet die Aufgabe. Erfordert die Zeiterfassung.",
     "Start date": "Startdatum",
     "Start time": "Startzeit",
     "End date": "Enddatum",
@@ -1702,6 +1723,13 @@ const I18N = {
     "Unsaved changes": "未保存の変更",
     "Quick note {n}": "クイックメモ {n}",
     "Collapse {name}": "{name} を折りたたむ",
+    "Pause or resume the time tracker timer": "タイムトラッカーのタイマーを一時停止または再開",
+    "Stop the time tracker timer": "タイムトラッカーのタイマーを停止",
+    "Timer running: {task}. Open it in the time tracker.": "タイマー実行中: {task}。タイムトラッカーで開く。",
+    "No timer to resume. Start one from the Time tracker card.": "再開するタイマーがありません。タイムトラッカーのカードから開始してください。",
+    "No timer is running.": "実行中のタイマーはありません。",
+    "Timer in the status bar": "ステータスバーのタイマー",
+    "Show the running timer in Obsidian's status bar on desktop, so you can see it from any note. Click it to open the task. Needs the Time tracker.": "実行中のタイマーをデスクトップ版 Obsidian のステータスバーに表示し、どのノートからでも確認できます。クリックするとタスクが開きます。タイムトラッカーが必要です。",
     "Start date": "開始日",
     "Start time": "開始時刻",
     "End date": "終了日",
@@ -2024,6 +2052,7 @@ const DEFAULT_SETTINGS = {
   showFavicons: true, // site icons on web clips (Google's favicon service)
   showRingNotes: false, // Pebble Index ring notes card (off unless enabled)
   showOnThisDay: false, // notes from this date a week, a month and a year ago (off unless enabled)
+  showTimerStatus: true, // the running timer in the status bar (desktop; needs the Time tracker)
   showTimeTracker: false, // projects, tasks and timers (off unless enabled); the time lives in its own file
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
   // "files" = a separate file per note in a folder
@@ -3487,6 +3516,21 @@ class TimeStore {
   runningTask() {
     const s = this.running();
     return s ? this.task(s.tid) : null;
+  }
+
+  // The task paused most recently, for a "resume" shortcut
+  lastPaused() {
+    let best = null;
+    let at = -1;
+    for (const task of this.data.tasks) {
+      if (task.del || !task.paused || task.done) continue;
+      const end = this.sessions(task.id).reduce((n, x) => Math.max(n, x.e || 0), 0);
+      if (end > at) {
+        at = end;
+        best = task;
+      }
+    }
+    return best;
   }
 
   // Seconds per task id in [from, to)
@@ -7489,6 +7533,11 @@ class HomepageSettingTab extends PluginSettingTab {
       .addToggle((t) => t.setValue(s.showTimeTracker).onChange((v) => save("showTimeTracker", v)));
 
     add()
+      .setName(T("Timer in the status bar"))
+      .setDesc(T("Show the running timer in Obsidian's status bar on desktop, so you can see it from any note. Click it to open the task. Needs the Time tracker."))
+      .addToggle((t) => t.setValue(s.showTimerStatus).onChange((v) => save("showTimerStatus", v)));
+
+    add()
       .setName(T("Pebble ring notes"))
       .setDesc(T("Show the latest voice notes from your Pebble Index ring."))
       .addToggle((t) => t.setValue(s.showRingNotes).onChange((v) => save("showRingNotes", v)));
@@ -7598,6 +7647,7 @@ module.exports = class HomepagePlugin extends Plugin {
       callback: () => this.activateView(),
     });
     this.addSettingTab(new HomepageSettingTab(this.app, this));
+    this.initTimerStatus();
 
     this.favPaths = new Set();
     const onVault = (f) => {
@@ -7830,7 +7880,91 @@ module.exports = class HomepagePlugin extends Plugin {
     for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE)) leaf.view.rebuild?.();
   }
 
+  // ── The running timer in the status bar ──
+
+  initTimerStatus() {
+    this.addCommand({ id: "toggle-timer", name: T("Pause or resume the time tracker timer"), callback: () => this.toggleTimer() });
+    this.addCommand({ id: "stop-timer", name: T("Stop the time tracker timer"), callback: () => this.stopTimer() });
+    // Phones and tablets have no status bar
+    if (Platform.isMobile) return;
+    const el = this.addStatusBarItem();
+    el.addClass("genkan-status-timer");
+    el.setAttribute("role", "button");
+    el.tabIndex = 0;
+    this.statusDot = el.createSpan({ cls: "genkan-status-dot", attr: { "aria-hidden": "true" } });
+    this.statusName = el.createSpan({ cls: "genkan-status-name" });
+    this.statusTime = el.createSpan({ cls: "genkan-status-time", attr: { "aria-hidden": "true" } });
+    el.addEventListener("click", () => this.openRunningTask());
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        this.openRunningTask();
+      }
+    });
+    this.statusEl = el;
+    this.time.subscribe(() => this.updateTimerStatus());
+    this.registerInterval(window.setInterval(() => this.updateTimerStatus(), 1000));
+    this.updateTimerStatus();
+  }
+
+  updateTimerStatus() {
+    const el = this.statusEl;
+    if (!el) return;
+    const task = this.settings.showTimeTracker && this.settings.showTimerStatus ? this.time.runningTask() : null;
+    el.style.display = task ? "" : "none";
+    if (!task) return;
+    if (this.statusTask !== task.name) {
+      this.statusTask = task.name;
+      this.statusName.textContent = task.name;
+      const label = T("Timer running: {task}. Open it in the time tracker.", { task: task.name });
+      el.setAttribute("aria-label", label);
+      el.setAttribute("title", label);
+    }
+    this.statusTime.textContent = ttClock(this.time.taskSecs(task.id));
+  }
+
+  async openRunningTask() {
+    const task = this.time.runningTask();
+    await this.activateView();
+    const view = this.app.workspace.getLeavesOfType(VIEW_TYPE)[0]?.view;
+    if (!view) return;
+    if (task) view.tt?.go({ name: "task", pid: task.pid, tid: task.id });
+    view.$("tt-card")?.scrollIntoView?.({ block: "nearest" });
+  }
+
+  // For a hotkey: pause what is running, or resume what was paused last
+  toggleTimer() {
+    const st = this.time;
+    const run = st.runningTask();
+    if (run) {
+      const secs = st.taskSecs(run.id);
+      st.pause(run.id, null);
+      new Notice(T("Paused {task} at {time}", { task: run.name, time: ttClock(secs) }));
+      return;
+    }
+    const back = st.lastPaused();
+    if (!back) {
+      new Notice(T("No timer to resume. Start one from the Time tracker card."));
+      return;
+    }
+    st.start(back.id, null);
+    new Notice(T("Started the timer for {task}", { task: back.name }));
+  }
+
+  stopTimer() {
+    const st = this.time;
+    const run = st.runningTask() || st.lastPaused();
+    if (!run) {
+      new Notice(T("No timer is running."));
+      return;
+    }
+    const secs = st.taskSecs(run.id);
+    st.stop(run.id, null);
+    new Notice(T("Stopped {task} at {time}", { task: run.name, time: ttClock(secs) }));
+  }
+
   refreshViews() {
+    this.updateTimerStatus();
     for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE)) {
       leaf.view.refreshAll?.(false);
     }

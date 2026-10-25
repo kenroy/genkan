@@ -246,6 +246,21 @@ class TimeStore {
     return s ? this.task(s.tid) : null;
   }
 
+  // The task paused most recently, for a "resume" shortcut
+  lastPaused() {
+    let best = null;
+    let at = -1;
+    for (const task of this.data.tasks) {
+      if (task.del || !task.paused || task.done) continue;
+      const end = this.sessions(task.id).reduce((n, x) => Math.max(n, x.e || 0), 0);
+      if (end > at) {
+        at = end;
+        best = task;
+      }
+    }
+    return best;
+  }
+
   // Seconds per task id in [from, to)
   secsByTask(from = 0, to = Infinity, now = Date.now()) {
     const live = new Set(this.data.tasks.filter((t) => !t.del).map((t) => t.id));

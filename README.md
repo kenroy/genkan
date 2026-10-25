@@ -119,6 +119,8 @@ Off by default. Turn on **Time tracker** in settings to add a card for timing yo
 - **Weekly summary.** The **Week** view shows each day of the week as a bar, then each project's time and share of the week, with arrows to move between weeks. The week starts on the day set in settings.
 - **Reports and export.** The **Report** view totals the time for one project or all projects over this week, last week, this month, last month or a range you choose, with each task's time under its project. **Export CSV**, **Export Excel** or **Export PDF** saves the report with the system save dialog, which opens in your vault folder and lets you choose another. The CSV and Excel files list every session (split at midnight, so each row falls on one day) and Excel adds a summary sheet with allocated, tracked and remaining hours. The PDF has the summary with budget bars, then the sessions. The PDF uses a standard font, so characters outside Western European languages (Japanese task names, say) print as "?" there; the CSV and Excel files keep them.
 
+- **Status bar and shortcuts.** On desktop, a running timer shows in Obsidian's status bar (a dot, the task and its total time) so you can see it from any note; click it, or press Enter on it, to open the task. Turn it off with **Timer in the status bar** in settings. Two commands, **Pause or resume the time tracker timer** and **Stop the time tracker timer**, can be given hotkeys: pause stops what is running, and resume restarts the task you paused last. Phones and tablets have no status bar.
+
 The time itself is kept in its own file, `Time Tracking.json`, in the Genkan data folder (`genkan/data` by default, next to your tasks and quick notes), apart from the plugin settings. It is a plain JSON file you can back up or read. Obsidian Sync only syncs `.json` files if **Sync all other types** is turned on in its settings; without it, each device keeps its own time. When the file does sync, changes from two devices are merged record by record, so a task renamed on one and a timer started on another both survive, and the card updates when the file changes. The tracker's data is never sent anywhere.
 
 ### Ring notes (Pebble Index)
@@ -179,7 +181,7 @@ Notes:
 
 ## Settings
 
-Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker, the Pebble ring options, photo of the day and Unsplash key, daily quote, site icons, and quick links.
+Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker (and its status bar timer), the Pebble ring options, photo of the day and Unsplash key, daily quote, site icons, and quick links.
 
 ## Development
 

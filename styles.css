@@ -3399,3 +3399,29 @@
 #genkan-root[data-theme="dark"] .tt-msg {
   color: #f87171;
 }
+
+/* The running timer in Obsidian's status bar (outside the dashboard, so not scoped) */
+.genkan-status-timer {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.genkan-status-timer .genkan-status-dot {
+  background: var(--color-green, #22c55e);
+  border-radius: 50%;
+  height: 7px;
+  width: 7px;
+}
+
+.genkan-status-timer .genkan-status-name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.genkan-status-timer .genkan-status-time {
+  font-variant-numeric: tabular-nums;
+}

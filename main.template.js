@@ -168,6 +168,7 @@ const DEFAULT_SETTINGS = {
   showFavicons: true, // site icons on web clips (Google's favicon service)
   showRingNotes: false, // Pebble Index ring notes card (off unless enabled)
   showOnThisDay: false, // notes from this date a week, a month and a year ago (off unless enabled)
+  showTimerStatus: true, // the running timer in the status bar (desktop; needs the Time tracker)
   showTimeTracker: false, // projects, tasks and timers (off unless enabled); the time lives in its own file
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
   // "files" = a separate file per note in a folder
@@ -4075,6 +4076,11 @@ class HomepageSettingTab extends PluginSettingTab {
       .addToggle((t) => t.setValue(s.showTimeTracker).onChange((v) => save("showTimeTracker", v)));
 
     add()
+      .setName(T("Timer in the status bar"))
+      .setDesc(T("Show the running timer in Obsidian's status bar on desktop, so you can see it from any note. Click it to open the task. Needs the Time tracker."))
+      .addToggle((t) => t.setValue(s.showTimerStatus).onChange((v) => save("showTimerStatus", v)));
+
+    add()
       .setName(T("Pebble ring notes"))
       .setDesc(T("Show the latest voice notes from your Pebble Index ring."))
       .addToggle((t) => t.setValue(s.showRingNotes).onChange((v) => save("showRingNotes", v)));
@@ -4184,6 +4190,7 @@ module.exports = class HomepagePlugin extends Plugin {
       callback: () => this.activateView(),
     });
     this.addSettingTab(new HomepageSettingTab(this.app, this));
+    this.initTimerStatus();
 
     this.favPaths = new Set();
     const onVault = (f) => {
@@ -4416,7 +4423,91 @@ module.exports = class HomepagePlugin extends Plugin {
     for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE)) leaf.view.rebuild?.();
   }
 
+  // ── The running timer in the status bar ──
+
+  initTimerStatus() {
+    this.addCommand({ id: "toggle-timer", name: T("Pause or resume the time tracker timer"), callback: () => this.toggleTimer() });
+    this.addCommand({ id: "stop-timer", name: T("Stop the time tracker timer"), callback: () => this.stopTimer() });
+    // Phones and tablets have no status bar
+    if (Platform.isMobile) return;
+    const el = this.addStatusBarItem();
+    el.addClass("genkan-status-timer");
+    el.setAttribute("role", "button");
+    el.tabIndex = 0;
+    this.statusDot = el.createSpan({ cls: "genkan-status-dot", attr: { "aria-hidden": "true" } });
+    this.statusName = el.createSpan({ cls: "genkan-status-name" });
+    this.statusTime = el.createSpan({ cls: "genkan-status-time", attr: { "aria-hidden": "true" } });
+    el.addEventListener("click", () => this.openRunningTask());
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        this.openRunningTask();
+      }
+    });
+    this.statusEl = el;
+    this.time.subscribe(() => this.updateTimerStatus());
+    this.registerInterval(window.setInterval(() => this.updateTimerStatus(), 1000));
+    this.updateTimerStatus();
+  }
+
+  updateTimerStatus() {
+    const el = this.statusEl;
+    if (!el) return;
+    const task = this.settings.showTimeTracker && this.settings.showTimerStatus ? this.time.runningTask() : null;
+    el.style.display = task ? "" : "none";
+    if (!task) return;
+    if (this.statusTask !== task.name) {
+      this.statusTask = task.name;
+      this.statusName.textContent = task.name;
+      const label = T("Timer running: {task}. Open it in the time tracker.", { task: task.name });
+      el.setAttribute("aria-label", label);
+      el.setAttribute("title", label);
+    }
+    this.statusTime.textContent = ttClock(this.time.taskSecs(task.id));
+  }
+
+  async openRunningTask() {
+    const task = this.time.runningTask();
+    await this.activateView();
+    const view = this.app.workspace.getLeavesOfType(VIEW_TYPE)[0]?.view;
+    if (!view) return;
+    if (task) view.tt?.go({ name: "task", pid: task.pid, tid: task.id });
+    view.$("tt-card")?.scrollIntoView?.({ block: "nearest" });
+  }
+
+  // For a hotkey: pause what is running, or resume what was paused last
+  toggleTimer() {
+    const st = this.time;
+    const run = st.runningTask();
+    if (run) {
+      const secs = st.taskSecs(run.id);
+      st.pause(run.id, null);
+      new Notice(T("Paused {task} at {time}", { task: run.name, time: ttClock(secs) }));
+      return;
+    }
+    const back = st.lastPaused();
+    if (!back) {
+      new Notice(T("No timer to resume. Start one from the Time tracker card."));
+      return;
+    }
+    st.start(back.id, null);
+    new Notice(T("Started the timer for {task}", { task: back.name }));
+  }
+
+  stopTimer() {
+    const st = this.time;
+    const run = st.runningTask() || st.lastPaused();
+    if (!run) {
+      new Notice(T("No timer is running."));
+      return;
+    }
+    const secs = st.taskSecs(run.id);
+    st.stop(run.id, null);
+    new Notice(T("Stopped {task} at {time}", { task: run.name, time: ttClock(secs) }));
+  }
+
   refreshViews() {
+    this.updateTimerStatus();
     for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE)) {
       leaf.view.refreshAll?.(false);
     }
