@@ -723,7 +723,7 @@ const I18N = {
     "{time} over": "{time} de dépassement",
     "{today} today · {week} this week": "{today} aujourd’hui · {week} cette semaine",
     "{used} of {total}": "{used} sur {total}",
-    "Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own file, Time Tracking.json, in the Genkan data folder.": "Suivez le temps passé sur vos projets et tâches avec des minuteurs, définissez des temps alloués, consultez un résumé hebdomadaire et exportez des rapports en CSV, Excel ou PDF. Stocké dans son propre fichier, Time Tracking.json, dans le dossier de données de Genkan.",
+    "Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own note, Time Tracking.md, in the Genkan data folder.": "Suivez le temps passé sur vos projets et tâches avec des minuteurs, définissez des temps alloués, consultez un résumé hebdomadaire et exportez des rapports en CSV, Excel ou PDF. Stocké dans sa propre note, Time Tracking.md, dans le dossier de données de Genkan.",
     "Expand {name}": "Développer {name}",
     "On this day": "Ce jour-là",
     "A week ago": "Il y a une semaine",
@@ -1110,7 +1110,7 @@ const I18N = {
     "{time} over": "{time} de más",
     "{today} today · {week} this week": "{today} hoy · {week} esta semana",
     "{used} of {total}": "{used} de {total}",
-    "Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own file, Time Tracking.json, in the Genkan data folder.": "Registra el tiempo de proyectos y tareas con temporizadores, asigna tiempo, consulta un resumen semanal y exporta informes en CSV, Excel o PDF. Se guarda en su propio archivo, Time Tracking.json, en la carpeta de datos de Genkan.",
+    "Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own note, Time Tracking.md, in the Genkan data folder.": "Registra el tiempo de proyectos y tareas con temporizadores, asigna tiempo, consulta un resumen semanal y exporta informes en CSV, Excel o PDF. Se guarda en su propia nota, Time Tracking.md, en la carpeta de datos de Genkan.",
     "Expand {name}": "Expandir {name}",
     "On this day": "Un día como hoy",
     "A week ago": "Hace una semana",
@@ -1497,7 +1497,7 @@ const I18N = {
     "{time} over": "{time} überschritten",
     "{today} today · {week} this week": "{today} heute · {week} diese Woche",
     "{used} of {total}": "{used} von {total}",
-    "Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own file, Time Tracking.json, in the Genkan data folder.": "Erfassen Sie die Zeit für Projekte und Aufgaben mit Timern, legen Sie Zeitbudgets fest, sehen Sie eine Wochenübersicht und exportieren Sie Berichte als CSV, Excel oder PDF. Gespeichert in einer eigenen Datei, Time Tracking.json, im Genkan-Datenordner.",
+    "Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own note, Time Tracking.md, in the Genkan data folder.": "Erfassen Sie die Zeit für Projekte und Aufgaben mit Timern, legen Sie Zeitbudgets fest, sehen Sie eine Wochenübersicht und exportieren Sie Berichte als CSV, Excel oder PDF. Gespeichert in einer eigenen Notiz, Time Tracking.md, im Genkan-Datenordner.",
     "Expand {name}": "{name} ausklappen",
     "On this day": "An diesem Tag",
     "A week ago": "Vor einer Woche",
@@ -1886,7 +1886,7 @@ const I18N = {
     "{time} over": "{time} 超過",
     "{today} today · {week} this week": "今日 {today} · 今週 {week}",
     "{used} of {total}": "{total} 中 {used}",
-    "Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own file, Time Tracking.json, in the Genkan data folder.": "タイマーでプロジェクトやタスクの時間を記録し、割り当て時間を設定し、週間サマリーを確認し、レポートを CSV、Excel、PDF で書き出せます。専用のファイル Time Tracking.json として Genkan のデータフォルダに保存されます。",
+    "Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own note, Time Tracking.md, in the Genkan data folder.": "タイマーでプロジェクトやタスクの時間を記録し、割り当て時間を設定し、週間サマリーを確認し、レポートを CSV、Excel、PDF で書き出せます。専用のノート Time Tracking.md として Genkan のデータフォルダに保存されます。",
     "Expand {name}": "{name} を展開",
     "On this day": "この日",
     "A week ago": "1週間前",
@@ -2078,7 +2078,7 @@ const DEFAULT_SETTINGS = {
   showRingNotes: false, // Pebble Index ring notes card (off unless enabled)
   showOnThisDay: false, // notes from this date a week, a month and a year ago (off unless enabled)
   showTimerStatus: true, // the running timer in the status bar (desktop; needs the Time tracker)
-  showTimeTracker: false, // projects, tasks and timers (off unless enabled); the time lives in its own file
+  showTimeTracker: false, // projects, tasks and timers (off unless enabled); the time lives in its own note
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
   // "files" = a separate file per note in a folder
   ringMode: "main",
@@ -3336,7 +3336,7 @@ function buildDashboard() {
 // ─── Time tracker ─────────────────────────────────────────────────────────────
 // Projects hold tasks, and a task's time is a list of sessions (start, end). Everything is derived
 // from the sessions, so a total can never drift from them. The data lives in its own file,
-// `Time Tracking.json` in the Genkan data folder, apart from the plugin settings; each record carries
+// `Time Tracking.md` in the Genkan data folder, apart from the plugin settings; each record carries
 // an `u` (updated) stamp and is deleted with a flag, so two devices merge by record instead of one
 // overwriting the other.
 
@@ -3351,13 +3351,63 @@ function ttEmpty() {
   return { projects: [], tasks: [], sessions: [], hb: 0 };
 }
 
-// The file's text as data; anything unreadable counts as empty
+// The file is a Markdown note, because Obsidian Sync carries notes on every setup (it leaves other
+// file types out unless a setting is on). One record per line, so Sync can merge two devices' edits
+// line by line and a damaged line costs one record, not everything.
+const TT_HEADER = [
+  "---",
+  "genkan: time-tracking",
+  "---",
+  "# Genkan time tracking",
+  "",
+  "This note holds the data behind Genkan's Time tracker. Each line is one project, task or session, so that Obsidian Sync can merge changes from different devices. Please don't edit it by hand.",
+  "",
+].join("\n");
+
+function ttSerialize(data) {
+  const d = ttNormalise(data);
+  const line = (t, r) => JSON.stringify({ t, ...r });
+  const lines = [
+    ...d.projects.slice().sort((a, b) => a.id.localeCompare(b.id)).map((r) => line("project", r)),
+    ...d.tasks.slice().sort((a, b) => a.pid.localeCompare(b.pid) || a.id.localeCompare(b.id)).map((r) => line("task", r)),
+    ...d.sessions.slice().sort((a, b) => a.s - b.s || a.id.localeCompare(b.id)).map((r) => line("session", r)),
+    JSON.stringify({ t: "hb", v: d.hb }),
+  ];
+  return `${TT_HEADER}\n\`\`\`text\n${lines.join("\n")}\n\`\`\`\n`;
+}
+
+// The note's text (or the older whole-file JSON) as data; anything unreadable counts as empty
 function ttParse(text) {
-  try {
-    return ttNormalise(JSON.parse(text));
-  } catch {
-    return ttEmpty();
+  const raw = { projects: [], tasks: [], sessions: [], hb: 0 };
+  const src = String(text || "");
+  if (/^\s*\{\s*"projects"/.test(src)) {
+    try {
+      return ttNormalise(JSON.parse(src));
+    } catch {
+      return ttEmpty();
+    }
   }
+  const best = { project: new Map(), task: new Map(), session: new Map() };
+  for (const l of src.split("\n")) {
+    const row = l.trim();
+    if (row[0] !== "{") continue;
+    let r;
+    try {
+      r = JSON.parse(row);
+    } catch {
+      continue; // a line damaged by a merge: skip just that record
+    }
+    if (!r || typeof r !== "object") continue;
+    if (r.t === "hb") raw.hb = Math.max(raw.hb, Number(r.v) || 0);
+    else if (best[r.t] && typeof r.id === "string") {
+      const old = best[r.t].get(r.id);
+      if (!old || (Number(r.u) || 0) >= (Number(old.u) || 0)) best[r.t].set(r.id, r); // a doubled line keeps the newer
+    }
+  }
+  raw.projects = [...best.project.values()];
+  raw.tasks = [...best.task.values()];
+  raw.sessions = [...best.session.values()];
+  return ttNormalise(raw);
 }
 
 // Accept anything from disk, keep only well-formed records
@@ -3384,7 +3434,7 @@ function ttNormalise(raw) {
   }
   for (const s of list(raw.sessions)) {
     if (!ok("sessions", s) || typeof s.tid !== "string" || !Number.isFinite(Number(s.s))) continue;
-    out.sessions.push({ id: s.id, tid: s.tid, s: Number(s.s), e: s.e == null ? null : num(s.e), u: num(s.u), del: s.del ? 1 : 0 });
+    out.sessions.push({ id: s.id, tid: s.tid, s: Number(s.s), e: s.e == null ? null : num(s.e), u: num(s.u), del: s.del ? 1 : 0, ...(typeof s.d === "string" && s.d ? { d: s.d.slice(0, 24) } : {}) });
   }
   out.hb = num(raw.hb);
   return out;
@@ -3478,6 +3528,26 @@ class TimeStore {
 
   // The time data has a file of its own in the Genkan data folder, apart from the plugin settings
   get path() {
+    return joinPath(this.plugin.settings.dataFolder, "Time Tracking.md");
+  }
+
+  // A random id for this device (kept in its local storage), stamped on the timers it starts
+  deviceId() {
+    const app = this.plugin.app;
+    try {
+      let id = app.loadLocalStorage("genkan-device");
+      if (!id) {
+        id = newId().slice(0, 12);
+        app.saveLocalStorage("genkan-device", id);
+      }
+      return id;
+    } catch {
+      return "";
+    }
+  }
+
+  // Where the data was kept before it moved into a note
+  get legacyPath() {
     return joinPath(this.plugin.settings.dataFolder, "Time Tracking.json");
   }
 
@@ -3513,16 +3583,31 @@ class TimeStore {
         let merged = this.data;
         await this.plugin.app.vault.process(file, (text) => {
           merged = ttMerge(ttParse(text), this.data);
-          return JSON.stringify(merged);
+          const out = ttSerialize(merged);
+          return out === text ? text : out;
         });
         this.take(merged);
+        this.warned = false;
+        await this.retireLegacy();
       } catch (err) {
         console.error("Genkan: could not save time tracking", err);
         if (!this.warned) new Notice(T("Could not save the time tracker's data."));
-        this.warned = true;
+        this.warned = true; // say so once per failure, not on every retry
       }
     });
     return this.writing;
+  }
+
+  // Once the note holds everything, set the old .json file aside so it is not read again
+  async retireLegacy() {
+    const vault = this.plugin.app.vault;
+    const old = vault.getAbstractFileByPath(this.legacyPath);
+    if (!(old instanceof TFile) || !this.loaded) return;
+    try {
+      await vault.rename(old, `${this.legacyPath}.old`);
+    } catch {
+      // it stays where it is and is merged again next time, which does no harm
+    }
   }
 
   // Use merged data, telling the views only when it differs from what they show
@@ -3536,8 +3621,12 @@ class TimeStore {
   // Take in what is in the file (on start, and when it changes from another device)
   async load() {
     try {
-      const file = this.plugin.app.vault.getAbstractFileByPath(this.path);
-      if (file instanceof TFile) this.take(ttMerge(ttParse(await this.plugin.app.vault.read(file)), this.data));
+      const vault = this.plugin.app.vault;
+      for (const path of [this.legacyPath, this.path]) {
+        const file = vault.getAbstractFileByPath(path);
+        if (file instanceof TFile) this.take(ttMerge(ttParse(await vault.read(file)), this.data));
+      }
+      this.legacy = vault.getAbstractFileByPath(this.legacyPath) instanceof TFile;
     } catch (err) {
       console.error("Genkan: could not read time tracking", err);
     }
@@ -3546,6 +3635,20 @@ class TimeStore {
       this.recover();
     }
     this.notify(null);
+    // Memory can hold records the note lacks (another device's copy just replaced the file, say):
+    // write the merged result back so nothing exists only in this window
+    if (this.legacy || (await this.noteDiffers())) this.save();
+  }
+
+  async noteDiffers() {
+    try {
+      const vault = this.plugin.app.vault;
+      const file = vault.getAbstractFileByPath(this.path);
+      if (!(file instanceof TFile)) return this.data.projects.length + this.data.tasks.length + this.data.sessions.length > 0;
+      return ttSerialize(this.data) !== (await vault.read(file));
+    } catch {
+      return false;
+    }
   }
 
   reload() {
@@ -3702,7 +3805,8 @@ class TimeStore {
     if (run && run.tid === tid) return;
     if (run) this.pause(run.tid, origin, true);
     const now = Date.now();
-    this.data.sessions.push(this.stamp({ id: newId(), tid, s: now, e: null, u: 0, del: 0 }));
+    const d = this.deviceId();
+    this.data.sessions.push(this.stamp({ id: newId(), tid, s: now, e: null, u: 0, del: 0, ...(d ? { d } : {}) }));
     t.paused = false;
     this.stamp(t);
     this.data.hb = now;
@@ -3733,6 +3837,9 @@ class TimeStore {
   recover(now = Date.now()) {
     const run = this.running();
     if (!run) return;
+    // A timer another device started is that device's to watch: this one may simply not have heard
+    // from it yet (Sync is not instant), and closing it here would cut the other device's time short
+    if (run.d && run.d !== this.deviceId()) return;
     const seen = Math.max(this.data.hb || 0, run.s, this.localBeat(run.id), this.lastBeat < now - TT_STALE_MS ? this.lastBeat : 0);
     if (now - seen <= TT_STALE_MS) return;
     const task = this.task(run.tid);
@@ -7620,7 +7727,7 @@ class HomepageSettingTab extends PluginSettingTab {
 
     add()
       .setName(T("Time tracker"))
-      .setDesc(T("Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own file, Time Tracking.json, in the Genkan data folder."))
+      .setDesc(T("Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own note, Time Tracking.md, in the Genkan data folder."))
       .addToggle((t) => t.setValue(s.showTimeTracker).onChange((v) => save("showTimeTracker", v)));
 
     add()

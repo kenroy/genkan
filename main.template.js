@@ -170,7 +170,7 @@ const DEFAULT_SETTINGS = {
   showRingNotes: false, // Pebble Index ring notes card (off unless enabled)
   showOnThisDay: false, // notes from this date a week, a month and a year ago (off unless enabled)
   showTimerStatus: true, // the running timer in the status bar (desktop; needs the Time tracker)
-  showTimeTracker: false, // projects, tasks and timers (off unless enabled); the time lives in its own file
+  showTimeTracker: false, // projects, tasks and timers (off unless enabled); the time lives in its own note
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
   // "files" = a separate file per note in a folder
   ringMode: "main",
@@ -4146,7 +4146,7 @@ class HomepageSettingTab extends PluginSettingTab {
 
     add()
       .setName(T("Time tracker"))
-      .setDesc(T("Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own file, Time Tracking.json, in the Genkan data folder."))
+      .setDesc(T("Track time on projects and tasks with timers, set time allocations, see a weekly summary and export reports as CSV, Excel or PDF. Stored in its own note, Time Tracking.md, in the Genkan data folder."))
       .addToggle((t) => t.setValue(s.showTimeTracker).onChange((v) => save("showTimeTracker", v)));
 
     add()
