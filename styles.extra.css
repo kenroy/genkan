@@ -2144,3 +2144,15 @@
 .genkan-status-timer .genkan-status-time {
   font-variant-numeric: tabular-nums;
 }
+
+/* Obsidian pins a date input's picker icon to its left edge, which sat on top of the year here;
+   put it back at the end of the field like the time inputs */
+#genkan-root .tt-input[type="date"]::-webkit-calendar-picker-indicator,
+#genkan-root .tt-input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  left: auto;
+  margin: 0 0 0 auto;
+  opacity: 0.7;
+  position: static;
+  right: auto;
+}
