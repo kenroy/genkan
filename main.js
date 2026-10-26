@@ -586,6 +586,18 @@ const I18N = {
     "Try again": "Réessayer",
     "By Randall Munroe": "Par Randall Munroe",
     "Explain this comic": "Expliquer cette bande dessinée",
+    "Archived ({n})": "Archivés ({n})",
+    "Archived": "Archivés",
+    "Archive project": "Archiver le projet",
+    "Unarchive project": "Désarchiver le projet",
+    "Archived project {name}": "Projet {name} archivé",
+    "Unarchived project {name}": "Projet {name} désarchivé",
+    "No active projects. Add one above, or open Archived below.": "Aucun projet actif. Ajoutez-en un ci-dessus, ou ouvrez Archivés ci-dessous.",
+    "No tasks.": "Aucune tâche.",
+    "This project is archived. Unarchive it from Edit project to add tasks or start timers.": "Ce projet est archivé. Désarchivez-le depuis Modifier le projet pour ajouter des tâches ou lancer des minuteurs.",
+    "Archived project: timers are off": "Projet archivé : minuteurs désactivés",
+    "Archived: its time still counts in reports and the weekly summary. Unarchive it to add tasks or start timers.": "Archivé : son temps compte toujours dans les rapports et le résumé hebdomadaire. Désarchivez-le pour ajouter des tâches ou lancer des minuteurs.",
+    "Archive a finished project to tuck it away. Its time still counts in reports and the weekly summary, but you can't start timers or add tasks until you unarchive it.": "Archivez un projet terminé pour le ranger. Son temps compte toujours dans les rapports et le résumé hebdomadaire, mais vous ne pouvez plus lancer de minuteurs ni ajouter de tâches tant qu'il n'est pas désarchivé.",
     "Previous comic": "Bande dessinée précédente",
     "Next comic": "Bande dessinée suivante",
     "Random comic": "Bande dessinée au hasard",
@@ -987,6 +999,18 @@ const I18N = {
     "Try again": "Reintentar",
     "By Randall Munroe": "De Randall Munroe",
     "Explain this comic": "Explicar este cómic",
+    "Archived ({n})": "Archivados ({n})",
+    "Archived": "Archivados",
+    "Archive project": "Archivar proyecto",
+    "Unarchive project": "Desarchivar proyecto",
+    "Archived project {name}": "Proyecto {name} archivado",
+    "Unarchived project {name}": "Proyecto {name} desarchivado",
+    "No active projects. Add one above, or open Archived below.": "No hay proyectos activos. Añade uno arriba o abre Archivados más abajo.",
+    "No tasks.": "Sin tareas.",
+    "This project is archived. Unarchive it from Edit project to add tasks or start timers.": "Este proyecto está archivado. Desarchívalo desde Editar proyecto para añadir tareas o iniciar temporizadores.",
+    "Archived project: timers are off": "Proyecto archivado: temporizadores desactivados",
+    "Archived: its time still counts in reports and the weekly summary. Unarchive it to add tasks or start timers.": "Archivado: su tiempo sigue contando en los informes y el resumen semanal. Desarchívalo para añadir tareas o iniciar temporizadores.",
+    "Archive a finished project to tuck it away. Its time still counts in reports and the weekly summary, but you can't start timers or add tasks until you unarchive it.": "Archiva un proyecto terminado para guardarlo. Su tiempo sigue contando en los informes y el resumen semanal, pero no podrás iniciar temporizadores ni añadir tareas hasta que lo desarchives.",
     "Previous comic": "Cómic anterior",
     "Next comic": "Cómic siguiente",
     "Random comic": "Cómic aleatorio",
@@ -1388,6 +1412,18 @@ const I18N = {
     "Try again": "Erneut versuchen",
     "By Randall Munroe": "Von Randall Munroe",
     "Explain this comic": "Diesen Comic erklären",
+    "Archived ({n})": "Archiviert ({n})",
+    "Archived": "Archiviert",
+    "Archive project": "Projekt archivieren",
+    "Unarchive project": "Projekt wiederherstellen",
+    "Archived project {name}": "Projekt {name} archiviert",
+    "Unarchived project {name}": "Projekt {name} wiederhergestellt",
+    "No active projects. Add one above, or open Archived below.": "Keine aktiven Projekte. Füge oben eines hinzu oder öffne unten Archiviert.",
+    "No tasks.": "Keine Aufgaben.",
+    "This project is archived. Unarchive it from Edit project to add tasks or start timers.": "Dieses Projekt ist archiviert. Stelle es unter Projekt bearbeiten wieder her, um Aufgaben hinzuzufügen oder Timer zu starten.",
+    "Archived project: timers are off": "Archiviertes Projekt: Timer sind aus",
+    "Archived: its time still counts in reports and the weekly summary. Unarchive it to add tasks or start timers.": "Archiviert: Die Zeit zählt weiterhin in Berichten und der Wochenübersicht. Stelle das Projekt wieder her, um Aufgaben hinzuzufügen oder Timer zu starten.",
+    "Archive a finished project to tuck it away. Its time still counts in reports and the weekly summary, but you can't start timers or add tasks until you unarchive it.": "Archiviere ein abgeschlossenes Projekt, um es wegzuräumen. Seine Zeit zählt weiterhin in Berichten und der Wochenübersicht, aber Timer und neue Aufgaben gibt es erst, wenn du es wiederherstellst.",
     "Previous comic": "Vorheriger Comic",
     "Next comic": "Nächster Comic",
     "Random comic": "Zufälliger Comic",
@@ -1791,6 +1827,18 @@ const I18N = {
     "Try again": "もう一度試す",
     "By Randall Munroe": "作者: Randall Munroe",
     "Explain this comic": "このコミックを解説",
+    "Archived ({n})": "アーカイブ済み（{n}）",
+    "Archived": "アーカイブ済み",
+    "Archive project": "プロジェクトをアーカイブ",
+    "Unarchive project": "アーカイブを解除",
+    "Archived project {name}": "プロジェクト {name} をアーカイブしました",
+    "Unarchived project {name}": "プロジェクト {name} のアーカイブを解除しました",
+    "No active projects. Add one above, or open Archived below.": "アクティブなプロジェクトはありません。上で追加するか、下の「アーカイブ済み」を開いてください。",
+    "No tasks.": "タスクはありません。",
+    "This project is archived. Unarchive it from Edit project to add tasks or start timers.": "このプロジェクトはアーカイブされています。タスクの追加やタイマーの開始は、「プロジェクトを編集」でアーカイブを解除してから行ってください。",
+    "Archived project: timers are off": "アーカイブ済みのプロジェクト：タイマーは使えません",
+    "Archived: its time still counts in reports and the weekly summary. Unarchive it to add tasks or start timers.": "アーカイブ済み：記録した時間はレポートと週のまとめに引き続き含まれます。タスクの追加やタイマーの開始は、解除してから行えます。",
+    "Archive a finished project to tuck it away. Its time still counts in reports and the weekly summary, but you can't start timers or add tasks until you unarchive it.": "完了したプロジェクトはアーカイブして片付けられます。記録した時間はレポートと週のまとめに引き続き含まれますが、解除するまでタイマーの開始やタスクの追加はできません。",
     "Previous comic": "前のコミック",
     "Next comic": "次のコミック",
     "Random comic": "ランダムなコミック",
@@ -3489,7 +3537,7 @@ function ttNormalise(raw) {
   };
   for (const p of list(raw.projects)) {
     if (!ok("projects", p)) continue;
-    out.projects.push({ id: p.id, name: str(p.name, 120), color: TT_COLOURS.includes(p.color) ? p.color : TT_COLOURS[0], alloc: int(p.alloc, 600000), u: num(p.u), del: p.del ? 1 : 0 });
+    out.projects.push({ id: p.id, name: str(p.name, 120), color: TT_COLOURS.includes(p.color) ? p.color : TT_COLOURS[0], alloc: int(p.alloc, 600000), arch: p.arch ? 1 : 0, u: num(p.u), del: p.del ? 1 : 0 });
   }
   for (const t of list(raw.tasks)) {
     if (!ok("tasks", t) || typeof t.pid !== "string") continue;
@@ -3730,6 +3778,10 @@ class TimeStore {
   project(id) {
     return this.data.projects.find((p) => p.id === id && !p.del) || null;
   }
+  // Archived projects keep their time (reports and the weekly summary count it) but take no new work
+  archivedProject(id) {
+    return !!this.project(id)?.arch;
+  }
   tasks(pid) {
     return this.data.tasks.filter((t) => t.pid === pid && !t.del);
   }
@@ -3752,7 +3804,7 @@ class TimeStore {
     let best = null;
     let at = -1;
     for (const task of this.data.tasks) {
-      if (task.del || !task.paused || task.done) continue;
+      if (task.del || !task.paused || task.done || this.archivedProject(task.pid)) continue;
       const end = this.sessions(task.id).reduce((n, x) => Math.max(n, x.e || 0), 0);
       if (end > at) {
         at = end;
@@ -3795,7 +3847,7 @@ class TimeStore {
 
   // ── Changing ──
   addProject(name, origin) {
-    const p = this.stamp({ id: newId(), name: name.trim().slice(0, 120), color: TT_COLOURS[this.data.projects.length % TT_COLOURS.length], alloc: 0, u: 0, del: 0 });
+    const p = this.stamp({ id: newId(), name: name.trim().slice(0, 120), color: TT_COLOURS[this.data.projects.length % TT_COLOURS.length], alloc: 0, arch: 0, u: 0, del: 0 });
     this.data.projects.push(p);
     this.commit(origin);
     return p;
@@ -3812,6 +3864,12 @@ class TimeStore {
     Object.assign(rec, fields);
     this.stamp(rec);
     this.commit(origin);
+  }
+
+  setArchived(p, on, origin) {
+    const run = this.runningTask();
+    if (on && run && run.pid === p.id) this.stop(run.id, origin);
+    this.update(p, { arch: on ? 1 : 0 }, origin);
   }
 
   removeProject(id, origin) {
@@ -3863,7 +3921,7 @@ class TimeStore {
   // Only one timer runs at a time: starting one pauses the other
   start(tid, origin) {
     const t = this.task(tid);
-    if (!t) return;
+    if (!t || this.archivedProject(t.pid)) return;
     const run = this.running();
     if (run && run.tid === tid) return;
     if (run) this.pause(run.tid, origin, true);
@@ -4573,36 +4631,53 @@ class TimeTrackerUI {
       this.say(T("Added project {name}", { name: p.name }));
       this.act("add", () => {});
     }));
-    const projects = st.projects().sort((a, b) => a.name.localeCompare(b.name, LOCALE));
+    const byName = (a, b) => a.name.localeCompare(b.name, LOCALE);
+    const projects = st.projects().filter((p) => !p.arch).sort(byName);
+    const archived = st.projects().filter((p) => p.arch).sort(byName);
     const list = h("div", { cls: "tt-list", role: "list", "aria-label": T("Projects") });
     if (!projects.length) {
-      list.append(h("div", { cls: "hp-empty", text: T("No projects yet. Add a client or project to start tracking time.") }));
+      list.append(h("div", { cls: "hp-empty", text: archived.length ? T("No active projects. Add one above, or open Archived below.") : T("No projects yet. Add a client or project to start tracking time.") }));
     }
-    for (const p of projects) {
-      const run = () => st.runningTask();
-      const row = h("button", { type: "button", cls: "tt-row", "data-k": `p-${p.id}` });
-      row.style.setProperty("--tt-c", p.color);
-      const sub = h("span", { cls: "tt-sub" });
-      const total = h("span", { cls: "tt-time" });
-      this.live.push(() => {
-        const n = st.tasks(p.id).length;
-        const r = run();
-        const running = r && r.pid === p.id;
-        sub.textContent = running ? T("Running: {task}", { task: r.name }) : plural(n, "{n} task", "{n} tasks");
-        sub.classList.toggle("is-running", !!running);
-        total.textContent = ttHM(st.projectSecs(p.id, 0, Infinity, this.now()));
-      });
-      row.append(
-        h("span", { cls: "tt-swatch", "aria-hidden": "true" }),
-        h("span", { cls: "tt-main" }, h("span", { cls: "tt-name", text: p.name || T("Untitled project") }), sub),
-        total,
-        iconNode("chevron"),
-      );
-      row.append(this.budget(() => st.projectSecs(p.id, 0, Infinity, this.now()), () => st.projectAlloc(p)));
-      row.addEventListener("click", () => this.go({ name: "project", pid: p.id }));
-      list.append(h("div", { role: "listitem" }, row));
+    for (const p of projects) list.append(this.projectRow(p));
+    body.append(list);
+    if (archived.length) {
+      const open = !!this.showArchived;
+      const toggle = h("button", { type: "button", cls: "tt-archive-toggle", "aria-expanded": String(open), "aria-controls": "tt-archived", "data-k": "archived" }, iconNode("chevron"), h("span", { text: T("Archived ({n})", { n: archived.length }) }));
+      toggle.addEventListener("click", () => this.act("archived", () => (this.showArchived = !open)));
+      body.append(toggle);
+      if (open) {
+        const alist = h("div", { cls: "tt-list", id: "tt-archived", role: "list", "aria-label": T("Archived") });
+        for (const p of archived) alist.append(this.projectRow(p));
+        body.append(alist);
+      }
     }
-    body.append(list, this.footer(""));
+    body.append(this.footer(""));
+  }
+
+  projectRow(p) {
+    const st = this.store;
+    const run = () => st.runningTask();
+    const row = h("button", { type: "button", cls: p.arch ? "tt-row is-archived" : "tt-row", "data-k": `p-${p.id}` });
+    row.style.setProperty("--tt-c", p.color);
+    const sub = h("span", { cls: "tt-sub" });
+    const total = h("span", { cls: "tt-time" });
+    this.live.push(() => {
+      const n = st.tasks(p.id).length;
+      const r = run();
+      const running = r && r.pid === p.id;
+      sub.textContent = running ? T("Running: {task}", { task: r.name }) : plural(n, "{n} task", "{n} tasks");
+      sub.classList.toggle("is-running", !!running);
+      total.textContent = ttHM(st.projectSecs(p.id, 0, Infinity, this.now()));
+    });
+    row.append(
+      h("span", { cls: "tt-swatch", "aria-hidden": "true" }),
+      h("span", { cls: "tt-main" }, h("span", { cls: "tt-name", text: p.name || T("Untitled project") }), sub),
+      total,
+      iconNode("chevron"),
+    );
+    row.append(this.budget(() => st.projectSecs(p.id, 0, Infinity, this.now()), () => st.projectAlloc(p)));
+    row.addEventListener("click", () => this.go({ name: "project", pid: p.id }));
+    return h("div", { role: "listitem" }, row);
   }
 
   // ── One project ──
@@ -4616,14 +4691,17 @@ class TimeTrackerUI {
     const summary = h("div", { cls: "tt-summary" });
     summary.append(this.budget(() => st.projectSecs(p.id, 0, Infinity, this.now()), () => st.projectAlloc(p)));
     body.append(summary);
-    body.append(this.addBox(T("Add a task and press Enter"), T("New task"), (name) => {
-      const t = st.addTask(p.id, name, this);
-      this.say(T("Added task {name}", { name: t.name }));
-      this.act("add", () => {});
-    }));
+    if (p.arch) body.append(h("p", { cls: "tt-sub tt-archived-note", text: T("This project is archived. Unarchive it from Edit project to add tasks or start timers.") }));
+    else {
+      body.append(this.addBox(T("Add a task and press Enter"), T("New task"), (name) => {
+        const t = st.addTask(p.id, name, this);
+        this.say(T("Added task {name}", { name: t.name }));
+        this.act("add", () => {});
+      }));
+    }
     const tasks = st.tasks(p.id).sort((a, b) => Number(a.done) - Number(b.done) || b.pri - a.pri || a.name.localeCompare(b.name, LOCALE));
     const list = h("div", { cls: "tt-list", role: "list", "aria-label": T("Tasks") });
-    if (!tasks.length) list.append(h("div", { cls: "hp-empty", text: T("No tasks yet. Add one above.") }));
+    if (!tasks.length) list.append(h("div", { cls: "hp-empty", text: p.arch ? T("No tasks.") : T("No tasks yet. Add one above.") }));
     for (const t of tasks) list.append(this.taskRow(t));
     body.append(list, this.footer(p.id));
   }
@@ -4654,7 +4732,7 @@ class TimeTrackerUI {
     };
     this.live.push(paint);
     const running = st.running()?.tid === t.id;
-    if (!t.done) {
+    if (!t.done && !st.archivedProject(t.pid)) {
       if (running) {
         controls.append(this.btn(T("Pause timer: {task}", { task: t.name }), `pause-${t.id}`, () => this.pauseTask(t), { cls: "tt-ctl", icon: "pause" }));
         controls.append(this.btn(T("Stop timer: {task}", { task: t.name }), `stop-${t.id}`, () => this.stopTask(t), { cls: "tt-ctl", icon: "stop" }));
@@ -4718,7 +4796,8 @@ class TimeTrackerUI {
 
     const running = st.running()?.tid === t.id;
     const ctl = h("div", { cls: "tt-big-controls" });
-    if (!t.done) {
+    if (st.archivedProject(t.pid)) ctl.append(h("span", { cls: "tt-sub", text: T("Archived project: timers are off") }));
+    else if (!t.done) {
       if (running) ctl.append(this.btn(T("Pause"), `pause-${t.id}`, () => this.pauseTask(t), { cls: "tt-btn tt-text", icon: "pause" }));
       else ctl.append(this.btn(t.paused ? T("Resume") : T("Start"), `play-${t.id}`, () => this.startTask(t), { cls: "tt-btn tt-text tt-primary", icon: "play" }));
       if (running || t.paused) ctl.append(this.btn(T("Stop"), `stop-${t.id}`, () => this.stopTask(t), { cls: "tt-btn tt-text", icon: "stop" }));
@@ -4906,6 +4985,21 @@ class TimeTrackerUI {
       })),
       h("p", { cls: "tt-sub", text: T("Leave this blank to add up the time allocated to each task instead.") }),
       this.budget(() => st.projectSecs(p.id, 0, Infinity, this.now()), () => st.projectAlloc(p)),
+      h(
+        "div",
+        { cls: "tt-archive" },
+        this.btn(p.arch ? T("Unarchive project") : T("Archive project"), "archive", () => {
+          if (p.arch) {
+            this.act("archive", () => st.setArchived(p, false, this));
+            this.say(T("Unarchived project {name}", { name: p.name }));
+          } else {
+            st.setArchived(p, true, this);
+            this.say(T("Archived project {name}", { name: p.name }));
+            this.go({ name: "projects" });
+          }
+        }),
+        h("p", { cls: "tt-sub", text: p.arch ? T("Archived: its time still counts in reports and the weekly summary. Unarchive it to add tasks or start timers.") : T("Archive a finished project to tuck it away. Its time still counts in reports and the weekly summary, but you can't start timers or add tasks until you unarchive it.") }),
+      ),
       h("div", { cls: "tt-danger" }, this.confirmButton(T("Delete project and its tasks"), "delete", () => {
         st.removeProject(p.id, this);
         this.say(T("Deleted project {name}", { name: p.name }));
@@ -4999,7 +5093,9 @@ class TimeTrackerUI {
       r.from = ttIso(a);
       r.to = ttIso(b - 1);
     }
-    const proj = h("select", { cls: "tt-input", id: "tt-rp", "data-k": "rp" }, h("option", { value: "", text: T("All projects") }), st.projects().sort((a, b) => a.name.localeCompare(b.name, LOCALE)).map((p) => h("option", { value: p.id, text: p.name })));
+    const proj = h("select", { cls: "tt-input", id: "tt-rp", "data-k": "rp" }, h("option", { value: "", text: T("All projects") }), st.projects().filter((p) => !p.arch).sort((a, b) => a.name.localeCompare(b.name, LOCALE)).map((p) => h("option", { value: p.id, text: p.name })));
+    const archivedProjects = st.projects().filter((p) => p.arch).sort((a, b) => a.name.localeCompare(b.name, LOCALE));
+    if (archivedProjects.length) proj.append(h("optgroup", { label: T("Archived") }, archivedProjects.map((p) => h("option", { value: p.id, text: p.name }))));
     proj.value = r.pid;
     const presets = { week: T("This week"), lastweek: T("Last week"), month: T("This month"), lastmonth: T("Last month"), custom: T("Custom range") };
     const pre = h("select", { cls: "tt-input", id: "tt-rr", "data-k": "rr" }, Object.entries(presets).map(([k, v]) => h("option", { value: k, text: v })));

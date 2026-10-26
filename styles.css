@@ -3618,3 +3618,45 @@
   height: 40px;
   width: 40px;
 }
+
+/* Archived projects: a collapsed list under the active ones */
+#genkan-root .tt-archive-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--text-2);
+  cursor: pointer;
+  display: flex;
+  font-size: 12px;
+  gap: 6px;
+  height: auto;
+  margin-top: 8px;
+  min-height: 24px;
+  padding: 4px 2px;
+}
+
+#genkan-root .tt-archive-toggle:hover {
+  color: var(--text-1);
+}
+
+.hp-root .tt-archive-toggle svg {
+  transition: transform 0.15s;
+}
+
+.hp-root .tt-archive-toggle[aria-expanded="true"] svg {
+  transform: rotate(90deg);
+}
+
+.hp-root .tt-row.is-archived .tt-name,
+.hp-root .tt-row.is-archived .tt-time {
+  opacity: 0.7;
+}
+
+.hp-root .tt-archive {
+  margin-top: 16px;
+}
+
+.hp-root .tt-archived-note {
+  margin: 4px 0 8px;
+}
