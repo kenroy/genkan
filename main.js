@@ -579,6 +579,13 @@ const I18N = {
     "Unsaved changes": "Modifications non enregistrées",
     "Quick note {n}": "Note rapide {n}",
     "Collapse {name}": "Réduire {name}",
+    "xkcd comic of the day": "Bande dessinée xkcd du jour",
+    "Shows one xkcd comic a day, the same one on all your devices. The comic's details load from xkcd.com once a day and its image whenever the dashboard opens. Off means nothing is requested.": "Affiche une bande dessinée xkcd par jour, la même sur tous vos appareils. Ses détails sont chargés depuis xkcd.com une fois par jour et son image à chaque ouverture du tableau de bord. Désactivé, rien n'est demandé.",
+    "Loading the comic…": "Chargement de la bande dessinée…",
+    "Couldn't load today's comic.": "Impossible de charger la bande dessinée du jour.",
+    "Try again": "Réessayer",
+    "By Randall Munroe": "Par Randall Munroe",
+    "Explain this comic": "Expliquer cette bande dessinée",
     "Open in Obsidian (Surfing)": "Ouvrir dans Obsidian (Surfing)",
     "Open in the default browser": "Ouvrir dans le navigateur par défaut",
     "Copy link": "Copier le lien",
@@ -966,6 +973,13 @@ const I18N = {
     "Unsaved changes": "Cambios sin guardar",
     "Quick note {n}": "Nota rápida {n}",
     "Collapse {name}": "Contraer {name}",
+    "xkcd comic of the day": "Cómic xkcd del día",
+    "Shows one xkcd comic a day, the same one on all your devices. The comic's details load from xkcd.com once a day and its image whenever the dashboard opens. Off means nothing is requested.": "Muestra un cómic de xkcd al día, el mismo en todos tus dispositivos. Sus datos se cargan desde xkcd.com una vez al día y su imagen cada vez que se abre el panel. Si está desactivado, no se solicita nada.",
+    "Loading the comic…": "Cargando el cómic…",
+    "Couldn't load today's comic.": "No se pudo cargar el cómic de hoy.",
+    "Try again": "Reintentar",
+    "By Randall Munroe": "De Randall Munroe",
+    "Explain this comic": "Explicar este cómic",
     "Open in Obsidian (Surfing)": "Abrir en Obsidian (Surfing)",
     "Open in the default browser": "Abrir en el navegador predeterminado",
     "Copy link": "Copiar enlace",
@@ -1353,6 +1367,13 @@ const I18N = {
     "Unsaved changes": "Ungespeicherte Änderungen",
     "Quick note {n}": "Schnellnotiz {n}",
     "Collapse {name}": "{name} einklappen",
+    "xkcd comic of the day": "xkcd-Comic des Tages",
+    "Shows one xkcd comic a day, the same one on all your devices. The comic's details load from xkcd.com once a day and its image whenever the dashboard opens. Off means nothing is requested.": "Zeigt täglich einen xkcd-Comic, auf allen Geräten denselben. Die Angaben dazu werden einmal täglich von xkcd.com geladen, das Bild bei jedem Öffnen des Dashboards. Ist die Option aus, wird nichts angefragt.",
+    "Loading the comic…": "Comic wird geladen …",
+    "Couldn't load today's comic.": "Der heutige Comic konnte nicht geladen werden.",
+    "Try again": "Erneut versuchen",
+    "By Randall Munroe": "Von Randall Munroe",
+    "Explain this comic": "Diesen Comic erklären",
     "Open in Obsidian (Surfing)": "In Obsidian (Surfing) öffnen",
     "Open in the default browser": "Im Standardbrowser öffnen",
     "Copy link": "Link kopieren",
@@ -1742,6 +1763,13 @@ const I18N = {
     "Unsaved changes": "未保存の変更",
     "Quick note {n}": "クイックメモ {n}",
     "Collapse {name}": "{name} を折りたたむ",
+    "xkcd comic of the day": "今日のxkcdコミック",
+    "Shows one xkcd comic a day, the same one on all your devices. The comic's details load from xkcd.com once a day and its image whenever the dashboard opens. Off means nothing is requested.": "xkcdのコミックを1日1本表示します。すべてのデバイスで同じものです。詳細は1日に1回xkcd.comから、画像はダッシュボードを開くたびに読み込みます。オフにすると何も取得しません。",
+    "Loading the comic…": "コミックを読み込んでいます…",
+    "Couldn't load today's comic.": "今日のコミックを読み込めませんでした。",
+    "Try again": "もう一度試す",
+    "By Randall Munroe": "作者: Randall Munroe",
+    "Explain this comic": "このコミックを解説",
     "Open in Obsidian (Surfing)": "Obsidian (Surfing) で開く",
     "Open in the default browser": "既定のブラウザで開く",
     "Copy link": "リンクをコピー",
@@ -2078,6 +2106,7 @@ const DEFAULT_SETTINGS = {
   showRingNotes: false, // Pebble Index ring notes card (off unless enabled)
   showOnThisDay: false, // notes from this date a week, a month and a year ago (off unless enabled)
   showTimerStatus: true, // the running timer in the status bar (desktop; needs the Time tracker)
+  showXkcd: false, // an xkcd comic of the day (off unless enabled)
   showTimeTracker: false, // projects, tasks and timers (off unless enabled); the time lives in its own note
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
   // "files" = a separate file per note in a folder
@@ -2811,7 +2840,7 @@ const ARRANGE_ZONES = ["top", "left", "center", "right"];
 const DEFAULT_LAYOUT = {
   top: ["favs-card"],
   left: ["calendar-card", "links-card"],
-  center: ["ring-card", "clips-card", "recent-card", "otd-card", "tt-card"],
+  center: ["ring-card", "clips-card", "recent-card", "otd-card", "tt-card", "xkcd-card"],
   right: ["tasks-card", "note-card"],
 };
 const CARD_NAMES = {
@@ -2823,6 +2852,7 @@ const CARD_NAMES = {
   "recent-card": "Recent notes",
   "otd-card": "On this day",
   "tt-card": "Time tracker",
+  "xkcd-card": "xkcd",
   "tasks-card": "Tasks",
   "note-card": "Quick notes",
 };
@@ -3203,6 +3233,10 @@ function buildDashboard() {
       h("div", { cls: "card-header" }, cardTitle("tt-card", "tt-body", T("Time tracker"))),
       h("div", { id: "tt-body" }),
       h("div", { cls: "sr-only", id: "tt-live", role: "status", "aria-live": "polite" }),
+    ),
+    h("section", { cls: "card hidden", id: "xkcd-card", "aria-labelledby": "xkcd-card-title" },
+      h("div", { cls: "card-header" }, cardTitle("xkcd-card", "xkcd-body", T("xkcd")), countRow("xkcd-count")),
+      h("div", { id: "xkcd-body" }),
     ),
   );
 
@@ -5251,6 +5285,7 @@ class HomepageView extends ItemView {
     this.renderClips();
     this.renderRecent();
     this.renderOnThisDay();
+    this.renderXkcd();
     this.tt?.render();
     this.$("hero").classList.toggle("hidden", !this.settings.showHero);
     if (this.settings.showHero) this.loadHero(false);
@@ -7536,6 +7571,97 @@ class HomepageView extends ItemView {
     }
     this.cacheSet("quote", { date: today, source, lang: LANG, ...this.fallbackQuote(), src: "builtin" });
   }
+
+  // ── xkcd comic of the day ──
+
+  // The comic is picked from the date alone, so every device shows the same one with nothing to sync
+  xkcdPick(latest, day) {
+    let x = Number(day.replace(/-/g, "")) >>> 0;
+    x = Math.imul(x ^ (x >>> 15), 0x2c1b3c6d);
+    x = Math.imul(x ^ (x >>> 12), 0x297a2d39);
+    x = (x ^ (x >>> 15)) >>> 0;
+    const n = (x % latest) + 1;
+    return n === 404 ? 403 : n; // there is no comic 404 (that is the joke)
+  }
+
+  async fetchXkcd(day) {
+    const get = async (url) => (await requestUrl({ url })).json;
+    const latest = Number((await get("https://xkcd.com/info.0.json"))?.num);
+    if (!(latest > 0)) return null;
+    const n = this.xkcdPick(latest, day);
+    const d = await get(`https://xkcd.com/${n}/info.0.json`);
+    const img = String(d?.img ?? "");
+    // The image must come from xkcd's own image server, whatever the response says
+    if (Number(d?.num) !== n || !/^https:\/\/imgs\.xkcd\.com\/comics\/[\w%.\-]+$/.test(img)) return null;
+    const tidy = (v) => String(v ?? "").replace(/\s+/g, " ").trim();
+    const transcript = tidy(String(d.transcript ?? "").replace(/\{\{[\s\S]*?\}\}/g, "").replace(/\[\[|\]\]/g, ""));
+    return { num: n, title: tidy(d.safe_title || d.title), alt: tidy(d.alt), transcript: transcript.length <= 1000 ? transcript : "", img };
+  }
+
+  async renderXkcd() {
+    const card = this.$("xkcd-card");
+    card.classList.toggle("hidden", !this.settings.showXkcd);
+    if (!this.settings.showXkcd) return; // off: no request, no image
+
+    const day = isoDay(new Date());
+    const cached = this.cacheGet("xkcd");
+    if (cached?.img) this.displayXkcd(cached); // yesterday's comic stays up until today's arrives
+    else this.xkcdMessage(T("Loading the comic…"));
+    if (cached?.date === day && cached.img) return;
+    if (this.xkcdLoading) return;
+    this.xkcdLoading = true;
+    try {
+      const comic = await this.fetchXkcd(day);
+      if (comic) {
+        const today = { date: day, ...comic };
+        this.cacheSet("xkcd", today);
+        return this.displayXkcd(today);
+      }
+    } catch {
+      /* offline or xkcd is down */
+    } finally {
+      this.xkcdLoading = false;
+    }
+    if (!cached?.img) this.xkcdMessage(T("Couldn't load today's comic."), true);
+  }
+
+  xkcdMessage(text, retry) {
+    const body = this.$("xkcd-body");
+    delete body.dataset.num;
+    this.$("xkcd-count").textContent = "";
+    body.empty();
+    body.append(h("p", { cls: "xkcd-msg", text }));
+    if (retry) {
+      const again = h("button", { type: "button", cls: "xkcd-retry", text: T("Try again") });
+      again.addEventListener("click", () => this.renderXkcd());
+      body.append(again);
+    }
+  }
+
+  displayXkcd(c) {
+    const body = this.$("xkcd-body");
+    this.$("xkcd-count").textContent = `#${c.num}`;
+    if (body.dataset.num === String(c.num)) return; // already showing it
+    body.dataset.num = String(c.num);
+    const link = (href, text) => h("a", { href, text });
+    // With a transcript the image is described by it; otherwise by the hover text, which is also
+    // shown as a caption so touch and keyboard users can read it (hidden from screen readers then)
+    const img = h("img", { cls: "xkcd-img", src: c.img, alt: c.transcript || c.alt || c.title, title: c.alt, referrerpolicy: "no-referrer" });
+    body.empty();
+    body.append(
+      h("h3", { cls: "xkcd-name" }, link(`https://xkcd.com/${c.num}/`, c.title)),
+      h("div", { cls: "xkcd-panel" }, img),
+      c.alt ? h("p", c.transcript ? { cls: "xkcd-alt", text: c.alt } : { cls: "xkcd-alt", text: c.alt, "aria-hidden": "true" }) : null,
+      h(
+        "p",
+        { cls: "xkcd-credit" },
+        T("By Randall Munroe") + " · ",
+        link("https://creativecommons.org/licenses/by-nc/2.5/", "CC BY-NC 2.5"),
+        " · ",
+        link(`https://www.explainxkcd.com/wiki/index.php/${c.num}`, T("Explain this comic")),
+      ),
+    );
+  }
 }
 
 // ─── Settings tab ─────────────────────────────────────────────────────────────
@@ -7734,6 +7860,11 @@ class HomepageSettingTab extends PluginSettingTab {
       .setName(T("Running timer display"))
       .setDesc(T("Show the running timer where you can always see it: in Obsidian's status bar on desktop, or at the top of the dashboard on phones and tablets. Click it to open the task. Needs the Time tracker."))
       .addToggle((t) => t.setValue(s.showTimerStatus).onChange((v) => save("showTimerStatus", v)));
+
+    add()
+      .setName(T("xkcd comic of the day"))
+      .setDesc(T("Shows one xkcd comic a day, the same one on all your devices. The comic's details load from xkcd.com once a day and its image whenever the dashboard opens. Off means nothing is requested."))
+      .addToggle((t) => t.setValue(s.showXkcd).onChange((v) => save("showXkcd", v)));
 
     add()
       .setName(T("Pebble ring notes"))

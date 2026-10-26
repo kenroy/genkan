@@ -13,6 +13,7 @@ Genkan (玄関) is the entryway of a Japanese home: the place you step in. This 
 - **Arrange cards**: drag the cards into the order and columns you want, and share the layout with your other devices
 - **On this day**: an optional card with notes from this date a week, a month and a year ago
 - **Time tracker**: an optional card for timing work on projects and tasks, with time allocations, a weekly summary, a running timer in the status bar or at the top of the dashboard on a phone, and CSV, Excel or PDF reports
+- **xkcd**: an optional card with one [xkcd](https://xkcd.com/) comic a day, the same one on all your devices
 - **Ring notes**: an optional card for voice notes from a Pebble Index ring
 - A photo of the day and a daily quote (both optional)
 
@@ -80,7 +81,7 @@ By default these live in `genkan/data/`. Change the **Data folder** setting to p
 Click a link in a quick note to open it: in Surfing if that plugin is installed (on desktop), otherwise in your default browser. Right-click a link to choose where it opens: **Open in Obsidian (Surfing)** (when Surfing is installed), **Open in the default browser**, or **Copy link**. With the cursor inside a link, Ctrl or Cmd+Enter opens it. Selecting text across a link does not open it, and to edit a link's text, move into it with the arrow keys. On a phone or tablet, a tap opens the link with the system.
 
 ### Collapsing cards
-Click the − beside **Ring notes**, **Web clips**, **Recent notes** or **On this day** to fold a card down to its title (the count stays visible), and the + to open it again. Each device remembers what you collapsed.
+Click the − beside **Ring notes**, **Web clips**, **Recent notes**, **On this day** or **xkcd** to fold a card down to its title (the count stays visible), and the + to open it again. Each device remembers what you collapsed.
 
 ### Arranging cards
 Click the **Arrange cards** button (the four-squares icon at the top right, between the theme and settings buttons) to enter arrange mode. Handles only appear in this mode, so you never drag a card by accident. Every card gets a bar with a handle, its name and four arrow buttons.
@@ -91,7 +92,7 @@ Click the **Arrange cards** button (the four-squares icon at the top right, betw
 
 Press **Done** to leave arrange mode, or **Reset layout** to go back to the default on this device.
 
-Each device remembers its own layout, so a phone and a laptop can differ. On a phone the columns stack, so a card's column decides its order (the right column comes first by default). Cards you have switched off, such as Ring notes or On this day, keep their place and come back where you left them.
+Each device remembers its own layout, so a phone and a laptop can differ. On a phone the columns stack, so a card's column decides its order (the right column comes first by default). Cards you have switched off, such as Ring notes, On this day or xkcd, keep their place and come back where you left them.
 
 **Sharing a layout between devices.** While arranging, press **Use on all my devices** to save the current layout as a shared one.
 
@@ -116,6 +117,11 @@ Edit them in settings, one per line: `icon | label | action`, where the action i
 Off by default. Turn on **On this day** in settings to add a card that looks back at this date a week, a month and a year ago, with a section for each (a section with nothing shows "Nothing from this date"). Each shows up to three notes with a one-line preview, then "+ N more". Click one to open it.
 
 A note's date comes from its `created`, `clipped` or `date` property, then from a date in its file name (like `2026-10-11`), then from when the file was created. If more than 20 notes without a date property were created on the same day, as happens after an import or a first sync, that day is ignored so it does not flood the card. Genkan's own data folder is left out. A month ago uses the same day of the previous month (or its last day), and a year ago the same date last year.
+
+### xkcd comic of the day
+Off by default. Turn on **xkcd comic of the day** in settings to add a card with one [xkcd](https://xkcd.com/) comic a day. The comic is chosen from the date alone, so it is the same on every device and changes at midnight, with nothing to sync. The title links to the comic on xkcd.com, **Explain this comic** opens its page on explain xkcd, and the hover text (the joke that usually hides in the tooltip) is printed under the comic so it is readable on a phone and with a keyboard. If today's comic can't be loaded, yesterday's stays up, or a **Try again** button shows when there is none.
+
+The comics are black line art drawn for white paper, so the card keeps a white panel behind them in dark themes too. xkcd is by Randall Munroe and is licensed [CC BY-NC 2.5](https://creativecommons.org/licenses/by-nc/2.5/); the card credits him and links back to xkcd.com, and nothing is copied or re-hosted.
 
 ### Time tracker
 Off by default. Turn on **Time tracker** in settings to add a card for timing your work. It has three views, chosen with the buttons at the top: **Projects**, **Week** and **Report**.
@@ -145,7 +151,7 @@ Newest first. Click an entry to open it. The card updates live as the ring saves
 
 Genkan aims to meet WCAG 2.2 level AA and is used with a keyboard and screen readers in mind.
 
-- **Structure:** the greeting is the page heading, each card has a heading and is a named region, and On this day's periods are sub-headings, so a screen reader can jump between them. Decorative emoji and icons are hidden from screen readers.
+- **Structure:** the greeting is the page heading, each card has a heading and is a named region, and On this day's periods and the xkcd comic's title are sub-headings, so a screen reader can jump between them. Decorative emoji and icons are hidden from screen readers.
 - **Controls:** everything works from the keyboard and shows a visible focus ring. The calendar is a grid with one Tab stop and arrow-key movement, the quick-note toolbar is one Tab stop, and search announces how many results it found. Tasks are checkboxes named for the task, the Tasks filter and the quick-note dots are tab lists, favourites are two real buttons (open and remove), and the clock is read once a minute rather than every second.
 - **Text and targets:** text meets the 4.5:1 contrast minimum in both themes, and controls are at least 24 by 24 pixels (larger on phones and tablets).
 - **Announcements:** switching quick notes with Cmd/Ctrl+1 to 7 says which note you are on, "Saved" is announced when you leave a note you changed, and moving a card or sharing a layout is announced.
@@ -175,20 +181,21 @@ Genkan does not collect analytics or telemetry, does not require an account, sho
 | [ZenQuotes](https://zenquotes.io/) (`zenquotes.io/api/today`) | Once a day, only when **Quote source** is ZenQuotes | Nothing from your vault; the server sees your IP address, as for any web request | Settings → **Daily quote**, or choose another **Quote source** |
 | [Echoes API](https://echoes.soferity.com/) (`echoes.soferity.com/api/quotes/random`) | Once a day, only when **Quote source** is Echoes | The language code (such as `fr`); nothing from your vault. The server sees your IP address | Settings → **Daily quote**, or choose another **Quote source** |
 | [Unsplash](https://unsplash.com/) (`api.unsplash.com`) | At most once a day (and when you press the photo's refresh button), only if you enter an Unsplash access key | Your access key and fixed nature search terms. The photo itself loads from Unsplash's image servers whenever the dashboard opens, with credit links back to the photographer and Unsplash | Remove the key, or turn off **Photo of the day** |
+| [xkcd](https://xkcd.com/) (`xkcd.com/info.0.json`, `xkcd.com/<number>/info.0.json`, and the image from `imgs.xkcd.com`) | Two small requests a day at most, only when **xkcd comic of the day** is on; the comic's image loads from xkcd's image server whenever the dashboard opens | Nothing from your vault; the server sees your IP address, and no referrer is sent with the image | Settings → **xkcd comic of the day** |
 | [Picsum Photos](https://picsum.photos/) | Whenever the dashboard opens, for the photo, when you have no Unsplash key | An image address seeded with today's date; nothing from your vault | Settings → **Photo of the day** |
 | Google favicon service (`www.google.com/s2/favicons`) | When web clips are shown | The **domain** (not the full address, title or contents) of each clipped page, to fetch a small site icon | Settings → **Site icons on web clips** |
 
 Notes:
 
 - The Unsplash key is optional. It is stored in this plugin's settings file (`.obsidian/plugins/genkan/data.json`) in your vault. If you use Obsidian Sync with plugin settings, the key syncs with it, so keep your vault private.
-- Quotes from ZenQuotes are credited in the interface, as their free API requires: "Inspirational quotes provided by ZenQuotes API". Echoes quotes are credited the same way. The bundled quotes make no request. If a request fails, a bundled quote is shown.
+- Comics are credited to Randall Munroe with a link to the licence and to xkcd.com. Quotes from ZenQuotes are credited in the interface, as their free API requires: "Inspirational quotes provided by ZenQuotes API". Echoes quotes are credited the same way. The bundled quotes make no request. If a request fails, a bundled quote is shown.
 - To search, list recent notes, offer the favourites picker and match daily notes, Genkan reads the list of note names and paths in your vault through Obsidian's API. It reads a note's contents only for search snippets, ring notes, web clips and the previews on the On this day card, and none of it leaves your device.
 - Today's photo and quote are cached in the plugin's own settings file, not in browser storage. Tracked time is not in that file; it has its own (see Time tracker above). Which note you had open, which cards you folded and your card layout are remembered per device, in Obsidian's local storage for this vault (or in that settings file when local storage isn't available). Genkan sends none of it anywhere; the one thing that can reach your other devices is a layout you push with **Use on all my devices**, which goes into the settings file and travels only through whatever syncs your vault.
 - Links you click (photographer credits, the ZenQuotes and Echoes links, any `https://` quick link) open in your browser.
 
 ## Settings
 
-Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker (and its running timer display), the Pebble ring options, photo of the day and Unsplash key, daily quote, site icons, and quick links.
+Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker (and its running timer display), xkcd comic of the day, the Pebble ring options, photo of the day and Unsplash key, daily quote, site icons, and quick links.
 
 ## Development
 
@@ -210,6 +217,6 @@ To release, set `version` in `manifest.json` (and add it to `versions.json`), ru
 
 Genkan is released under the [MIT licence](LICENSE).
 
-Quotes by [ZenQuotes](https://zenquotes.io/) and the [Echoes API](https://echoes.soferity.com/). Photos from [Unsplash](https://unsplash.com/) and [Picsum Photos](https://picsum.photos/). Site icons from Google's favicon service.
+Quotes by [ZenQuotes](https://zenquotes.io/) and the [Echoes API](https://echoes.soferity.com/). Photos from [Unsplash](https://unsplash.com/) and [Picsum Photos](https://picsum.photos/). Comics from [xkcd](https://xkcd.com/) by Randall Munroe, used under [CC BY-NC 2.5](https://creativecommons.org/licenses/by-nc/2.5/). Site icons from Google's favicon service.
 
 Genkan is an independent project. It is not affiliated with or endorsed by Obsidian, Pebble or Core Devices. "Pebble" and "Pebble Index" belong to their owners and are used only to describe compatibility.
