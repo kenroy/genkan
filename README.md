@@ -121,6 +121,8 @@ A note's date comes from its `created`, `clipped` or `date` property, then from 
 ### xkcd comic of the day
 Off by default. Turn on **xkcd comic of the day** in settings to add a card with one [xkcd](https://xkcd.com/) comic a day. The comic is chosen from the date alone, so it is the same on every device and changes at midnight, with nothing to sync. The arrow buttons step to the previous or next comic, **Random** picks any comic, and **Today** (shown once you have wandered off) takes you back; the card keeps the comic you browsed to until you press **Today** or reload. The title links to the comic on xkcd.com, **Explain this comic** opens its page on explain xkcd, and the hover text (the joke that usually hides in the tooltip) is printed under the comic so it is readable on a phone and with a keyboard. If today's comic can't be loaded, yesterday's stays up, or a **Try again** button shows when there is none.
 
+<img src="docs/screenshots/xkcd.png" alt="The Genkan xkcd card in the dark theme: comic number 353 with its title, previous, next and random buttons, the comic on a white panel, its hover text and a credit line" width="560">
+
 The comics are black line art drawn for white paper, so the card keeps a white panel behind them in dark themes too. xkcd is by Randall Munroe and is licensed [CC BY-NC 2.5](https://creativecommons.org/licenses/by-nc/2.5/); the card credits him and links back to xkcd.com, and nothing is copied or re-hosted.
 
 ### Time tracker
