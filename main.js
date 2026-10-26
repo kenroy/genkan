@@ -580,12 +580,19 @@ const I18N = {
     "Quick note {n}": "Note rapide {n}",
     "Collapse {name}": "Réduire {name}",
     "xkcd comic of the day": "Bande dessinée xkcd du jour",
-    "Shows one xkcd comic a day, the same one on all your devices. The comic's details load from xkcd.com once a day and its image whenever the dashboard opens. Off means nothing is requested.": "Affiche une bande dessinée xkcd par jour, la même sur tous vos appareils. Ses détails sont chargés depuis xkcd.com une fois par jour et son image à chaque ouverture du tableau de bord. Désactivé, rien n'est demandé.",
+    "Shows one xkcd comic a day, the same one on all your devices, with buttons to browse others. Today's comic loads from xkcd.com once a day and its image whenever the dashboard opens; browsing loads more. Off means nothing is requested.": "Affiche une bande dessinée xkcd par jour, la même sur tous vos appareils, avec des boutons pour en parcourir d'autres. Celle du jour est chargée depuis xkcd.com une fois par jour et son image à chaque ouverture du tableau de bord ; parcourir en charge d'autres. Désactivé, rien n'est demandé.",
     "Loading the comic…": "Chargement de la bande dessinée…",
     "Couldn't load today's comic.": "Impossible de charger la bande dessinée du jour.",
     "Try again": "Réessayer",
     "By Randall Munroe": "Par Randall Munroe",
     "Explain this comic": "Expliquer cette bande dessinée",
+    "Previous comic": "Bande dessinée précédente",
+    "Next comic": "Bande dessinée suivante",
+    "Random comic": "Bande dessinée au hasard",
+    "Random": "Au hasard",
+    "Back to today's comic": "Revenir à la bande dessinée du jour",
+    "Couldn't load that comic.": "Impossible de charger cette bande dessinée.",
+    "xkcd {num}: {title}": "xkcd {num} : {title}",
     "Open in Obsidian (Surfing)": "Ouvrir dans Obsidian (Surfing)",
     "Open in the default browser": "Ouvrir dans le navigateur par défaut",
     "Copy link": "Copier le lien",
@@ -974,12 +981,19 @@ const I18N = {
     "Quick note {n}": "Nota rápida {n}",
     "Collapse {name}": "Contraer {name}",
     "xkcd comic of the day": "Cómic xkcd del día",
-    "Shows one xkcd comic a day, the same one on all your devices. The comic's details load from xkcd.com once a day and its image whenever the dashboard opens. Off means nothing is requested.": "Muestra un cómic de xkcd al día, el mismo en todos tus dispositivos. Sus datos se cargan desde xkcd.com una vez al día y su imagen cada vez que se abre el panel. Si está desactivado, no se solicita nada.",
+    "Shows one xkcd comic a day, the same one on all your devices, with buttons to browse others. Today's comic loads from xkcd.com once a day and its image whenever the dashboard opens; browsing loads more. Off means nothing is requested.": "Muestra un cómic de xkcd al día, el mismo en todos tus dispositivos, con botones para explorar otros. El de hoy se carga desde xkcd.com una vez al día y su imagen cada vez que se abre el panel; al explorar se cargan más. Si está desactivado, no se solicita nada.",
     "Loading the comic…": "Cargando el cómic…",
     "Couldn't load today's comic.": "No se pudo cargar el cómic de hoy.",
     "Try again": "Reintentar",
     "By Randall Munroe": "De Randall Munroe",
     "Explain this comic": "Explicar este cómic",
+    "Previous comic": "Cómic anterior",
+    "Next comic": "Cómic siguiente",
+    "Random comic": "Cómic aleatorio",
+    "Random": "Aleatorio",
+    "Back to today's comic": "Volver al cómic de hoy",
+    "Couldn't load that comic.": "No se pudo cargar ese cómic.",
+    "xkcd {num}: {title}": "xkcd {num}: {title}",
     "Open in Obsidian (Surfing)": "Abrir en Obsidian (Surfing)",
     "Open in the default browser": "Abrir en el navegador predeterminado",
     "Copy link": "Copiar enlace",
@@ -1368,12 +1382,19 @@ const I18N = {
     "Quick note {n}": "Schnellnotiz {n}",
     "Collapse {name}": "{name} einklappen",
     "xkcd comic of the day": "xkcd-Comic des Tages",
-    "Shows one xkcd comic a day, the same one on all your devices. The comic's details load from xkcd.com once a day and its image whenever the dashboard opens. Off means nothing is requested.": "Zeigt täglich einen xkcd-Comic, auf allen Geräten denselben. Die Angaben dazu werden einmal täglich von xkcd.com geladen, das Bild bei jedem Öffnen des Dashboards. Ist die Option aus, wird nichts angefragt.",
+    "Shows one xkcd comic a day, the same one on all your devices, with buttons to browse others. Today's comic loads from xkcd.com once a day and its image whenever the dashboard opens; browsing loads more. Off means nothing is requested.": "Zeigt täglich einen xkcd-Comic, auf allen Geräten denselben, mit Schaltflächen zum Blättern. Der heutige wird einmal täglich von xkcd.com geladen, sein Bild bei jedem Öffnen des Dashboards; beim Blättern werden weitere geladen. Ist die Option aus, wird nichts angefragt.",
     "Loading the comic…": "Comic wird geladen …",
     "Couldn't load today's comic.": "Der heutige Comic konnte nicht geladen werden.",
     "Try again": "Erneut versuchen",
     "By Randall Munroe": "Von Randall Munroe",
     "Explain this comic": "Diesen Comic erklären",
+    "Previous comic": "Vorheriger Comic",
+    "Next comic": "Nächster Comic",
+    "Random comic": "Zufälliger Comic",
+    "Random": "Zufall",
+    "Back to today's comic": "Zurück zum heutigen Comic",
+    "Couldn't load that comic.": "Dieser Comic konnte nicht geladen werden.",
+    "xkcd {num}: {title}": "xkcd {num}: {title}",
     "Open in Obsidian (Surfing)": "In Obsidian (Surfing) öffnen",
     "Open in the default browser": "Im Standardbrowser öffnen",
     "Copy link": "Link kopieren",
@@ -1764,12 +1785,19 @@ const I18N = {
     "Quick note {n}": "クイックメモ {n}",
     "Collapse {name}": "{name} を折りたたむ",
     "xkcd comic of the day": "今日のxkcdコミック",
-    "Shows one xkcd comic a day, the same one on all your devices. The comic's details load from xkcd.com once a day and its image whenever the dashboard opens. Off means nothing is requested.": "xkcdのコミックを1日1本表示します。すべてのデバイスで同じものです。詳細は1日に1回xkcd.comから、画像はダッシュボードを開くたびに読み込みます。オフにすると何も取得しません。",
+    "Shows one xkcd comic a day, the same one on all your devices, with buttons to browse others. Today's comic loads from xkcd.com once a day and its image whenever the dashboard opens; browsing loads more. Off means nothing is requested.": "xkcdのコミックを1日1本、すべてのデバイスで同じものを表示し、ボタンで他のコミックも見られます。今日のコミックは1日に1回xkcd.comから、画像はダッシュボードを開くたびに読み込み、閲覧すると追加で読み込みます。オフにすると何も取得しません。",
     "Loading the comic…": "コミックを読み込んでいます…",
     "Couldn't load today's comic.": "今日のコミックを読み込めませんでした。",
     "Try again": "もう一度試す",
     "By Randall Munroe": "作者: Randall Munroe",
     "Explain this comic": "このコミックを解説",
+    "Previous comic": "前のコミック",
+    "Next comic": "次のコミック",
+    "Random comic": "ランダムなコミック",
+    "Random": "ランダム",
+    "Back to today's comic": "今日のコミックに戻る",
+    "Couldn't load that comic.": "そのコミックを読み込めませんでした。",
+    "xkcd {num}: {title}": "xkcd {num}: {title}",
     "Open in Obsidian (Surfing)": "Obsidian (Surfing) で開く",
     "Open in the default browser": "既定のブラウザで開く",
     "Copy link": "リンクをコピー",
@@ -3237,6 +3265,7 @@ function buildDashboard() {
     h("section", { cls: "card hidden", id: "xkcd-card", "aria-labelledby": "xkcd-card-title" },
       h("div", { cls: "card-header" }, cardTitle("xkcd-card", "xkcd-body", T("xkcd")), countRow("xkcd-count")),
       h("div", { id: "xkcd-body" }),
+      h("div", { cls: "sr-only", id: "xkcd-live", role: "status", "aria-live": "polite" }),
     ),
   );
 
@@ -7584,18 +7613,27 @@ class HomepageView extends ItemView {
     return n === 404 ? 403 : n; // there is no comic 404 (that is the joke)
   }
 
-  async fetchXkcd(day) {
-    const get = async (url) => (await requestUrl({ url })).json;
-    const latest = Number((await get("https://xkcd.com/info.0.json"))?.num);
-    if (!(latest > 0)) return null;
-    const n = this.xkcdPick(latest, day);
-    const d = await get(`https://xkcd.com/${n}/info.0.json`);
+  async fetchXkcdLatest() {
+    const n = Number((await requestUrl({ url: "https://xkcd.com/info.0.json" })).json?.num);
+    return n > 0 ? n : 0;
+  }
+
+  // One comic's details, or null when the response is not what we expect
+  async fetchXkcdComic(n) {
+    const d = (await requestUrl({ url: `https://xkcd.com/${n}/info.0.json` })).json;
     const img = String(d?.img ?? "");
     // The image must come from xkcd's own image server, whatever the response says
     if (Number(d?.num) !== n || !/^https:\/\/imgs\.xkcd\.com\/comics\/[\w%.\-]+$/.test(img)) return null;
     const tidy = (v) => String(v ?? "").replace(/\s+/g, " ").trim();
     const transcript = tidy(String(d.transcript ?? "").replace(/\{\{[\s\S]*?\}\}/g, "").replace(/\[\[|\]\]/g, ""));
     return { num: n, title: tidy(d.safe_title || d.title), alt: tidy(d.alt), transcript: transcript.length <= 1000 ? transcript : "", img };
+  }
+
+  async fetchXkcd(day) {
+    const latest = await this.fetchXkcdLatest();
+    if (!latest) return null;
+    const comic = await this.fetchXkcdComic(this.xkcdPick(latest, day));
+    return comic && { ...comic, latest };
   }
 
   async renderXkcd() {
@@ -7605,8 +7643,11 @@ class HomepageView extends ItemView {
 
     const day = isoDay(new Date());
     const cached = this.cacheGet("xkcd");
-    if (cached?.img) this.displayXkcd(cached); // yesterday's comic stays up until today's arrives
-    else this.xkcdMessage(T("Loading the comic…"));
+    if (cached?.img) {
+      this.xkcdToday = cached; // yesterday's comic stays up until today's arrives
+      // Leave a comic you have browsed to alone when the dashboard refreshes
+      if (!this.xkcdAway && this.$("xkcd-body").dataset.num !== String(cached.num)) this.displayXkcd(cached);
+    } else this.xkcdMessage(T("Loading the comic…"));
     if (cached?.date === day && cached.img) return;
     if (this.xkcdLoading) return;
     this.xkcdLoading = true;
@@ -7615,6 +7656,8 @@ class HomepageView extends ItemView {
       if (comic) {
         const today = { date: day, ...comic };
         this.cacheSet("xkcd", today);
+        this.xkcdToday = today;
+        this.xkcdAway = false;
         return this.displayXkcd(today);
       }
     } catch {
@@ -7632,24 +7675,81 @@ class HomepageView extends ItemView {
     body.empty();
     body.append(h("p", { cls: "xkcd-msg", text }));
     if (retry) {
-      const again = h("button", { type: "button", cls: "xkcd-retry", text: T("Try again") });
+      const again = h("button", { type: "button", cls: "xkcd-btn", text: T("Try again") });
       again.addEventListener("click", () => this.renderXkcd());
       body.append(again);
     }
   }
 
-  displayXkcd(c) {
+  // Step to another comic: a number, "random", or "today"
+  async browseXkcd(target) {
+    const today = this.xkcdToday;
+    if (!today || this.xkcdBusy) return;
+    if (target === "today") {
+      this.xkcdAway = false;
+      return this.displayXkcd(today);
+    }
+    const body = this.$("xkcd-body");
+    const shown = Number(body.dataset.num) || today.num;
+    this.xkcdBusy = true;
+    body.setAttribute("aria-busy", "true");
+    try {
+      const latest = today.latest || (await this.fetchXkcdLatest()) || today.num;
+      let n = target === "random" ? 1 + Math.floor(Math.random() * latest) : target;
+      if (n === 404) n += n > shown ? 1 : -1; // there is no comic 404
+      n = Math.max(1, Math.min(latest, n));
+      this.xkcdSeen ??= new Map();
+      let comic = this.xkcdSeen.get(n);
+      if (!comic) {
+        comic = await this.fetchXkcdComic(n);
+        if (!comic) throw new Error("bad comic");
+        this.xkcdSeen.set(n, { ...comic, latest });
+      }
+      this.xkcdAway = n !== today.num;
+      this.displayXkcd({ latest, ...comic });
+      this.$("xkcd-live").textContent = T("xkcd {num}: {title}", { num: comic.num, title: comic.title });
+    } catch {
+      this.displayXkcd(this.xkcdSeen?.get(shown) ?? today, T("Couldn't load that comic."));
+    } finally {
+      this.xkcdBusy = false;
+      body.removeAttribute("aria-busy");
+    }
+  }
+
+  displayXkcd(c, note) {
     const body = this.$("xkcd-body");
     this.$("xkcd-count").textContent = `#${c.num}`;
-    if (body.dataset.num === String(c.num)) return; // already showing it
     body.dataset.num = String(c.num);
+    const latest = c.latest || this.xkcdToday?.latest || c.num;
     const link = (href, text) => h("a", { href, text });
+    const nav = (key, label, content, go, disabled, cls) => {
+      const b = h("button", { type: "button", cls, "data-nav": key, title: label, "aria-label": label, ...(disabled ? { disabled: "" } : {}) }, content);
+      b.addEventListener("click", () => {
+        this.xkcdFocus = key;
+        go();
+      });
+      return b;
+    };
     // With a transcript the image is described by it; otherwise by the hover text, which is also
     // shown as a caption so touch and keyboard users can read it (hidden from screen readers then)
     const img = h("img", { cls: "xkcd-img", src: c.img, alt: c.transcript || c.alt || c.title, title: c.alt, referrerpolicy: "no-referrer" });
     body.empty();
     body.append(
-      h("h3", { cls: "xkcd-name" }, link(`https://xkcd.com/${c.num}/`, c.title)),
+      ...[
+      h(
+        "div",
+        { cls: "xkcd-head" },
+        h("h3", { cls: "xkcd-name" }, link(`https://xkcd.com/${c.num}/`, c.title)),
+        h(
+          "div",
+          { cls: "xkcd-nav" },
+          nav("prev", T("Previous comic"), iconNode("arrow-left"), () => this.browseXkcd(c.num - 1), c.num <= 1, "icon-btn sm"),
+          nav("next", T("Next comic"), iconNode("arrow-right"), () => this.browseXkcd(c.num + 1), c.num >= latest, "icon-btn sm"),
+          nav("random", T("Random comic"), T("Random"), () => this.browseXkcd("random"), false, "xkcd-btn"),
+          this.xkcdAway ? nav("today", T("Back to today's comic"), T("Today"), () => this.browseXkcd("today"), false, "xkcd-btn") : null,
+        ),
+      ),
+      note ? h("p", { cls: "xkcd-msg", role: "status", text: note }) : null,
       h("div", { cls: "xkcd-panel" }, img),
       c.alt ? h("p", c.transcript ? { cls: "xkcd-alt", text: c.alt } : { cls: "xkcd-alt", text: c.alt, "aria-hidden": "true" }) : null,
       h(
@@ -7660,7 +7760,10 @@ class HomepageView extends ItemView {
         " · ",
         link(`https://www.explainxkcd.com/wiki/index.php/${c.num}`, T("Explain this comic")),
       ),
-    );
+    ].filter(Boolean));
+    const want = this.xkcdFocus === "today" ? "random" : this.xkcdFocus; // Today's button is gone by now
+    this.xkcdFocus = null;
+    if (want) (body.querySelector(`[data-nav="${want}"]:not(:disabled)`) ?? body.querySelector("[data-nav]:not(:disabled)"))?.focus();
   }
 }
 
@@ -7863,7 +7966,7 @@ class HomepageSettingTab extends PluginSettingTab {
 
     add()
       .setName(T("xkcd comic of the day"))
-      .setDesc(T("Shows one xkcd comic a day, the same one on all your devices. The comic's details load from xkcd.com once a day and its image whenever the dashboard opens. Off means nothing is requested."))
+      .setDesc(T("Shows one xkcd comic a day, the same one on all your devices, with buttons to browse others. Today's comic loads from xkcd.com once a day and its image whenever the dashboard opens; browsing loads more. Off means nothing is requested."))
       .addToggle((t) => t.setValue(s.showXkcd).onChange((v) => save("showXkcd", v)));
 
     add()
