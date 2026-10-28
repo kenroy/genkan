@@ -586,6 +586,30 @@ const I18N = {
     "Try again": "Réessayer",
     "By Randall Munroe": "Par Randall Munroe",
     "Explain this comic": "Expliquer cette bande dessinée",
+    "Vault stats": "Statistiques du coffre",
+    "A summary of your vault: a 12-week heatmap of the days you wrote, your streak, counts of notes, orphan notes, unresolved links and open tasks, and your top tags. Worked out on your device from file dates and links; nothing is sent anywhere.": "Un résumé de votre coffre : une carte de chaleur sur 12 semaines des jours où vous avez écrit, votre série, le nombre de notes, de notes orphelines, de liens non résolus et de tâches ouvertes, et vos principaux tags. Calculé sur votre appareil à partir des dates des fichiers et des liens ; rien n'est envoyé.",
+    "Notes created or edited each day over the last 12 weeks. {streak}": "Notes créées ou modifiées chaque jour au cours des 12 dernières semaines. {streak}",
+    "{n}-day streak": "Série de {n} jours",
+    "No current streak": "Aucune série en cours",
+    "Notes on {date}: {n}": "Notes le {date} : {n}",
+    "Less": "Moins",
+    "More": "Plus",
+    "day streak": "jours d'affilée",
+    "created in 12 weeks": "créées en 12 semaines",
+    "Notes": "Notes",
+    "Orphan notes": "Notes orphelines",
+    "Unresolved links": "Liens non résolus",
+    "Open tasks": "Tâches ouvertes",
+    "Show the {n} orphan notes": "Afficher les {n} notes orphelines",
+    "Show the {n} unresolved links": "Afficher les {n} liens non résolus",
+    "Top tags": "Tags principaux",
+    "Search for {tag}": "Rechercher {tag}",
+    "Based on file dates": "D'après les dates des fichiers",
+    "Updated {time}": "Mis à jour à {time}",
+    "Back": "Retour",
+    "No orphan notes.": "Aucune note orpheline.",
+    "No unresolved links.": "Aucun lien non résolu.",
+    "in {note}": "dans {note}",
     "Archived ({n})": "Archivés ({n})",
     "Archived": "Archivés",
     "Archive project": "Archiver le projet",
@@ -643,7 +667,6 @@ const I18N = {
     "Allocated minutes": "Minutes allouées",
     "Allocated time": "Temps alloué",
     "Allocated time for the whole project": "Temps alloué pour l’ensemble du projet",
-    "Back": "Retour",
     "Blue": "Bleu",
     "Choose a start date that is not after the end date.": "Choisissez une date de début qui ne soit pas postérieure à la date de fin.",
     "Click again to confirm": "Cliquez à nouveau pour confirmer",
@@ -686,7 +709,6 @@ const I18N = {
     "No time was tracked in this period.": "Aucun temps n’a été enregistré sur cette période.",
     "No time was tracked this week.": "Aucun temps n’a été enregistré cette semaine.",
     "None": "Aucune",
-    "Notes": "Notes",
     "Orange": "Orange",
     "Pause": "Pause",
     "Pause timer: {task}": "Mettre le minuteur en pause : {task}",
@@ -999,6 +1021,30 @@ const I18N = {
     "Try again": "Reintentar",
     "By Randall Munroe": "De Randall Munroe",
     "Explain this comic": "Explicar este cómic",
+    "Vault stats": "Estadísticas de la bóveda",
+    "A summary of your vault: a 12-week heatmap of the days you wrote, your streak, counts of notes, orphan notes, unresolved links and open tasks, and your top tags. Worked out on your device from file dates and links; nothing is sent anywhere.": "Un resumen de tu bóveda: un mapa de calor de 12 semanas con los días en que escribiste, tu racha, el número de notas, notas huérfanas, enlaces sin resolver y tareas abiertas, y tus etiquetas principales. Se calcula en tu dispositivo a partir de las fechas de los archivos y los enlaces; no se envía nada.",
+    "Notes created or edited each day over the last 12 weeks. {streak}": "Notas creadas o editadas cada día durante las últimas 12 semanas. {streak}",
+    "{n}-day streak": "Racha de {n} días",
+    "No current streak": "Sin racha actual",
+    "Notes on {date}: {n}": "Notas el {date}: {n}",
+    "Less": "Menos",
+    "More": "Más",
+    "day streak": "días seguidos",
+    "created in 12 weeks": "creadas en 12 semanas",
+    "Notes": "Notas",
+    "Orphan notes": "Notas huérfanas",
+    "Unresolved links": "Enlaces sin resolver",
+    "Open tasks": "Tareas abiertas",
+    "Show the {n} orphan notes": "Mostrar las {n} notas huérfanas",
+    "Show the {n} unresolved links": "Mostrar los {n} enlaces sin resolver",
+    "Top tags": "Etiquetas principales",
+    "Search for {tag}": "Buscar {tag}",
+    "Based on file dates": "Según las fechas de los archivos",
+    "Updated {time}": "Actualizado a las {time}",
+    "Back": "Volver",
+    "No orphan notes.": "No hay notas huérfanas.",
+    "No unresolved links.": "No hay enlaces sin resolver.",
+    "in {note}": "en {note}",
     "Archived ({n})": "Archivados ({n})",
     "Archived": "Archivados",
     "Archive project": "Archivar proyecto",
@@ -1056,7 +1102,6 @@ const I18N = {
     "Allocated minutes": "Minutos asignados",
     "Allocated time": "Tiempo asignado",
     "Allocated time for the whole project": "Tiempo asignado a todo el proyecto",
-    "Back": "Atrás",
     "Blue": "Azul",
     "Choose a start date that is not after the end date.": "Elige una fecha de inicio que no sea posterior a la de fin.",
     "Click again to confirm": "Haz clic otra vez para confirmar",
@@ -1099,7 +1144,6 @@ const I18N = {
     "No time was tracked in this period.": "No se registró tiempo en este período.",
     "No time was tracked this week.": "No se registró tiempo esta semana.",
     "None": "Ninguna",
-    "Notes": "Notas",
     "Orange": "Naranja",
     "Pause": "Pausa",
     "Pause timer: {task}": "Pausar el temporizador: {task}",
@@ -1412,6 +1456,30 @@ const I18N = {
     "Try again": "Erneut versuchen",
     "By Randall Munroe": "Von Randall Munroe",
     "Explain this comic": "Diesen Comic erklären",
+    "Vault stats": "Vault-Statistik",
+    "A summary of your vault: a 12-week heatmap of the days you wrote, your streak, counts of notes, orphan notes, unresolved links and open tasks, and your top tags. Worked out on your device from file dates and links; nothing is sent anywhere.": "Eine Übersicht über deinen Vault: eine Heatmap der letzten 12 Wochen mit den Tagen, an denen du geschrieben hast, deine Serie, die Anzahl der Notizen, verwaisten Notizen, ungelösten Links und offenen Aufgaben sowie deine häufigsten Tags. Wird auf deinem Gerät aus Dateidaten und Links berechnet; nichts wird gesendet.",
+    "Notes created or edited each day over the last 12 weeks. {streak}": "An jedem Tag der letzten 12 Wochen erstellte oder bearbeitete Notizen. {streak}",
+    "{n}-day streak": "Serie von {n} Tagen",
+    "No current streak": "Keine aktuelle Serie",
+    "Notes on {date}: {n}": "Notizen am {date}: {n}",
+    "Less": "Weniger",
+    "More": "Mehr",
+    "day streak": "Tage in Folge",
+    "created in 12 weeks": "in 12 Wochen erstellt",
+    "Notes": "Notizen",
+    "Orphan notes": "Verwaiste Notizen",
+    "Unresolved links": "Ungelöste Links",
+    "Open tasks": "Offene Aufgaben",
+    "Show the {n} orphan notes": "Die {n} verwaisten Notizen anzeigen",
+    "Show the {n} unresolved links": "Die {n} ungelösten Links anzeigen",
+    "Top tags": "Häufigste Tags",
+    "Search for {tag}": "Nach {tag} suchen",
+    "Based on file dates": "Nach Dateidaten",
+    "Updated {time}": "Aktualisiert um {time}",
+    "Back": "Zurück",
+    "No orphan notes.": "Keine verwaisten Notizen.",
+    "No unresolved links.": "Keine ungelösten Links.",
+    "in {note}": "in {note}",
     "Archived ({n})": "Archiviert ({n})",
     "Archived": "Archiviert",
     "Archive project": "Projekt archivieren",
@@ -1469,7 +1537,6 @@ const I18N = {
     "Allocated minutes": "Zugewiesene Minuten",
     "Allocated time": "Zugewiesene Zeit",
     "Allocated time for the whole project": "Zugewiesene Zeit für das ganze Projekt",
-    "Back": "Zurück",
     "Blue": "Blau",
     "Choose a start date that is not after the end date.": "Wählen Sie ein Startdatum, das nicht nach dem Enddatum liegt.",
     "Click again to confirm": "Zum Bestätigen erneut klicken",
@@ -1512,7 +1579,6 @@ const I18N = {
     "No time was tracked in this period.": "In diesem Zeitraum wurde keine Zeit erfasst.",
     "No time was tracked this week.": "In dieser Woche wurde keine Zeit erfasst.",
     "None": "Keine",
-    "Notes": "Notizen",
     "Orange": "Orange",
     "Pause": "Pause",
     "Pause timer: {task}": "Timer anhalten: {task}",
@@ -1827,6 +1893,30 @@ const I18N = {
     "Try again": "もう一度試す",
     "By Randall Munroe": "作者: Randall Munroe",
     "Explain this comic": "このコミックを解説",
+    "Vault stats": "保管庫の統計",
+    "A summary of your vault: a 12-week heatmap of the days you wrote, your streak, counts of notes, orphan notes, unresolved links and open tasks, and your top tags. Worked out on your device from file dates and links; nothing is sent anywhere.": "保管庫の概要です。書いた日の12週間ヒートマップ、連続日数、ノート数、孤立ノート、未解決リンク、未完了タスクの数、よく使うタグを表示します。ファイルの日付とリンクからお使いの端末で計算し、何も送信しません。",
+    "Notes created or edited each day over the last 12 weeks. {streak}": "過去12週間に毎日作成または編集したノート。{streak}",
+    "{n}-day streak": "{n}日連続",
+    "No current streak": "連続記録なし",
+    "Notes on {date}: {n}": "{date}のノート: {n}",
+    "Less": "少ない",
+    "More": "多い",
+    "day streak": "日連続",
+    "created in 12 weeks": "12週間で作成",
+    "Notes": "ノート",
+    "Orphan notes": "孤立ノート",
+    "Unresolved links": "未解決リンク",
+    "Open tasks": "未完了タスク",
+    "Show the {n} orphan notes": "{n}件の孤立ノートを表示",
+    "Show the {n} unresolved links": "{n}件の未解決リンクを表示",
+    "Top tags": "よく使うタグ",
+    "Search for {tag}": "{tag}を検索",
+    "Based on file dates": "ファイルの日付に基づく",
+    "Updated {time}": "{time}に更新",
+    "Back": "戻る",
+    "No orphan notes.": "孤立ノートはありません。",
+    "No unresolved links.": "未解決リンクはありません。",
+    "in {note}": "{note}内",
     "Archived ({n})": "アーカイブ済み（{n}）",
     "Archived": "アーカイブ済み",
     "Archive project": "プロジェクトをアーカイブ",
@@ -1884,7 +1974,6 @@ const I18N = {
     "Allocated minutes": "割り当て時間 (分)",
     "Allocated time": "割り当て時間",
     "Allocated time for the whole project": "プロジェクト全体の割り当て時間",
-    "Back": "戻る",
     "Blue": "青",
     "Choose a start date that is not after the end date.": "開始日は終了日以前の日付にしてください。",
     "Click again to confirm": "もう一度クリックして確定",
@@ -1927,7 +2016,6 @@ const I18N = {
     "No time was tracked in this period.": "この期間に記録された時間はありません。",
     "No time was tracked this week.": "今週記録された時間はありません。",
     "None": "なし",
-    "Notes": "メモ",
     "Orange": "オレンジ",
     "Pause": "一時停止",
     "Pause timer: {task}": "タイマーを一時停止: {task}",
@@ -2183,6 +2271,7 @@ const DEFAULT_SETTINGS = {
   showOnThisDay: false, // notes from this date a week, a month and a year ago (off unless enabled)
   showTimerStatus: true, // the running timer in the status bar (desktop; needs the Time tracker)
   showXkcd: false, // an xkcd comic of the day (off unless enabled)
+  showVaultStats: false, // a heatmap, streak, counts and top tags worked out from the vault (off unless enabled)
   showTimeTracker: false, // projects, tasks and timers (off unless enabled); the time lives in its own note
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
   // "files" = a separate file per note in a folder
@@ -2822,6 +2911,7 @@ function savedAgo(ms) {
 
 const FLOOD = 20;
 const DAY_RE = /(\d{4})-(\d{2})-(\d{2})/;
+const VS_WEEKS = 12; // weeks shown in the Vault stats heatmap
 const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 function onThisDayDates(today) {
@@ -2916,7 +3006,7 @@ const ARRANGE_ZONES = ["top", "left", "center", "right"];
 const DEFAULT_LAYOUT = {
   top: ["favs-card"],
   left: ["calendar-card", "links-card"],
-  center: ["ring-card", "clips-card", "recent-card", "otd-card", "tt-card", "xkcd-card"],
+  center: ["ring-card", "clips-card", "recent-card", "otd-card", "tt-card", "xkcd-card", "stats-card"],
   right: ["tasks-card", "note-card"],
 };
 const CARD_NAMES = {
@@ -2929,6 +3019,7 @@ const CARD_NAMES = {
   "otd-card": "On this day",
   "tt-card": "Time tracker",
   "xkcd-card": "xkcd",
+  "stats-card": "Vault stats",
   "tasks-card": "Tasks",
   "note-card": "Quick notes",
 };
@@ -3314,6 +3405,10 @@ function buildDashboard() {
       h("div", { cls: "card-header" }, cardTitle("xkcd-card", "xkcd-body", T("xkcd")), countRow("xkcd-count")),
       h("div", { id: "xkcd-body" }),
       h("div", { cls: "sr-only", id: "xkcd-live", role: "status", "aria-live": "polite" }),
+    ),
+    h("section", { cls: "card hidden", id: "stats-card", "aria-labelledby": "stats-card-title" },
+      h("div", { cls: "card-header" }, cardTitle("stats-card", "stats-body", T("Vault stats")), countRow("stats-count")),
+      h("div", { id: "stats-body" }),
     ),
   );
 
@@ -5373,6 +5468,7 @@ class HomepageView extends ItemView {
       window.setInterval(() => {
         this.renderCalendar();
         this.renderOnThisDay();
+        this.renderVaultStats(true);
         this.loadHero(false);
         this.loadQuote();
         this.syncSharedLayout(true);
@@ -5411,6 +5507,7 @@ class HomepageView extends ItemView {
     this.renderRecent();
     this.renderOnThisDay();
     this.renderXkcd();
+    this.renderVaultStats(true);
     this.tt?.render();
     this.$("hero").classList.toggle("hidden", !this.settings.showHero);
     if (this.settings.showHero) this.loadHero(false);
@@ -5503,6 +5600,189 @@ class HomepageView extends ItemView {
     });
   }
 
+  // ── Vault stats ──
+
+  // One pass over the vault, kept for 30 seconds so a refresh or a task change doesn't repeat it
+  vaultStatsData(force) {
+    const now = Date.now();
+    if (!force && this.vsData && now - this.vsData.at < 30_000) return this.vsData;
+    const mc = this.app.metadataCache;
+    const files = this.app.vault.getMarkdownFiles().filter((f) => !this.isDataFile(f));
+    const paths = new Set(files.map((f) => f.path));
+    const days = new Map(); // day -> notes created or edited that day
+    const since = now - VS_WEEKS * 7 * 86_400_000;
+    let created = 0;
+    for (const f of files) {
+      const c = isoDay(new Date(f.stat.ctime));
+      const m = isoDay(new Date(f.stat.mtime));
+      days.set(c, (days.get(c) || 0) + 1);
+      if (m !== c) days.set(m, (days.get(m) || 0) + 1);
+      if (f.stat.ctime >= since) created++;
+    }
+    // A note is an orphan when it links to no other note and no other note links to it
+    const linked = new Set();
+    for (const [src, dests] of Object.entries(mc.resolvedLinks || {})) {
+      if (!paths.has(src)) continue;
+      for (const dest of Object.keys(dests)) {
+        if (dest !== src && paths.has(dest)) {
+          linked.add(src);
+          linked.add(dest);
+        }
+      }
+    }
+    const orphans = files.filter((f) => !linked.has(f.path)).sort((a, b) => a.basename.localeCompare(b.basename));
+    const unresolved = new Map(); // a note that is linked but doesn't exist -> the first note linking to it
+    for (const [src, targets] of Object.entries(mc.unresolvedLinks || {})) {
+      if (!paths.has(src)) continue;
+      for (const name of Object.keys(targets)) if (!unresolved.has(name)) unresolved.set(name, src);
+    }
+    const tags = Object.entries(mc.getTags?.() || {})
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .slice(0, 5);
+    // Days in a row with a note created or edited, counting back from today (or from yesterday if today is still empty)
+    let streak = 0;
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    if (!days.has(isoDay(d))) d.setDate(d.getDate() - 1);
+    while (days.has(isoDay(d)) && streak < 3650) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    }
+    return (this.vsData = { at: now, total: files.length, days, created, orphans, unresolved: [...unresolved], tags, streak });
+  }
+
+  searchTag(tag) {
+    const search = this.app.internalPlugins?.getPluginById?.("global-search")?.instance;
+    if (search?.openGlobalSearch) search.openGlobalSearch(`tag:${tag}`);
+    else this.app.commands.executeCommandById("global-search:open");
+  }
+
+  renderVaultStats(force) {
+    const card = this.$("stats-card");
+    const enabled = !!this.settings.showVaultStats;
+    card.classList.toggle("hidden", !enabled);
+    if (!enabled) {
+      this.vsData = null;
+      return;
+    }
+    const body = this.$("stats-body");
+    if (!body.dataset.wired) {
+      body.dataset.wired = "1";
+      body.addEventListener("click", (e) => {
+        const tag = e.target.closest("[data-tag]");
+        if (tag) return this.searchTag(tag.dataset.tag);
+        const go = e.target.closest("[data-vs]");
+        if (!go) return;
+        this.vsFocus = go.dataset.vsFocus === "back" ? this.vsView : "back"; // focus goes to the control that replaces this one
+        this.vsView = go.dataset.vs || null;
+        this.renderVaultStats();
+      });
+    }
+    const d = this.vaultStatsData(force);
+    this.$("stats-count").textContent = "";
+    body.empty();
+    if (this.vsView) this.drawVaultList(body, d);
+    else this.drawVaultStats(body, d);
+    const want = this.vsFocus;
+    this.vsFocus = null;
+    if (want) body.querySelector(`[data-vs-focus="${want}"]`)?.focus();
+  }
+
+  drawVaultStats(body, d) {
+    const ws = this.settings.weekStart === "auto" ? localeWeekStart() : Number(this.settings.weekStart);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(today);
+    start.setDate(start.getDate() - ((today.getDay() - ws + 7) % 7) - 7 * (VS_WEEKS - 1));
+    const cells = [];
+    let max = 0;
+    for (let i = 0; i < VS_WEEKS * 7; i++) {
+      const day = new Date(start);
+      day.setDate(start.getDate() + i);
+      const future = day > today;
+      const n = future ? 0 : d.days.get(isoDay(day)) || 0;
+      max = Math.max(max, n);
+      cells.push({ day, n, future });
+    }
+    const level = (n) => (n ? Math.min(4, Math.ceil((4 * n) / max)) : 0);
+    const heat = h(
+      "div",
+      { cls: "vs-heat", role: "img", "aria-label": T("Notes created or edited each day over the last 12 weeks. {streak}", { streak: d.streak ? T("{n}-day streak", { n: fmtNum(d.streak) }) : T("No current streak") }) },
+      ...cells.map(({ day, n, future }) =>
+        h("i", {
+          cls: `vs-cell l${level(n)}${future ? " future" : ""}`,
+          ...(future ? {} : { title: T("Notes on {date}: {n}", { date: fmtDate(day, { weekday: "short", month: "short", day: "numeric" }), n: fmtNum(n) }) }),
+        }),
+      ),
+    );
+    const tile = (n, label, view, aria) =>
+      view
+        ? h("button", { type: "button", cls: "vs-tile", "data-vs": view, "data-vs-focus": view, "aria-label": aria }, h("span", { cls: "vs-n", text: fmtNum(n) }), h("span", { cls: "vs-k", text: label }))
+        : h("div", { cls: "vs-tile static" }, h("span", { cls: "vs-n", text: fmtNum(n) }), h("span", { cls: "vs-k", text: label }));
+    const open = this.tasks.filter((t) => t.id && !t.done).length;
+    body.append(
+      heat,
+      h("div", { cls: "vs-legend", "aria-hidden": "true" }, T("Less"), ...[0, 1, 2, 3, 4].map((l) => h("i", { cls: `vs-cell l${l}` })), T("More")),
+      h(
+        "div",
+        { cls: "vs-sum" },
+        h("span", {}, h("b", { text: fmtNum(d.streak) }), " ", T("day streak")),
+        h("span", {}, h("b", { text: fmtNum(d.created) }), " ", T("created in 12 weeks")),
+      ),
+      h(
+        "div",
+        { cls: "vs-tiles" },
+        tile(d.total, T("Notes")),
+        tile(d.orphans.length, T("Orphan notes"), d.orphans.length ? "orphans" : null, T("Show the {n} orphan notes", { n: fmtNum(d.orphans.length) })),
+        tile(d.unresolved.length, T("Unresolved links"), d.unresolved.length ? "unresolved" : null, T("Show the {n} unresolved links", { n: fmtNum(d.unresolved.length) })),
+        tile(open, T("Open tasks")),
+      ),
+    );
+    if (d.tags.length) {
+      body.append(
+        h("h3", { cls: "vs-sub", text: T("Top tags") }),
+        h("div", { cls: "vs-tags" }, ...d.tags.map(([tag, n]) => h("button", { type: "button", cls: "vs-tag", "data-tag": tag, title: T("Search for {tag}", { tag }) }, tag, h("em", { text: fmtNum(n) })))),
+      );
+    }
+    body.append(
+      h("div", { cls: "vs-foot" }, h("span", { text: T("Based on file dates") }), h("span", { text: T("Updated {time}", { time: new Date(d.at).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) }) })),
+    );
+  }
+
+  // The notes behind the Orphan notes and Unresolved links tiles
+  drawVaultList(body, d) {
+    const orphans = this.vsView === "orphans";
+    const items = orphans ? d.orphans : d.unresolved;
+    const max = 50;
+    body.append(
+      h(
+        "div",
+        { cls: "vs-listhead" },
+        h("button", { type: "button", cls: "vs-back", "data-vs": "", "data-vs-focus": "back" }, "← ", T("Back")),
+        h("h3", { cls: "vs-sub", text: orphans ? T("Orphan notes") : T("Unresolved links") }),
+      ),
+    );
+    if (!items.length) {
+      body.append(h("p", { cls: "vs-empty", text: orphans ? T("No orphan notes.") : T("No unresolved links.") }));
+      return;
+    }
+    const list = body.createDiv({ cls: "notes-list" });
+    for (const it of items.slice(0, max)) {
+      const [path, title, sub] = orphans
+        ? [it.path, it.basename, it.parent && it.parent.path !== "/" ? it.parent.path : ""]
+        : [it[1], it[0], T("in {note}", { note: it[1].replace(/^.*\//, "").replace(/\.md$/, "") })];
+      list.append(
+        h(
+          "a",
+          { cls: "note-item", href: "#", "data-open": path },
+          h("span", { cls: "note-icon", "aria-hidden": "true", text: orphans ? "📄" : "🔗" }),
+          h("div", { cls: "note-info" }, h("div", { cls: "note-title-row" }, h("span", { cls: "note-title", text: title })), sub ? h("span", { cls: "note-path", text: sub }) : null),
+        ),
+      );
+    }
+    if (items.length > max) body.append(h("div", { cls: "otd-more", text: T("+ {n} more", { n: fmtNum(items.length - max) }) }));
+  }
+
   scheduleLists() {
     this.later("lists", 1500, () => {
       if (this.ringMode === "files") this.renderRingNotes(); // frontmatter may have changed
@@ -5511,6 +5791,7 @@ class HomepageView extends ItemView {
       this.renderRecent();
       this.renderOnThisDay();
       this.renderCalendar();
+      this.later("vaultStats", 5000, () => this.renderVaultStats(true)); // a full pass over the vault, so less often
     });
   }
 
@@ -5830,11 +6111,13 @@ class HomepageView extends ItemView {
     if (!(f instanceof TFile)) {
       this.tasks = [];
       this.renderTasks();
+      this.renderVaultStats();
       return;
     }
     const text = await this.app.vault.read(f);
     this.tasks = parseTasks(text);
     this.renderTasks();
+    this.renderVaultStats();
 
     // Tasks typed by hand in Obsidian have no ^id yet — add one so they can be toggled
     if (this.tasks.some((t) => !t.id) && !this.fixingIds) {
@@ -8064,6 +8347,11 @@ class HomepageSettingTab extends PluginSettingTab {
       .setName(T("xkcd comic of the day"))
       .setDesc(T("Shows one xkcd comic a day, the same one on all your devices, with buttons to browse others. Today's comic loads from xkcd.com once a day and its image whenever the dashboard opens; browsing loads more. Off means nothing is requested."))
       .addToggle((t) => t.setValue(s.showXkcd).onChange((v) => save("showXkcd", v)));
+
+    add()
+      .setName(T("Vault stats"))
+      .setDesc(T("A summary of your vault: a 12-week heatmap of the days you wrote, your streak, counts of notes, orphan notes, unresolved links and open tasks, and your top tags. Worked out on your device from file dates and links; nothing is sent anywhere."))
+      .addToggle((t) => t.setValue(s.showVaultStats).onChange((v) => save("showVaultStats", v)));
 
     add()
       .setName(T("Pebble ring notes"))

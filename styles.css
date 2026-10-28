@@ -2723,7 +2723,8 @@
 #genkan-root h1.greeting,
 #genkan-root h2.card-label,
 #genkan-root h3.otd-period,
-#genkan-root h3.xkcd-name {
+#genkan-root h3.xkcd-name,
+#genkan-root h3.vs-sub {
   border: 0;
   font-family: inherit;
   font-style: normal;
@@ -3659,4 +3660,174 @@
 
 .hp-root .tt-archived-note {
   margin: 4px 0 8px;
+}
+
+/* ============================================================
+   Vault stats: a 12-week heatmap, a streak, four tiles and the top tags
+   ============================================================ */
+.hp-root .vs-heat {
+  display: grid;
+  gap: 3px;
+  grid-auto-flow: column;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(7, auto);
+}
+
+.hp-root .vs-cell {
+  background: var(--surface-2);
+  border-radius: 3px;
+  display: block;
+  height: 14px;
+}
+
+.hp-root .vs-cell.l1 { background: color-mix(in srgb, var(--accent) 28%, var(--surface-2)); }
+.hp-root .vs-cell.l2 { background: color-mix(in srgb, var(--accent) 52%, var(--surface-2)); }
+.hp-root .vs-cell.l3 { background: color-mix(in srgb, var(--accent) 76%, var(--surface-2)); }
+.hp-root .vs-cell.l4 { background: var(--accent); }
+.hp-root .vs-cell.future { background: transparent; }
+
+.hp-root .vs-legend {
+  align-items: center;
+  color: var(--text-3);
+  display: flex;
+  font-size: 11px;
+  gap: 4px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.hp-root .vs-legend .vs-cell {
+  height: 10px;
+  width: 10px;
+}
+
+.hp-root .vs-sum {
+  color: var(--text-2);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12px;
+  gap: 4px 16px;
+  margin: 10px 0 12px;
+}
+
+.hp-root .vs-sum b {
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 600;
+  margin-right: 2px;
+}
+
+.hp-root .vs-tiles {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#genkan-root .vs-tile {
+  appearance: none;
+  background: var(--surface-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  color: var(--text);
+  cursor: pointer;
+  display: block;
+  height: auto;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+#genkan-root .vs-tile.static {
+  cursor: default;
+}
+
+#genkan-root button.vs-tile:hover {
+  background: var(--accent-lo);
+}
+
+.hp-root .vs-n {
+  display: block;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.hp-root .vs-k {
+  color: var(--text-2);
+  display: block;
+  font-size: 12px;
+}
+
+#genkan-root h3.vs-sub {
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin: 14px 0 6px;
+  text-transform: uppercase;
+}
+
+.hp-root .vs-listhead {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+#genkan-root .vs-listhead h3.vs-sub {
+  margin: 0;
+}
+
+.hp-root .vs-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+#genkan-root .vs-tag,
+#genkan-root .vs-back {
+  appearance: none;
+  background: var(--accent-lo);
+  border: 0;
+  border-radius: 999px;
+  box-shadow: none;
+  color: var(--accent-txt);
+  cursor: pointer;
+  font-size: 12px;
+  height: auto;
+  min-height: 24px;
+  padding: 2px 10px;
+}
+
+#genkan-root .vs-back {
+  background: transparent;
+  border: 1px solid var(--border-hi);
+  color: var(--text-2);
+  font-size: 11px;
+}
+
+#genkan-root .vs-tag:hover,
+#genkan-root .vs-back:hover {
+  background: var(--surface-2);
+}
+
+.hp-root .vs-tag em {
+  color: var(--text-2);
+  font-style: normal;
+  margin-left: 5px;
+}
+
+.hp-root .vs-empty {
+  color: var(--text-3);
+  font-size: 12px;
+  margin: 8px 0 0;
+}
+
+.hp-root .vs-foot {
+  color: var(--text-3);
+  display: flex;
+  font-size: 11px;
+  gap: 8px;
+  justify-content: space-between;
+  margin-top: 12px;
 }
