@@ -812,6 +812,27 @@ function savedAgo(ms) {
 
 const FLOOD = 20;
 const DAY_RE = /(\d{4})-(\d{2})-(\d{2})/;
+// Whether dark text reads better than white over a photo, once the overlay scrim is laid on it.
+// px is RGBA pixel data of the part of the photo behind the header. Scores each pixel's WCAG contrast
+// for both choices (capped at 7, so one extreme pixel cannot dominate) and keeps white unless dark wins.
+function heroPrefersDarkText(px) {
+  const lin = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  const lum = (r, g, b) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  const SCRIM = 0.4; // matches the gradient in styles.extra.css (a black scrim for white text, a white one for dark text)
+  let white = 0;
+  let dark = 0;
+  let n = 0;
+  for (let i = 0; i + 3 < px.length; i += 4) {
+    const [r, g, b] = [px[i], px[i + 1], px[i + 2]];
+    const lw = lum(r * (1 - SCRIM), g * (1 - SCRIM), b * (1 - SCRIM));
+    const ld = lum(r * (1 - SCRIM) + 255 * SCRIM, g * (1 - SCRIM) + 255 * SCRIM, b * (1 - SCRIM) + 255 * SCRIM);
+    white += Math.min(7, 1.05 / (lw + 0.05));
+    dark += Math.min(7, (ld + 0.05) / 0.0575); // text #111 has luminance about 0.0056
+    n++;
+  }
+  return n > 0 && dark / n > white / n + 0.5;
+}
+
 const VS_WEEKS = 12; // weeks shown in the Vault stats heatmap
 const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
@@ -1691,7 +1712,9 @@ class HomepageView extends ItemView {
     this.tt?.render();
     this.$("hero").classList.toggle("hidden", !this.settings.showHero);
     this.$("app").classList.toggle("hero-over", !!this.settings.showHero && !!this.settings.heroOverlay);
+    this.applyHeroTone();
     if (this.settings.showHero) this.loadHero(false);
+    this.measureHeroTone();
     this.loadQuote();
   }
 
@@ -4067,15 +4090,65 @@ class HomepageView extends ItemView {
     this.displayHero(photo);
   }
 
+  // Over-the-photo header: dark text on a pale scrim when the photo is bright, white on a dark one otherwise
+  applyHeroTone() {
+    const over = !!this.settings.showHero && !!this.settings.heroOverlay;
+    this.$("app").classList.toggle("hero-light", over && !!this.heroLight);
+  }
+
+  async measureHeroTone() {
+    const img = this.$("hero-img");
+    const src = img.currentSrc || img.src;
+    if (!this.settings.showHero || !this.settings.heroOverlay || !src || !img.complete || !img.naturalWidth) return;
+    if (this.heroToneSrc === src) return;
+    this.heroToneSrc = src;
+    this.heroLight = false;
+    try {
+      // A separate CORS request, so a host that refuses it cannot stop the visible photo from loading
+      const probe = new Image();
+      probe.crossOrigin = "anonymous";
+      await new Promise((ok, no) => {
+        probe.onload = ok;
+        probe.onerror = no;
+        probe.src = src;
+      });
+      if (this.heroToneSrc !== src) return;
+      const hero = this.$("hero");
+      const boxW = hero.clientWidth || 1600;
+      const boxH = hero.clientHeight || 500;
+      // The part of the photo that shows: object-fit cover, object-position center 60%
+      const scale = Math.max(boxW / probe.naturalWidth, boxH / probe.naturalHeight);
+      const sw = boxW / scale;
+      const sh = boxH / scale;
+      const sx = (probe.naturalWidth - sw) / 2;
+      const sy = (probe.naturalHeight - sh) * 0.6;
+      const w = 48;
+      const hgt = Math.max(1, Math.round((w * boxH) / boxW));
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = hgt;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(probe, sx, sy, sw, sh, 0, 0, w, hgt);
+      this.heroLight = heroPrefersDarkText(ctx.getImageData(0, 0, w, hgt).data);
+    } catch {
+      this.heroLight = false; // tainted canvas or a failed request: keep white text
+    }
+    this.applyHeroTone();
+  }
+
   displayHero(photo) {
     const hero = this.$("hero");
     const img = this.$("hero-img");
     const credit = this.$("hero-credit");
     img.alt = photo.alt || T("Photo of the day");
     img.classList.remove("visible");
+    this.heroToneSrc = null;
+    this.heroLight = false;
+    this.applyHeroTone();
     img.onload = () => {
       img.classList.add("visible");
       hero.classList.add("loaded");
+      this.measureHeroTone();
     };
     img.onerror = () => {
       hero.classList.add("loaded");

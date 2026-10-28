@@ -2655,6 +2655,75 @@
   color: #fff;
 }
 
+/* Bright photo: dark text on a pale scrim (the class is set from a measurement of the photo) */
+#genkan-root #app.hero-over.hero-light .hero-overlay {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.46));
+}
+
+#genkan-root #app.hero-over.hero-light .header .greeting,
+#genkan-root #app.hero-over.hero-light .header .greeting .gname,
+#genkan-root #app.hero-over.hero-light .header #clock-main {
+  color: #111;
+}
+
+#genkan-root #app.hero-over.hero-light .header .greeting,
+#genkan-root #app.hero-over.hero-light .header #clock-main {
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.6);
+}
+
+#genkan-root #app.hero-over.hero-light .header #clock-sec,
+#genkan-root #app.hero-over.hero-light .header #clock-ampm,
+#genkan-root #app.hero-over.hero-light .header .clock-date {
+  color: rgba(17, 17, 17, 0.92);
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.6);
+}
+
+#genkan-root #app.hero-over.hero-light .header .header-controls .icon-btn {
+  background: rgba(255, 255, 255, 0.4);
+  color: #111;
+}
+
+#genkan-root #app.hero-over.hero-light .header .header-controls .icon-btn:hover {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+#genkan-root #app.hero-over.hero-light .header .search-wrap {
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+#genkan-root #app.hero-over.hero-light .header .search-wrap:focus-within {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: #111;
+}
+
+#genkan-root #app.hero-over.hero-light .header #search-input {
+  color: #111;
+}
+
+#genkan-root #app.hero-over.hero-light .header #search-input::placeholder,
+#genkan-root #app.hero-over.hero-light .header .search-icon {
+  color: rgba(17, 17, 17, 0.75);
+}
+
+#genkan-root #app.hero-over.hero-light .header .search-kbd {
+  background: rgba(255, 255, 255, 0.45);
+  border-color: rgba(0, 0, 0, 0.3);
+  color: #111;
+}
+
+/* The credit and photo refresh button sit on the same pale scrim, so they go dark too */
+#genkan-root #app.hero-over.hero-light .hero-credit,
+#genkan-root #app.hero-over.hero-light .hero-credit a {
+  color: #111;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.7);
+}
+
+#genkan-root #app.hero-over.hero-light #hero-refresh {
+  background: rgba(255, 255, 255, 0.55);
+  color: #111;
+}
+
 /* On a narrow screen the search box is full width, so leave room for the photo credit and refresh button below it */
 @media (max-width: 560px) {
   #genkan-root #app.hero-over > .header {
