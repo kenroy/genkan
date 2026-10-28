@@ -3849,6 +3849,17 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
+/* The header sits over the photo's credit and refresh button, so let clicks fall through the gaps to them */
+#genkan-root #app.hero-over > .header {
+  pointer-events: none;
+}
+
+#genkan-root #app.hero-over > .header .header-controls,
+#genkan-root #app.hero-over > .header .search-wrap,
+#genkan-root #app.hero-over > .header .search-results {
+  pointer-events: auto;
+}
+
 #genkan-root #app.hero-over > .header {
   gap: 8px;
   grid-area: 1 / 1;
@@ -3905,8 +3916,11 @@
   backdrop-filter: blur(6px);
 }
 
+/* A clear hover: a darker disc and a ring, so it reads on any photo (the plain photo's refresh button gets the same) */
+#genkan-root .hero .icon-btn:hover,
 #genkan-root #app.hero-over .header .header-controls .icon-btn:hover {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.9);
 }
 
 #genkan-root #app.hero-over .header .search-wrap {
@@ -3965,8 +3979,10 @@
   color: #111;
 }
 
-#genkan-root #app.hero-over.hero-light .header .header-controls .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.65);
+#genkan-root #app.hero-over.hero-light .header .header-controls .icon-btn:hover,
+#genkan-root #app.hero-over.hero-light #hero-refresh:hover {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.6);
 }
 
 #genkan-root #app.hero-over.hero-light .header .search-wrap {
