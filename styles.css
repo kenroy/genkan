@@ -1683,6 +1683,7 @@
 /* The round icon buttons: refresh (header, photo, web clips, recent notes), theme and settings */
 #genkan-root #page-refresh,
 #genkan-root #theme-toggle,
+#genkan-root #arrange-btn,
 #genkan-root #settings-btn,
 #genkan-root #hero-refresh,
 #genkan-root #refresh-clips,
