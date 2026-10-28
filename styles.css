@@ -3731,10 +3731,17 @@
   box-shadow: none;
   color: var(--text);
   cursor: pointer;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  font: inherit;
   height: auto;
+  justify-content: flex-start;
   padding: 10px 12px;
   text-align: left;
+}
+
+#genkan-root #stats-count:empty {
+  display: none;
 }
 
 #genkan-root .vs-tile.static {

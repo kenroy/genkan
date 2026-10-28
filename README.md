@@ -134,6 +134,8 @@ Off by default. Turn on **Vault stats** in settings to add a card that summarise
 - **Tiles:** notes, **orphan notes** (no links to or from another note), **unresolved links** (links to notes that don't exist yet) and open tasks from your Genkan task list. Click Orphan notes or Unresolved links to see the list (the first 50), click a note to open it, and press **Back** to return. An unresolved link opens the note that contains it.
 - **Top tags:** your five most used tags with their counts; click one to search for it.
 
+<img src="docs/screenshots/vault-stats.png" alt="The Genkan Vault stats card in the dark theme: a 12-week heatmap of the days you wrote, a 26-day streak, tiles for notes, orphan notes, unresolved links and open tasks, and the top tags" width="560">
+
 Genkan's own data folder is left out. The vault is scanned when the dashboard opens and again a few seconds after notes change, so a very large vault is not rescanned on every keystroke.
 
 ### Time tracker
