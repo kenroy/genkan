@@ -398,6 +398,8 @@ const I18N = {
     "Clear search": "Effacer la recherche",
     "Search results": "Résultats de la recherche",
     "Photo of the day": "Photo du jour",
+    "Clock and search over the photo": "Horloge et recherche sur la photo",
+    "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Place le message d'accueil, l'horloge, la date et la recherche sur la photo du jour au lieu de les mettre au-dessus, ce qui économise de la place en hauteur. La photo est un peu assombrie pour que le texte reste lisible ; les photos très claires paraissent donc plus ternes. Nécessite la photo du jour.",
     "Load a new photo": "Charger une nouvelle photo",
     "Load new photo": "Charger une nouvelle photo",
     "Inspirational quotes provided by": "Citations inspirantes fournies par",
@@ -833,6 +835,8 @@ const I18N = {
     "Clear search": "Borrar búsqueda",
     "Search results": "Resultados de la búsqueda",
     "Photo of the day": "Foto del día",
+    "Clock and search over the photo": "Reloj y búsqueda sobre la foto",
+    "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Coloca el saludo, el reloj, la fecha y la búsqueda sobre la foto del día en lugar de encima, lo que ahorra espacio vertical. La foto se oscurece un poco para que el texto se lea bien, así que las fotos muy claras se ven más apagadas. Requiere la foto del día.",
     "Load a new photo": "Cargar una foto nueva",
     "Load new photo": "Cargar una foto nueva",
     "Inspirational quotes provided by": "Citas inspiradoras proporcionadas por",
@@ -1268,6 +1272,8 @@ const I18N = {
     "Clear search": "Suche löschen",
     "Search results": "Suchergebnisse",
     "Photo of the day": "Foto des Tages",
+    "Clock and search over the photo": "Uhr und Suche über dem Foto",
+    "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Legt Begrüßung, Uhr, Datum und Suche über das Foto des Tages statt darüber, was Platz in der Höhe spart. Das Foto wird leicht abgedunkelt, damit der Text lesbar bleibt; sehr helle Fotos wirken dadurch matter. Benötigt das Foto des Tages.",
     "Load a new photo": "Neues Foto laden",
     "Load new photo": "Neues Foto laden",
     "Inspirational quotes provided by": "Inspirierende Zitate von",
@@ -1703,6 +1709,8 @@ const I18N = {
     "Clear search": "検索をクリア",
     "Search results": "検索結果",
     "Photo of the day": "今日の写真",
+    "Clock and search over the photo": "時計と検索を写真の上に表示",
+    "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "あいさつ、時計、日付、検索ボックスを今日の写真の上に重ねて表示し、縦のスペースを節約します。文字が読みやすいよう写真を少し暗くするため、とても明るい写真はやや地味に見えます。今日の写真が必要です。",
     "Load a new photo": "新しい写真を読み込む",
     "Load new photo": "新しい写真を読み込む",
     "Inspirational quotes provided by": "名言の提供元:",
@@ -2264,6 +2272,7 @@ const DEFAULT_SETTINGS = {
   clockFont: "default", // see CLOCK_FONTS
   clockFontCustom: "", // font name(s) typed in settings when clockFont is "custom"
   showHero: true,
+  heroOverlay: false, // lay the greeting, clock and search over the photo instead of above it
   showQuote: true, // a daily quote
   quoteSource: undefined, // zenquotes | echoes | bundled (unset: ZenQuotes in English, else bundled)
   showFavicons: true, // site icons on web clips (Google's favicon service)
@@ -5510,6 +5519,7 @@ class HomepageView extends ItemView {
     this.renderVaultStats(true);
     this.tt?.render();
     this.$("hero").classList.toggle("hidden", !this.settings.showHero);
+    this.$("app").classList.toggle("hero-over", !!this.settings.showHero && !!this.settings.heroOverlay);
     if (this.settings.showHero) this.loadHero(false);
     this.loadQuote();
   }
@@ -8399,6 +8409,10 @@ class HomepageSettingTab extends PluginSettingTab {
       .setName(T("Photo of the day"))
       .setDesc(T("Shows a landscape photo from Picsum, or from Unsplash if you add a key below. Off means no photo is requested."))
       .addToggle((t) => t.setValue(s.showHero).onChange((v) => save("showHero", v)));
+    add()
+      .setName(T("Clock and search over the photo"))
+      .setDesc(T("Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day."))
+      .addToggle((t) => t.setValue(s.heroOverlay).onChange((v) => save("heroOverlay", v)));
     text(
       T("Unsplash access key"), T("Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault."),
       "unsplashKey",

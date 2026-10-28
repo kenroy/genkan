@@ -3838,3 +3838,107 @@
   justify-content: space-between;
   margin-top: 12px;
 }
+
+/* ============================================================
+   Clock and search over the photo (setting: Clock and search over the photo)
+   The header and the photo share one grid cell, so the photo is exactly as tall as the header
+   ============================================================ */
+#genkan-root #app.hero-over {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#genkan-root #app.hero-over > .header {
+  gap: 8px;
+  grid-area: 1 / 1;
+  margin-bottom: 16px;
+  padding: 18px 22px 24px;
+  position: relative;
+  z-index: 2;
+}
+
+#genkan-root #app.hero-over > .hero {
+  animation: none;
+  background: #26263a; /* dark behind the white text while the photo loads, or if it fails */
+  grid-area: 1 / 1;
+  height: auto;
+  margin-bottom: 16px;
+  min-height: 0;
+}
+
+#genkan-root #app.hero-over > .hero.loaded {
+  background: #26263a;
+}
+
+#genkan-root #app.hero-over .hero-overlay {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.46));
+}
+
+/* White text on the darkened photo, whatever the theme */
+#genkan-root #app.hero-over .header .greeting,
+#genkan-root #app.hero-over .header .greeting .gname,
+#genkan-root #app.hero-over .header #clock-main {
+  color: #fff;
+}
+
+#genkan-root #app.hero-over .header .greeting {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+
+#genkan-root #app.hero-over .header #clock-main {
+  font-weight: 200;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
+}
+
+#genkan-root #app.hero-over .header #clock-sec,
+#genkan-root #app.hero-over .header #clock-ampm,
+#genkan-root #app.hero-over .header .clock-date {
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+
+#genkan-root #app.hero-over .header .header-controls .icon-btn {
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+#genkan-root #app.hero-over .header .header-controls .icon-btn:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+#genkan-root #app.hero-over .header .search-wrap {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+#genkan-root #app.hero-over .header .search-wrap:focus-within {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: #fff;
+}
+
+#genkan-root #app.hero-over .header #search-input {
+  color: #fff;
+}
+
+#genkan-root #app.hero-over .header #search-input::placeholder,
+#genkan-root #app.hero-over .header .search-icon {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+#genkan-root #app.hero-over .header .search-kbd {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+
+/* On a narrow screen the search box is full width, so leave room for the photo credit and refresh button below it */
+@media (max-width: 560px) {
+  #genkan-root #app.hero-over > .header {
+    padding-bottom: 56px;
+  }
+}

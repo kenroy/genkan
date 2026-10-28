@@ -16,7 +16,7 @@ Genkan (玄関) is the entryway of a Japanese home: the place you step in. This 
 - **xkcd**: an optional card with one [xkcd](https://xkcd.com/) comic a day, the same one on all your devices
 - **Vault stats**: an optional card with a 12-week heatmap of the days you wrote, your streak, counts of notes, orphan notes, unresolved links and open tasks, and your top tags
 - **Ring notes**: an optional card for voice notes from a Pebble Index ring
-- A photo of the day and a daily quote (both optional)
+- A photo of the day and a daily quote (both optional), with an option to lay the clock and search over the photo to save vertical space
 
 It reads and writes your vault directly through Obsidian's own API. There is no server, no account and no API key required.
 
@@ -114,6 +114,9 @@ Click a day to open that day's note, creating it if it does not exist. Genkan us
 ### Quick links
 Edit them in settings, one per line: `icon | label | action`, where the action is `command:<command id>`, `open:<note path>`, `daily`, `random` or an `https://` address.
 
+### Photo of the day
+By default the greeting, clock, date and search box sit above the photo. Turn on **Clock and search over the photo** in settings (it needs **Photo of the day**) to lay them over the photo instead, which saves roughly a quarter of the screen's height at the top. The photo is darkened a little so the white text stays readable, so very bright photos look duller, and a bright patch behind the text can still make part of it harder to read. If you don't like it, turn the setting off; with the photo off, the header looks as it always did. On a phone the photo grows to fit the header, and the search results open over the photo.
+
 ### On this day
 Off by default. Turn on **On this day** in settings to add a card that looks back at this date a week, a month and a year ago, with a section for each (a section with nothing shows "Nothing from this date"). Each shows up to three notes with a one-line preview, then "+ N more". Click one to open it.
 
@@ -170,6 +173,7 @@ Genkan aims to meet WCAG 2.2 level AA and is used with a keyboard and screen rea
 - **Structure:** the greeting is the page heading, each card has a heading and is a named region, and On this day's periods, Vault stats' sections and the xkcd comic's title are sub-headings, so a screen reader can jump between them. Decorative emoji and icons are hidden from screen readers.
 - **Controls:** everything works from the keyboard and shows a visible focus ring. The calendar is a grid with one Tab stop and arrow-key movement, the quick-note toolbar is one Tab stop, and search announces how many results it found. Tasks are checkboxes named for the task, the Tasks filter and the quick-note dots are tab lists, favourites are two real buttons (open and remove), and the clock is read once a minute rather than every second.
 - **Text and targets:** text meets the 4.5:1 contrast minimum in both themes, and controls are at least 24 by 24 pixels (larger on phones and tablets).
+- **Over the photo:** the clock, date and search are real page content next to the photo, not inside it, so screen readers read them as before; their text is white on a darkened photo, which makes contrast depend on the photo.
 - **Vault stats:** the heatmap is read as one image with your streak (its squares are for sighted hover only), the Orphan notes and Unresolved links tiles and the tags are real buttons, and Back returns focus to the tile you opened.
 - **Announcements:** switching quick notes with Cmd/Ctrl+1 to 7 says which note you are on, "Saved" is announced when you leave a note you changed, and moving a card or sharing a layout is announced.
 - **No drag required:** arranging cards also works with buttons and the keyboard, and each step is announced.
@@ -212,7 +216,7 @@ Notes:
 
 ## Settings
 
-Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker (and its running timer display), Vault stats, xkcd comic of the day, the Pebble ring options, photo of the day and Unsplash key, daily quote, site icons, and quick links.
+Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker (and its running timer display), Vault stats, xkcd comic of the day, the Pebble ring options, photo of the day (and whether the clock and search sit over it) and Unsplash key, daily quote, site icons, and quick links.
 
 ## Development
 

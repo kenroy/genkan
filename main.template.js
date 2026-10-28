@@ -164,6 +164,7 @@ const DEFAULT_SETTINGS = {
   clockFont: "default", // see CLOCK_FONTS
   clockFontCustom: "", // font name(s) typed in settings when clockFont is "custom"
   showHero: true,
+  heroOverlay: false, // lay the greeting, clock and search over the photo instead of above it
   showQuote: true, // a daily quote
   quoteSource: undefined, // zenquotes | echoes | bundled (unset: ZenQuotes in English, else bundled)
   showFavicons: true, // site icons on web clips (Google's favicon service)
@@ -1689,6 +1690,7 @@ class HomepageView extends ItemView {
     this.renderVaultStats(true);
     this.tt?.render();
     this.$("hero").classList.toggle("hidden", !this.settings.showHero);
+    this.$("app").classList.toggle("hero-over", !!this.settings.showHero && !!this.settings.heroOverlay);
     if (this.settings.showHero) this.loadHero(false);
     this.loadQuote();
   }
@@ -4578,6 +4580,10 @@ class HomepageSettingTab extends PluginSettingTab {
       .setName(T("Photo of the day"))
       .setDesc(T("Shows a landscape photo from Picsum, or from Unsplash if you add a key below. Off means no photo is requested."))
       .addToggle((t) => t.setValue(s.showHero).onChange((v) => save("showHero", v)));
+    add()
+      .setName(T("Clock and search over the photo"))
+      .setDesc(T("Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day."))
+      .addToggle((t) => t.setValue(s.heroOverlay).onChange((v) => save("heroOverlay", v)));
     text(
       T("Unsplash access key"), T("Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault."),
       "unsplashKey",
