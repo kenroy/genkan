@@ -4214,3 +4214,7 @@
 .hp-root a.vs-tag em {
   flex: none;
 }
+
+.hp-root .gr-tools {
+  margin-bottom: 8px;
+}

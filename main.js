@@ -414,12 +414,9 @@ const I18N = {
     "Orphans": "Orphelines",
     "Existing files only": "Fichiers existants seulement",
     "Colours come from the groups in your Graph view.": "Les couleurs viennent des groupes de votre vue graphique.",
-    "Filters": "Filtres",
     "Zoom in": "Zoom avant",
     "Zoom out": "Zoom arrière",
     "Fit": "Ajuster",
-    "Expand": "Agrandir",
-    "Collapse": "Réduire",
     "{n} nodes · {links} links": "{n} nœuds · {links} liens",
     "Showing {shown} of {total}": "{shown} sur {total} affichés",
     "No notes match.": "Aucune note ne correspond.",
@@ -431,6 +428,9 @@ const I18N = {
     "Animate": "Animer",
     "Playing how the graph grew": "Lecture de la croissance du graphe",
     "Finished playing": "Lecture terminée",
+    "Graph options": "Options du graphe",
+    "Larger": "Agrandir",
+    "Smaller": "Réduire",
     "Clock and search over the photo": "Horloge et recherche sur la photo",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Place le message d'accueil, l'horloge, la date et la recherche sur la photo du jour au lieu de les mettre au-dessus, ce qui économise de la place en hauteur. La photo est un peu assombrie pour que le texte reste lisible ; les photos très claires paraissent donc plus ternes. Nécessite la photo du jour.",
     "Load a new photo": "Charger une nouvelle photo",
@@ -884,12 +884,9 @@ const I18N = {
     "Orphans": "Huérfanas",
     "Existing files only": "Solo archivos existentes",
     "Colours come from the groups in your Graph view.": "Los colores vienen de los grupos de tu vista de grafo.",
-    "Filters": "Filtros",
     "Zoom in": "Acercar",
     "Zoom out": "Alejar",
     "Fit": "Ajustar",
-    "Expand": "Ampliar",
-    "Collapse": "Reducir",
     "{n} nodes · {links} links": "{n} nodos · {links} enlaces",
     "Showing {shown} of {total}": "Mostrando {shown} de {total}",
     "No notes match.": "Ninguna nota coincide.",
@@ -901,6 +898,9 @@ const I18N = {
     "Animate": "Animar",
     "Playing how the graph grew": "Reproduciendo cómo creció el grafo",
     "Finished playing": "Reproducción terminada",
+    "Graph options": "Opciones del grafo",
+    "Larger": "Ampliar",
+    "Smaller": "Reducir",
     "Clock and search over the photo": "Reloj y búsqueda sobre la foto",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Coloca el saludo, el reloj, la fecha y la búsqueda sobre la foto del día en lugar de encima, lo que ahorra espacio vertical. La foto se oscurece un poco para que el texto se lea bien, así que las fotos muy claras se ven más apagadas. Requiere la foto del día.",
     "Load a new photo": "Cargar una foto nueva",
@@ -1354,12 +1354,9 @@ const I18N = {
     "Orphans": "Verwaiste",
     "Existing files only": "Nur vorhandene Dateien",
     "Colours come from the groups in your Graph view.": "Die Farben stammen aus den Gruppen deiner Graphansicht.",
-    "Filters": "Filter",
     "Zoom in": "Vergrößern",
     "Zoom out": "Verkleinern",
     "Fit": "Einpassen",
-    "Expand": "Aufklappen",
-    "Collapse": "Zuklappen",
     "{n} nodes · {links} links": "{n} Knoten · {links} Links",
     "Showing {shown} of {total}": "{shown} von {total} angezeigt",
     "No notes match.": "Keine passenden Notizen.",
@@ -1371,6 +1368,9 @@ const I18N = {
     "Animate": "Animieren",
     "Playing how the graph grew": "Das Wachstum des Graphen wird abgespielt",
     "Finished playing": "Wiedergabe beendet",
+    "Graph options": "Graph-Optionen",
+    "Larger": "Größer",
+    "Smaller": "Kleiner",
     "Clock and search over the photo": "Uhr und Suche über dem Foto",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Legt Begrüßung, Uhr, Datum und Suche über das Foto des Tages statt darüber, was Platz in der Höhe spart. Das Foto wird leicht abgedunkelt, damit der Text lesbar bleibt; sehr helle Fotos wirken dadurch matter. Benötigt das Foto des Tages.",
     "Load a new photo": "Neues Foto laden",
@@ -1824,12 +1824,9 @@ const I18N = {
     "Orphans": "孤立ノート",
     "Existing files only": "既存のファイルのみ",
     "Colours come from the groups in your Graph view.": "色はグラフビューのグループに従います。",
-    "Filters": "フィルター",
     "Zoom in": "拡大",
     "Zoom out": "縮小",
     "Fit": "全体表示",
-    "Expand": "広げる",
-    "Collapse": "狭める",
     "{n} nodes · {links} links": "{n} 個のノード · {links} 件のリンク",
     "Showing {shown} of {total}": "{total} 件中 {shown} 件を表示",
     "No notes match.": "一致するノートはありません。",
@@ -1841,6 +1838,9 @@ const I18N = {
     "Animate": "アニメーション",
     "Playing how the graph grew": "グラフの成長を再生しています",
     "Finished playing": "再生が終わりました",
+    "Graph options": "グラフのオプション",
+    "Larger": "大きく",
+    "Smaller": "小さく",
     "Clock and search over the photo": "時計と検索を写真の上に表示",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "あいさつ、時計、日付、検索ボックスを今日の写真の上に重ねて表示し、縦のスペースを節約します。文字が読みやすいよう写真を少し暗くするため、とても明るい写真はやや地味に見えます。今日の写真が必要です。",
     "Load a new photo": "新しい写真を読み込む",
@@ -6285,12 +6285,29 @@ class HomepageView extends ItemView {
     gr.chipsHead = h("h3", { cls: "vs-sub", text: T("Most connected") });
     gr.panel = h(
       "div",
-      { cls: "gr-panel hidden", id: "gr-panel" },
+      { cls: "gr-panel" },
       h("input", { type: "search", cls: "gr-filter", "data-gr-query": "", placeholder: T("Filter notes…"), "aria-label": T("Filter notes"), spellcheck: "false" }),
       h("div", { cls: "gr-checks" }, check("tags", T("Tags")), check("attachments", T("Attachments")), check("orphans", T("Orphans")), check("existingOnly", T("Existing files only"))),
       h("p", { cls: "vs-empty", text: T("Colours come from the groups in your Graph view.") }),
     );
-    gr.filterBtn = h("button", { type: "button", cls: "icon-btn sm", "data-gr": "filters", title: T("Filters"), "aria-label": T("Filters"), "aria-expanded": "false", "aria-controls": "gr-panel" }, iconNode("settings"));
+    // The everyday view is just the two modes and the picture; the tools and filters sit behind one button
+    gr.optBtn = h("button", { type: "button", cls: "icon-btn sm", "data-gr": "options", title: T("Graph options"), "aria-label": T("Graph options"), "aria-expanded": "false", "aria-controls": "gr-tools" }, iconNode("settings"));
+    gr.tools = h(
+      "div",
+      { cls: "gr-tools hidden", id: "gr-tools" },
+      h(
+        "div",
+        { cls: "gr-bar" },
+        iconBtn("out", "minus", T("Zoom out")),
+        iconBtn("in", "plus", T("Zoom in")),
+        h("button", { type: "button", cls: "gr-mode", "data-gr": "fit" }, T("Fit")),
+        reduced ? null : (gr.animBtn = h("button", { type: "button", cls: "gr-mode", "data-gr": "animate" }, T("Animate"))),
+        h("button", { type: "button", cls: "gr-mode", "data-gr": "tall" }, T("Larger")),
+        h("span", { cls: "gr-gap" }),
+        hasGraph ? h("button", { type: "button", cls: "vs-back", "data-gr": "open" }, T("Open graph view")) : null,
+      ),
+      gr.panel,
+    );
     const mode = (id, label) => h("button", { type: "button", cls: "gr-mode", "data-gr-mode": id }, label);
     body.append(
       h(
@@ -6299,15 +6316,9 @@ class HomepageView extends ItemView {
         mode("overview", T("Overview")),
         mode("local", T("This note")),
         h("span", { cls: "gr-gap" }),
-        iconBtn("out", "minus", T("Zoom out")),
-        iconBtn("in", "plus", T("Zoom in")),
-        h("button", { type: "button", cls: "gr-mode", "data-gr": "fit" }, T("Fit")),
-        reduced ? null : (gr.animBtn = h("button", { type: "button", cls: "gr-mode", "data-gr": "animate" }, T("Animate"))),
-        h("button", { type: "button", cls: "gr-mode", "data-gr": "tall" }, T("Expand")),
-        gr.filterBtn,
-        hasGraph ? h("button", { type: "button", cls: "vs-back", "data-gr": "open" }, T("Open graph view")) : null,
+        gr.optBtn,
       ),
-      gr.panel,
+      gr.tools,
       gr.stage,
       gr.empty,
       gr.status,
@@ -6456,13 +6467,13 @@ class HomepageView extends ItemView {
       else if (act === "fit") this.fitGraph();
       else if (act === "animate") this.animateGraph();
       else if (act === "open") this.app.commands.executeCommandById("graph:open");
-      else if (act === "filters") {
-        const open = gr.panel.classList.toggle("hidden") === false;
-        gr.filterBtn.setAttribute("aria-expanded", String(open));
+      else if (act === "options") {
+        const open = gr.tools.classList.toggle("hidden") === false;
+        gr.optBtn.setAttribute("aria-expanded", String(open));
       } else if (act === "tall") {
         gr.tall = !gr.tall;
         gr.stage.classList.toggle("tall", gr.tall);
-        e.target.closest("[data-gr]").textContent = gr.tall ? T("Collapse") : T("Expand");
+        e.target.closest("[data-gr]").textContent = gr.tall ? T("Smaller") : T("Larger");
         size();
         this.fitGraph();
       }

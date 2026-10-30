@@ -2324,12 +2324,29 @@ class HomepageView extends ItemView {
     gr.chipsHead = h("h3", { cls: "vs-sub", text: T("Most connected") });
     gr.panel = h(
       "div",
-      { cls: "gr-panel hidden", id: "gr-panel" },
+      { cls: "gr-panel" },
       h("input", { type: "search", cls: "gr-filter", "data-gr-query": "", placeholder: T("Filter notes…"), "aria-label": T("Filter notes"), spellcheck: "false" }),
       h("div", { cls: "gr-checks" }, check("tags", T("Tags")), check("attachments", T("Attachments")), check("orphans", T("Orphans")), check("existingOnly", T("Existing files only"))),
       h("p", { cls: "vs-empty", text: T("Colours come from the groups in your Graph view.") }),
     );
-    gr.filterBtn = h("button", { type: "button", cls: "icon-btn sm", "data-gr": "filters", title: T("Filters"), "aria-label": T("Filters"), "aria-expanded": "false", "aria-controls": "gr-panel" }, iconNode("settings"));
+    // The everyday view is just the two modes and the picture; the tools and filters sit behind one button
+    gr.optBtn = h("button", { type: "button", cls: "icon-btn sm", "data-gr": "options", title: T("Graph options"), "aria-label": T("Graph options"), "aria-expanded": "false", "aria-controls": "gr-tools" }, iconNode("settings"));
+    gr.tools = h(
+      "div",
+      { cls: "gr-tools hidden", id: "gr-tools" },
+      h(
+        "div",
+        { cls: "gr-bar" },
+        iconBtn("out", "minus", T("Zoom out")),
+        iconBtn("in", "plus", T("Zoom in")),
+        h("button", { type: "button", cls: "gr-mode", "data-gr": "fit" }, T("Fit")),
+        reduced ? null : (gr.animBtn = h("button", { type: "button", cls: "gr-mode", "data-gr": "animate" }, T("Animate"))),
+        h("button", { type: "button", cls: "gr-mode", "data-gr": "tall" }, T("Larger")),
+        h("span", { cls: "gr-gap" }),
+        hasGraph ? h("button", { type: "button", cls: "vs-back", "data-gr": "open" }, T("Open graph view")) : null,
+      ),
+      gr.panel,
+    );
     const mode = (id, label) => h("button", { type: "button", cls: "gr-mode", "data-gr-mode": id }, label);
     body.append(
       h(
@@ -2338,15 +2355,9 @@ class HomepageView extends ItemView {
         mode("overview", T("Overview")),
         mode("local", T("This note")),
         h("span", { cls: "gr-gap" }),
-        iconBtn("out", "minus", T("Zoom out")),
-        iconBtn("in", "plus", T("Zoom in")),
-        h("button", { type: "button", cls: "gr-mode", "data-gr": "fit" }, T("Fit")),
-        reduced ? null : (gr.animBtn = h("button", { type: "button", cls: "gr-mode", "data-gr": "animate" }, T("Animate"))),
-        h("button", { type: "button", cls: "gr-mode", "data-gr": "tall" }, T("Expand")),
-        gr.filterBtn,
-        hasGraph ? h("button", { type: "button", cls: "vs-back", "data-gr": "open" }, T("Open graph view")) : null,
+        gr.optBtn,
       ),
-      gr.panel,
+      gr.tools,
       gr.stage,
       gr.empty,
       gr.status,
@@ -2495,13 +2506,13 @@ class HomepageView extends ItemView {
       else if (act === "fit") this.fitGraph();
       else if (act === "animate") this.animateGraph();
       else if (act === "open") this.app.commands.executeCommandById("graph:open");
-      else if (act === "filters") {
-        const open = gr.panel.classList.toggle("hidden") === false;
-        gr.filterBtn.setAttribute("aria-expanded", String(open));
+      else if (act === "options") {
+        const open = gr.tools.classList.toggle("hidden") === false;
+        gr.optBtn.setAttribute("aria-expanded", String(open));
       } else if (act === "tall") {
         gr.tall = !gr.tall;
         gr.stage.classList.toggle("tall", gr.tall);
-        e.target.closest("[data-gr]").textContent = gr.tall ? T("Collapse") : T("Expand");
+        e.target.closest("[data-gr]").textContent = gr.tall ? T("Smaller") : T("Larger");
         size();
         this.fitGraph();
       }
