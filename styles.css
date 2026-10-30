@@ -4099,10 +4099,22 @@
 }
 
 #genkan-root .gr-filter {
+  background: var(--surface-1);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
   box-sizing: border-box;
+  color: var(--text);
   font-size: 12px;
-  margin-bottom: 8px;
+  height: auto;
+  margin-bottom: 10px;
+  padding: 6px 10px;
   width: 100%;
+}
+
+#genkan-root .gr-filter::placeholder {
+  color: var(--text-3);
+  opacity: 1;
 }
 
 .hp-root .gr-checks {
@@ -4113,11 +4125,59 @@
 
 .hp-root .gr-check {
   align-items: center;
-  color: var(--text-2);
+  color: var(--text);
   cursor: pointer;
   display: flex;
   font-size: 12px;
-  gap: 6px;
+  gap: 8px;
+  min-height: 24px;
+}
+
+/* A drawn checkbox: a clear box that is dark enough against the panel, and a white tick on the accent when ticked,
+   so the state shows whatever the Obsidian theme does to checkboxes */
+#genkan-root .gr-check input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--surface-1) center / 12px 12px no-repeat;
+  border: 2px solid var(--input-border);
+  border-radius: 4px;
+  box-shadow: none;
+  cursor: pointer;
+  flex: 0 0 auto;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  position: static;
+  width: 18px;
+}
+
+#genkan-root .gr-check input[type="checkbox"]::before,
+#genkan-root .gr-check input[type="checkbox"]::after {
+  content: none;
+  display: none;
+}
+
+#genkan-root .gr-check input[type="checkbox"]:hover {
+  border-color: var(--accent-txt);
+}
+
+#genkan-root .gr-check input[type="checkbox"]:checked {
+  background-color: var(--accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 6.5l2.8 2.8L10 3.5'/%3E%3C/svg%3E");
+  border-color: var(--accent);
+}
+
+#genkan-root .gr-check input[type="checkbox"]:focus-visible,
+#genkan-root .gr-filter:focus-visible {
+  outline: 2px solid var(--accent-txt);
+  outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+  #genkan-root .gr-check input[type="checkbox"] {
+    appearance: auto;
+    -webkit-appearance: auto;
+  }
 }
 
 .hp-root .gr-hover {
