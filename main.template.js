@@ -174,7 +174,6 @@ const DEFAULT_SETTINGS = {
   showXkcd: false, // an xkcd comic of the day (off unless enabled)
   graphWheel: true, // the scroll wheel zooms the Graph card (off: only Ctrl or ⌘ + scroll does, so scrolling the dashboard is never caught)
   showGraph: false, // a picture of how notes link together (off unless enabled)
-  graphMode: "overview", // "overview" (most connected notes) or "local" (around the open note)
   showVaultStats: false, // a heatmap, streak, counts and top tags worked out from the vault (off unless enabled)
   showTimeTracker: false, // projects, tasks and timers (off unless enabled); the time lives in its own note
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
@@ -872,8 +871,8 @@ function graphMatch(query, node) {
 }
 
 // The nodes and links to draw. notes is [{ path, label, tags }]; resolved and unresolved are Obsidian's link maps.
-// local is null for the whole vault, or the path of the note to centre on. Past cap, the least connected nodes go first.
-function graphModel({ notes, resolved, unresolved, opts, query, local, cap }) {
+// Past cap, the least connected nodes go first.
+function graphModel({ notes, resolved, unresolved, opts, query, cap }) {
   const byPath = new Map(notes.map((n) => [n.path, n]));
   const nodes = new Map();
   const add = (n) => nodes.has(n.id) || nodes.set(n.id, { ...n, deg: 0 });
@@ -916,19 +915,8 @@ function graphModel({ notes, resolved, unresolved, opts, query, local, cap }) {
   }
   let keep = [...nodes.values()];
   if (query) keep = keep.filter((n) => graphMatch(query, n));
-  let ids = new Set(keep.map((n) => n.id));
+  const ids = new Set(keep.map((n) => n.id));
   links = links.filter(([a, b]) => ids.has(a) && ids.has(b));
-  if (local !== null) {
-    if (!ids.has(local)) return { nodes: [], links: [], total: 0 };
-    const near = new Set([local]);
-    for (const [a, b] of links) {
-      if (a === local) near.add(b);
-      if (b === local) near.add(a);
-    }
-    keep = keep.filter((n) => near.has(n.id));
-    ids = new Set(keep.map((n) => n.id));
-    links = links.filter(([a, b]) => ids.has(a) && ids.has(b));
-  }
   for (const [a, b] of links) {
     nodes.get(a).deg++;
     nodes.get(b).deg++;
@@ -1866,7 +1854,6 @@ class HomepageView extends ItemView {
       this.app.metadataCache.on("changed", () => this.scheduleLists()),
     );
     this.registerEvent(this.app.workspace.on("css-change", () => this.applyTheme()));
-    this.registerEvent(this.app.workspace.on("file-open", () => this.settings.graphMode === "local" && this.settings.showGraph && this.renderGraph()));
 
     this.registerInterval(window.setInterval(() => this.tickClock(), 1000));
     // Day rollover: refresh date-dependent content every 5 minutes
@@ -2348,23 +2335,20 @@ class HomepageView extends ItemView {
       h(
         "div",
         { cls: "gr-bar" },
-        iconBtn("out", "minus", T("Zoom out")),
-        iconBtn("in", "plus", T("Zoom in")),
-        h("button", { type: "button", cls: "gr-mode", "data-gr": "fit" }, T("Fit")),
         h("button", { type: "button", cls: "gr-mode", "data-gr": "tall" }, T("Larger")),
         h("span", { cls: "gr-gap" }),
         hasGraph ? h("button", { type: "button", cls: "vs-back", "data-gr": "open" }, T("Open graph view")) : null,
       ),
       gr.panel,
     );
-    const mode = (id, label) => h("button", { type: "button", cls: "gr-mode", "data-gr-mode": id }, label);
     body.append(
       h(
         "div",
         { cls: "gr-bar" },
-        mode("overview", T("Overview")),
-        mode("local", T("This note")),
         gr.animBtn,
+        iconBtn("out", "minus", T("Zoom out")),
+        iconBtn("in", "plus", T("Zoom in")),
+        h("button", { type: "button", cls: "gr-mode", "data-gr": "fit" }, T("Fit")),
         h("span", { cls: "gr-gap" }),
         gr.optBtn,
       ),
@@ -2504,13 +2488,6 @@ class HomepageView extends ItemView {
     );
 
     body.addEventListener("click", (e) => {
-      const mode = e.target.closest("[data-gr-mode]");
-      if (mode) {
-        this.plugin.settings.graphMode = mode.dataset.grMode;
-        this.plugin.saveSettings().catch(() => {});
-        this.renderGraph().then(() => body.querySelector(`[data-gr-mode="${mode.dataset.grMode}"]`)?.focus());
-        return;
-      }
       const act = e.target.closest("[data-gr]")?.dataset.gr;
       if (act === "in") zoomAt(1.4);
       else if (act === "out") zoomAt(1 / 1.4);
@@ -2546,7 +2523,7 @@ class HomepageView extends ItemView {
   }
 
   graphRadius(n) {
-    return 3 + Math.min(6, Math.log2(n.deg + 1) * 1.4) + (n.centre ? 2 : 0);
+    return 3 + Math.min(6, Math.log2(n.deg + 1) * 1.4);
   }
 
   openGraphNode(n, evt) {
@@ -2643,12 +2620,6 @@ class HomepageView extends ItemView {
         ctx.fillStyle = n.color || base[n.type];
         ctx.fill();
       }
-      if (n.centre) {
-        ctx.strokeStyle = ink;
-        ctx.lineWidth = 1.5 / view.k;
-        ctx.stroke();
-        ctx.lineWidth = 1 / view.k;
-      }
     });
     // Names: the hovered note and its neighbours, or every note once you have zoomed in
     const all = view.k >= 1.6;
@@ -2693,17 +2664,13 @@ class HomepageView extends ItemView {
     if (token !== this.grToken || !this.settings.showGraph) return; // a newer render has taken over
     const gr = this.graphShell();
     const opts = { ...cfg.defaults, ...(this.settings.graphOpts ?? {}) };
-    const local = this.settings.graphMode === "local";
-    const active = local ? this.app.workspace.getActiveFile() : null;
-    const model = graphModel({ ...this.graphInput(force), opts, query: this.grQuery ?? "", local: local ? (active?.path ?? "") : null, cap: document.body.classList.contains("is-mobile") ? 300 : GRAPH_CAP });
+    const model = graphModel({ ...this.graphInput(force), opts, query: this.grQuery ?? "", cap: document.body.classList.contains("is-mobile") ? 300 : GRAPH_CAP });
     this.$("graph-count").textContent = "";
     gr.canvas.title = this.settings.graphWheel === false ? T("Drag to move, Ctrl or ⌘ + scroll to zoom") : T("Drag to move, scroll to zoom");
     for (const b of gr.panel.querySelectorAll("[data-gr-opt]")) b.checked = !!opts[b.dataset.grOpt];
-    for (const b of this.$("graph-body").querySelectorAll("[data-gr-mode]")) b.setAttribute("aria-pressed", String((b.dataset.grMode === "local") === local));
     // Colour groups from the Graph view: the first group a node matches decides its colour
     for (const n of model.nodes) {
       n.color = cfg.groups.find((g) => graphMatch(g.query, n))?.color;
-      n.centre = local && n.id === active?.path;
     }
     const sig = `${model.nodes.map((n) => n.id).join("|")}#${model.links.map((l) => l.join(">")).join("|")}`;
     const empty = !model.nodes.length;
@@ -2711,7 +2678,7 @@ class HomepageView extends ItemView {
     gr.chipsHead.classList.toggle("hidden", empty);
     gr.chips.classList.toggle("hidden", empty);
     gr.empty.classList.toggle("hidden", !empty);
-    gr.empty.textContent = this.grQuery || opts.orphans === false ? T("No notes match.") : local ? T("Open a note that has links to see what it connects to.") : T("No linked notes yet.");
+    gr.empty.textContent = this.grQuery || opts.orphans === false ? T("No notes match.") : T("No linked notes yet.");
     if (empty) {
       this.stopGraph();
       Object.assign(gr, { nodes: [], links: [], sig: "", total: 0, hover: -1 });
@@ -2745,7 +2712,7 @@ class HomepageView extends ItemView {
     }
     gr.canvas.setAttribute("aria-label", T("Graph of {n} nodes and {links} links. The most connected notes are listed below it.", { n: fmtNum(gr.nodes.length), links: fmtNum(gr.links.length) }));
     this.graphStatus();
-    const top = gr.nodes.filter((n) => n.type === "note" && !n.centre).sort((a, b) => b.deg - a.deg || a.label.localeCompare(b.label)).slice(0, 5);
+    const top = gr.nodes.filter((n) => n.type === "note").sort((a, b) => b.deg - a.deg || a.label.localeCompare(b.label)).slice(0, 5);
     gr.chips.empty();
     for (const n of top) gr.chips.append(h("a", { cls: "vs-tag", href: "#", "data-open": n.path, title: n.label }, h("span", { cls: "gr-chip", text: n.label }), h("em", { text: fmtNum(n.deg) })));
     this.drawGraph();
@@ -5375,7 +5342,7 @@ class HomepageSettingTab extends PluginSettingTab {
 
     add()
       .setName(T("Graph"))
-      .setDesc(T("Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere."))
+      .setDesc(T("Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter and play how your vault grew. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere."))
       .addToggle((t) => t.setValue(s.showGraph).onChange((v) => save("showGraph", v)));
 
     add()

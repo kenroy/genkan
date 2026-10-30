@@ -399,12 +399,9 @@ const I18N = {
     "Search results": "Résultats de la recherche",
     "Photo of the day": "Photo du jour",
     "Graph": "Graphe",
-    "Overview": "Vue d'ensemble",
-    "This note": "Cette note",
     "Open graph view": "Ouvrir la vue graphique",
     "Most connected": "Les plus liées",
     "No linked notes yet.": "Aucune note liée pour l'instant.",
-    "Open a note that has links to see what it connects to.": "Ouvrez une note qui contient des liens pour voir à quoi elle est reliée.",
     "{name} · {n} links": "{name} · {n} liens",
     "Drag to move, Ctrl or ⌘ + scroll to zoom": "Glissez pour déplacer, Ctrl ou ⌘ + molette pour zoomer",
     "Filter notes…": "Filtrer les notes…",
@@ -421,7 +418,6 @@ const I18N = {
     "Showing {shown} of {total}": "{shown} sur {total} affichés",
     "No notes match.": "Aucune note ne correspond.",
     "Graph of {n} nodes and {links} links. The most connected notes are listed below it.": "Graphe de {n} nœuds et {links} liens. Les notes les plus liées sont listées en dessous.",
-    "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Dessine les liens entre vos notes, comme la vue graphique d'Obsidian : déplacez les points, zoomez, filtrez et voyez les notes autour de celle qui est ouverte. Part des filtres de votre vue graphique et reprend ses groupes de couleurs. Cliquez sur un point pour ouvrir la note. Calculé sur votre appareil à partir de vos liens ; rien n'est envoyé.",
     "Drag to move, scroll to zoom": "Glissez pour déplacer, molette pour zoomer",
     "Scroll wheel zooms the graph": "La molette zoome sur le graphe",
     "Like Obsidian's Graph view, scrolling over the Graph card zooms it. Turn this off to scroll the dashboard past it instead; Ctrl or ⌘ + scroll still zooms.": "Comme la vue graphique d'Obsidian, la molette sur la carte Graphe zoome. Désactivez-la pour faire défiler le tableau de bord à la place ; Ctrl ou ⌘ + molette zoome toujours.",
@@ -431,6 +427,7 @@ const I18N = {
     "Graph options": "Options du graphe",
     "Larger": "Agrandir",
     "Smaller": "Réduire",
+    "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter and play how your vault grew. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Dessine les liens entre vos notes, comme la vue graphique d'Obsidian : déplacez les points, zoomez, filtrez et rejouez la croissance de votre coffre. Part des filtres de votre vue graphique et reprend ses groupes de couleurs. Cliquez sur un point pour ouvrir la note. Calculé sur votre appareil à partir de vos liens ; rien n'est envoyé.",
     "Clock and search over the photo": "Horloge et recherche sur la photo",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Place le message d'accueil, l'horloge, la date et la recherche sur la photo du jour au lieu de les mettre au-dessus, ce qui économise de la place en hauteur. La photo est un peu assombrie pour que le texte reste lisible ; les photos très claires paraissent donc plus ternes. Nécessite la photo du jour.",
     "Load a new photo": "Charger une nouvelle photo",
@@ -869,12 +866,9 @@ const I18N = {
     "Search results": "Resultados de la búsqueda",
     "Photo of the day": "Foto del día",
     "Graph": "Grafo",
-    "Overview": "Resumen",
-    "This note": "Esta nota",
     "Open graph view": "Abrir vista de grafo",
     "Most connected": "Más conectadas",
     "No linked notes yet.": "Aún no hay notas enlazadas.",
-    "Open a note that has links to see what it connects to.": "Abre una nota que tenga enlaces para ver con qué se conecta.",
     "{name} · {n} links": "{name} · {n} enlaces",
     "Drag to move, Ctrl or ⌘ + scroll to zoom": "Arrastra para mover, Ctrl o ⌘ + rueda para ampliar",
     "Filter notes…": "Filtrar notas…",
@@ -891,7 +885,6 @@ const I18N = {
     "Showing {shown} of {total}": "Mostrando {shown} de {total}",
     "No notes match.": "Ninguna nota coincide.",
     "Graph of {n} nodes and {links} links. The most connected notes are listed below it.": "Grafo de {n} nodos y {links} enlaces. Las notas más conectadas aparecen debajo.",
-    "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Dibuja cómo se enlazan tus notas, como la vista de grafo de Obsidian: arrastra los puntos, haz zoom, filtra y mira las notas alrededor de la abierta. Parte de los filtros de tu vista de grafo y usa sus grupos de color. Haz clic en un punto para abrir esa nota. Se calcula en tu dispositivo a partir de tus enlaces; no se envía nada.",
     "Drag to move, scroll to zoom": "Arrastra para mover, rueda para ampliar",
     "Scroll wheel zooms the graph": "La rueda amplía el grafo",
     "Like Obsidian's Graph view, scrolling over the Graph card zooms it. Turn this off to scroll the dashboard past it instead; Ctrl or ⌘ + scroll still zooms.": "Como en la vista de grafo de Obsidian, desplazarte sobre la tarjeta Grafo hace zoom. Desactívalo para desplazar el panel en su lugar; Ctrl o ⌘ + rueda sigue haciendo zoom.",
@@ -901,6 +894,7 @@ const I18N = {
     "Graph options": "Opciones del grafo",
     "Larger": "Ampliar",
     "Smaller": "Reducir",
+    "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter and play how your vault grew. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Dibuja cómo se enlazan tus notas, como la vista de grafo de Obsidian: arrastra los puntos, haz zoom, filtra y reproduce cómo creció tu bóveda. Parte de los filtros de tu vista de grafo y usa sus grupos de color. Haz clic en un punto para abrir esa nota. Se calcula en tu dispositivo a partir de tus enlaces; no se envía nada.",
     "Clock and search over the photo": "Reloj y búsqueda sobre la foto",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Coloca el saludo, el reloj, la fecha y la búsqueda sobre la foto del día en lugar de encima, lo que ahorra espacio vertical. La foto se oscurece un poco para que el texto se lea bien, así que las fotos muy claras se ven más apagadas. Requiere la foto del día.",
     "Load a new photo": "Cargar una foto nueva",
@@ -1339,12 +1333,9 @@ const I18N = {
     "Search results": "Suchergebnisse",
     "Photo of the day": "Foto des Tages",
     "Graph": "Graph",
-    "Overview": "Übersicht",
-    "This note": "Diese Notiz",
     "Open graph view": "Graphansicht öffnen",
     "Most connected": "Am stärksten vernetzt",
     "No linked notes yet.": "Noch keine verlinkten Notizen.",
-    "Open a note that has links to see what it connects to.": "Öffne eine Notiz mit Links, um zu sehen, womit sie verbunden ist.",
     "{name} · {n} links": "{name} · {n} Links",
     "Drag to move, Ctrl or ⌘ + scroll to zoom": "Ziehen zum Verschieben, Strg oder ⌘ + Scrollen zum Zoomen",
     "Filter notes…": "Notizen filtern…",
@@ -1361,7 +1352,6 @@ const I18N = {
     "Showing {shown} of {total}": "{shown} von {total} angezeigt",
     "No notes match.": "Keine passenden Notizen.",
     "Graph of {n} nodes and {links} links. The most connected notes are listed below it.": "Graph aus {n} Knoten und {links} Links. Die am stärksten vernetzten Notizen stehen darunter.",
-    "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Zeichnet, wie deine Notizen verlinkt sind, wie die Graphansicht von Obsidian: Punkte ziehen, zoomen, filtern und die Notizen rund um die geöffnete sehen. Startet mit den Filtern deiner Graphansicht und nutzt deren Farbgruppen. Klicke auf einen Punkt, um die Notiz zu öffnen. Wird auf deinem Gerät aus deinen Links berechnet; nichts wird gesendet.",
     "Drag to move, scroll to zoom": "Ziehen zum Verschieben, Scrollen zum Zoomen",
     "Scroll wheel zooms the graph": "Mausrad zoomt den Graphen",
     "Like Obsidian's Graph view, scrolling over the Graph card zooms it. Turn this off to scroll the dashboard past it instead; Ctrl or ⌘ + scroll still zooms.": "Wie in Obsidians Graphansicht zoomt Scrollen über der Graph-Karte. Schalte es aus, um stattdessen das Dashboard zu scrollen; Strg oder ⌘ + Scrollen zoomt weiterhin.",
@@ -1371,6 +1361,7 @@ const I18N = {
     "Graph options": "Graph-Optionen",
     "Larger": "Größer",
     "Smaller": "Kleiner",
+    "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter and play how your vault grew. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Zeichnet, wie deine Notizen verlinkt sind, wie die Graphansicht von Obsidian: Punkte ziehen, zoomen, filtern und abspielen, wie dein Tresor gewachsen ist. Startet mit den Filtern deiner Graphansicht und nutzt deren Farbgruppen. Klicke auf einen Punkt, um die Notiz zu öffnen. Wird auf deinem Gerät aus deinen Links berechnet; nichts wird gesendet.",
     "Clock and search over the photo": "Uhr und Suche über dem Foto",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Legt Begrüßung, Uhr, Datum und Suche über das Foto des Tages statt darüber, was Platz in der Höhe spart. Das Foto wird leicht abgedunkelt, damit der Text lesbar bleibt; sehr helle Fotos wirken dadurch matter. Benötigt das Foto des Tages.",
     "Load a new photo": "Neues Foto laden",
@@ -1809,12 +1800,9 @@ const I18N = {
     "Search results": "検索結果",
     "Photo of the day": "今日の写真",
     "Graph": "グラフ",
-    "Overview": "全体",
-    "This note": "このノート",
     "Open graph view": "グラフビューを開く",
     "Most connected": "リンクの多いノート",
     "No linked notes yet.": "リンクされたノートはまだありません。",
-    "Open a note that has links to see what it connects to.": "リンクのあるノートを開くと、つながり先が表示されます。",
     "{name} · {n} links": "{name} · {n} 件のリンク",
     "Drag to move, Ctrl or ⌘ + scroll to zoom": "ドラッグで移動、Ctrl または ⌘ + スクロールでズーム",
     "Filter notes…": "ノートを絞り込む…",
@@ -1831,7 +1819,6 @@ const I18N = {
     "Showing {shown} of {total}": "{total} 件中 {shown} 件を表示",
     "No notes match.": "一致するノートはありません。",
     "Graph of {n} nodes and {links} links. The most connected notes are listed below it.": "{n} 個のノードと {links} 件のリンクのグラフ。リンクの多いノートは下に一覧があります。",
-    "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Obsidian のグラフビューのように、ノート同士のつながりを描きます。点のドラッグ、ズーム、絞り込み、開いているノートの周辺の表示ができます。グラフビューのフィルター設定を初期値とし、色のグループも使います。点をクリックするとそのノートが開きます。リンクからお使いのデバイス上で計算され、何も送信されません。",
     "Drag to move, scroll to zoom": "ドラッグで移動、スクロールでズーム",
     "Scroll wheel zooms the graph": "スクロールでグラフをズーム",
     "Like Obsidian's Graph view, scrolling over the Graph card zooms it. Turn this off to scroll the dashboard past it instead; Ctrl or ⌘ + scroll still zooms.": "Obsidian のグラフビューと同様に、グラフカード上でスクロールするとズームします。オフにするとダッシュボードがスクロールします。Ctrl または ⌘ + スクロールでは常にズームします。",
@@ -1841,6 +1828,7 @@ const I18N = {
     "Graph options": "グラフのオプション",
     "Larger": "大きく",
     "Smaller": "小さく",
+    "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter and play how your vault grew. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Obsidian のグラフビューのように、ノート同士のつながりを描きます。点のドラッグ、ズーム、絞り込み、ボールトの成長の再生ができます。グラフビューのフィルター設定を初期値とし、色のグループも使います。点をクリックするとそのノートが開きます。リンクからお使いのデバイス上で計算され、何も送信されません。",
     "Clock and search over the photo": "時計と検索を写真の上に表示",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "あいさつ、時計、日付、検索ボックスを今日の写真の上に重ねて表示し、縦のスペースを節約します。文字が読みやすいよう写真を少し暗くするため、とても明るい写真はやや地味に見えます。今日の写真が必要です。",
     "Load a new photo": "新しい写真を読み込む",
@@ -2414,7 +2402,6 @@ const DEFAULT_SETTINGS = {
   showXkcd: false, // an xkcd comic of the day (off unless enabled)
   graphWheel: true, // the scroll wheel zooms the Graph card (off: only Ctrl or ⌘ + scroll does, so scrolling the dashboard is never caught)
   showGraph: false, // a picture of how notes link together (off unless enabled)
-  graphMode: "overview", // "overview" (most connected notes) or "local" (around the open note)
   showVaultStats: false, // a heatmap, streak, counts and top tags worked out from the vault (off unless enabled)
   showTimeTracker: false, // projects, tasks and timers (off unless enabled); the time lives in its own note
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
@@ -3112,8 +3099,8 @@ function graphMatch(query, node) {
 }
 
 // The nodes and links to draw. notes is [{ path, label, tags }]; resolved and unresolved are Obsidian's link maps.
-// local is null for the whole vault, or the path of the note to centre on. Past cap, the least connected nodes go first.
-function graphModel({ notes, resolved, unresolved, opts, query, local, cap }) {
+// Past cap, the least connected nodes go first.
+function graphModel({ notes, resolved, unresolved, opts, query, cap }) {
   const byPath = new Map(notes.map((n) => [n.path, n]));
   const nodes = new Map();
   const add = (n) => nodes.has(n.id) || nodes.set(n.id, { ...n, deg: 0 });
@@ -3156,19 +3143,8 @@ function graphModel({ notes, resolved, unresolved, opts, query, local, cap }) {
   }
   let keep = [...nodes.values()];
   if (query) keep = keep.filter((n) => graphMatch(query, n));
-  let ids = new Set(keep.map((n) => n.id));
+  const ids = new Set(keep.map((n) => n.id));
   links = links.filter(([a, b]) => ids.has(a) && ids.has(b));
-  if (local !== null) {
-    if (!ids.has(local)) return { nodes: [], links: [], total: 0 };
-    const near = new Set([local]);
-    for (const [a, b] of links) {
-      if (a === local) near.add(b);
-      if (b === local) near.add(a);
-    }
-    keep = keep.filter((n) => near.has(n.id));
-    ids = new Set(keep.map((n) => n.id));
-    links = links.filter(([a, b]) => ids.has(a) && ids.has(b));
-  }
   for (const [a, b] of links) {
     nodes.get(a).deg++;
     nodes.get(b).deg++;
@@ -5827,7 +5803,6 @@ class HomepageView extends ItemView {
       this.app.metadataCache.on("changed", () => this.scheduleLists()),
     );
     this.registerEvent(this.app.workspace.on("css-change", () => this.applyTheme()));
-    this.registerEvent(this.app.workspace.on("file-open", () => this.settings.graphMode === "local" && this.settings.showGraph && this.renderGraph()));
 
     this.registerInterval(window.setInterval(() => this.tickClock(), 1000));
     // Day rollover: refresh date-dependent content every 5 minutes
@@ -6309,23 +6284,20 @@ class HomepageView extends ItemView {
       h(
         "div",
         { cls: "gr-bar" },
-        iconBtn("out", "minus", T("Zoom out")),
-        iconBtn("in", "plus", T("Zoom in")),
-        h("button", { type: "button", cls: "gr-mode", "data-gr": "fit" }, T("Fit")),
         h("button", { type: "button", cls: "gr-mode", "data-gr": "tall" }, T("Larger")),
         h("span", { cls: "gr-gap" }),
         hasGraph ? h("button", { type: "button", cls: "vs-back", "data-gr": "open" }, T("Open graph view")) : null,
       ),
       gr.panel,
     );
-    const mode = (id, label) => h("button", { type: "button", cls: "gr-mode", "data-gr-mode": id }, label);
     body.append(
       h(
         "div",
         { cls: "gr-bar" },
-        mode("overview", T("Overview")),
-        mode("local", T("This note")),
         gr.animBtn,
+        iconBtn("out", "minus", T("Zoom out")),
+        iconBtn("in", "plus", T("Zoom in")),
+        h("button", { type: "button", cls: "gr-mode", "data-gr": "fit" }, T("Fit")),
         h("span", { cls: "gr-gap" }),
         gr.optBtn,
       ),
@@ -6465,13 +6437,6 @@ class HomepageView extends ItemView {
     );
 
     body.addEventListener("click", (e) => {
-      const mode = e.target.closest("[data-gr-mode]");
-      if (mode) {
-        this.plugin.settings.graphMode = mode.dataset.grMode;
-        this.plugin.saveSettings().catch(() => {});
-        this.renderGraph().then(() => body.querySelector(`[data-gr-mode="${mode.dataset.grMode}"]`)?.focus());
-        return;
-      }
       const act = e.target.closest("[data-gr]")?.dataset.gr;
       if (act === "in") zoomAt(1.4);
       else if (act === "out") zoomAt(1 / 1.4);
@@ -6507,7 +6472,7 @@ class HomepageView extends ItemView {
   }
 
   graphRadius(n) {
-    return 3 + Math.min(6, Math.log2(n.deg + 1) * 1.4) + (n.centre ? 2 : 0);
+    return 3 + Math.min(6, Math.log2(n.deg + 1) * 1.4);
   }
 
   openGraphNode(n, evt) {
@@ -6604,12 +6569,6 @@ class HomepageView extends ItemView {
         ctx.fillStyle = n.color || base[n.type];
         ctx.fill();
       }
-      if (n.centre) {
-        ctx.strokeStyle = ink;
-        ctx.lineWidth = 1.5 / view.k;
-        ctx.stroke();
-        ctx.lineWidth = 1 / view.k;
-      }
     });
     // Names: the hovered note and its neighbours, or every note once you have zoomed in
     const all = view.k >= 1.6;
@@ -6654,17 +6613,13 @@ class HomepageView extends ItemView {
     if (token !== this.grToken || !this.settings.showGraph) return; // a newer render has taken over
     const gr = this.graphShell();
     const opts = { ...cfg.defaults, ...(this.settings.graphOpts ?? {}) };
-    const local = this.settings.graphMode === "local";
-    const active = local ? this.app.workspace.getActiveFile() : null;
-    const model = graphModel({ ...this.graphInput(force), opts, query: this.grQuery ?? "", local: local ? (active?.path ?? "") : null, cap: document.body.classList.contains("is-mobile") ? 300 : GRAPH_CAP });
+    const model = graphModel({ ...this.graphInput(force), opts, query: this.grQuery ?? "", cap: document.body.classList.contains("is-mobile") ? 300 : GRAPH_CAP });
     this.$("graph-count").textContent = "";
     gr.canvas.title = this.settings.graphWheel === false ? T("Drag to move, Ctrl or ⌘ + scroll to zoom") : T("Drag to move, scroll to zoom");
     for (const b of gr.panel.querySelectorAll("[data-gr-opt]")) b.checked = !!opts[b.dataset.grOpt];
-    for (const b of this.$("graph-body").querySelectorAll("[data-gr-mode]")) b.setAttribute("aria-pressed", String((b.dataset.grMode === "local") === local));
     // Colour groups from the Graph view: the first group a node matches decides its colour
     for (const n of model.nodes) {
       n.color = cfg.groups.find((g) => graphMatch(g.query, n))?.color;
-      n.centre = local && n.id === active?.path;
     }
     const sig = `${model.nodes.map((n) => n.id).join("|")}#${model.links.map((l) => l.join(">")).join("|")}`;
     const empty = !model.nodes.length;
@@ -6672,7 +6627,7 @@ class HomepageView extends ItemView {
     gr.chipsHead.classList.toggle("hidden", empty);
     gr.chips.classList.toggle("hidden", empty);
     gr.empty.classList.toggle("hidden", !empty);
-    gr.empty.textContent = this.grQuery || opts.orphans === false ? T("No notes match.") : local ? T("Open a note that has links to see what it connects to.") : T("No linked notes yet.");
+    gr.empty.textContent = this.grQuery || opts.orphans === false ? T("No notes match.") : T("No linked notes yet.");
     if (empty) {
       this.stopGraph();
       Object.assign(gr, { nodes: [], links: [], sig: "", total: 0, hover: -1 });
@@ -6706,7 +6661,7 @@ class HomepageView extends ItemView {
     }
     gr.canvas.setAttribute("aria-label", T("Graph of {n} nodes and {links} links. The most connected notes are listed below it.", { n: fmtNum(gr.nodes.length), links: fmtNum(gr.links.length) }));
     this.graphStatus();
-    const top = gr.nodes.filter((n) => n.type === "note" && !n.centre).sort((a, b) => b.deg - a.deg || a.label.localeCompare(b.label)).slice(0, 5);
+    const top = gr.nodes.filter((n) => n.type === "note").sort((a, b) => b.deg - a.deg || a.label.localeCompare(b.label)).slice(0, 5);
     gr.chips.empty();
     for (const n of top) gr.chips.append(h("a", { cls: "vs-tag", href: "#", "data-open": n.path, title: n.label }, h("span", { cls: "gr-chip", text: n.label }), h("em", { text: fmtNum(n.deg) })));
     this.drawGraph();
@@ -9336,7 +9291,7 @@ class HomepageSettingTab extends PluginSettingTab {
 
     add()
       .setName(T("Graph"))
-      .setDesc(T("Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere."))
+      .setDesc(T("Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter and play how your vault grew. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere."))
       .addToggle((t) => t.setValue(s.showGraph).onChange((v) => save("showGraph", v)));
 
     add()
