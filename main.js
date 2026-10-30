@@ -405,10 +405,26 @@ const I18N = {
     "Most connected": "Les plus liées",
     "No linked notes yet.": "Aucune note liée pour l'instant.",
     "Open a note that has links to see what it connects to.": "Ouvrez une note qui contient des liens pour voir à quoi elle est reliée.",
-    "Graph of {notes} notes and {links} links. The most connected notes are listed below it.": "Graphe de {notes} notes et {links} liens. Les notes les plus liées sont listées en dessous.",
-    "{notes} notes · {links} links": "{notes} notes · {links} liens",
     "{name} · {n} links": "{name} · {n} liens",
-    "A picture of how your notes link together: your most connected notes, or the notes around the one you have open. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Une image des liens entre vos notes : les notes les plus liées, ou celles qui entourent la note ouverte. Cliquez sur un point pour ouvrir la note. Calculé sur votre appareil à partir de vos liens ; rien n'est envoyé.",
+    "Drag to move, Ctrl or ⌘ + scroll to zoom": "Glissez pour déplacer, Ctrl ou ⌘ + molette pour zoomer",
+    "Filter notes…": "Filtrer les notes…",
+    "Filter notes": "Filtrer les notes",
+    "Tags": "Tags",
+    "Attachments": "Pièces jointes",
+    "Orphans": "Orphelines",
+    "Existing files only": "Fichiers existants seulement",
+    "Colours come from the groups in your Graph view.": "Les couleurs viennent des groupes de votre vue graphique.",
+    "Filters": "Filtres",
+    "Zoom in": "Zoom avant",
+    "Zoom out": "Zoom arrière",
+    "Fit": "Ajuster",
+    "Expand": "Agrandir",
+    "Collapse": "Réduire",
+    "{n} nodes · {links} links": "{n} nœuds · {links} liens",
+    "Showing {shown} of {total}": "{shown} sur {total} affichés",
+    "No notes match.": "Aucune note ne correspond.",
+    "Graph of {n} nodes and {links} links. The most connected notes are listed below it.": "Graphe de {n} nœuds et {links} liens. Les notes les plus liées sont listées en dessous.",
+    "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Dessine les liens entre vos notes, comme la vue graphique d'Obsidian : déplacez les points, zoomez, filtrez et voyez les notes autour de celle qui est ouverte. Part des filtres de votre vue graphique et reprend ses groupes de couleurs. Cliquez sur un point pour ouvrir la note. Calculé sur votre appareil à partir de vos liens ; rien n'est envoyé.",
     "Clock and search over the photo": "Horloge et recherche sur la photo",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Place le message d'accueil, l'horloge, la date et la recherche sur la photo du jour au lieu de les mettre au-dessus, ce qui économise de la place en hauteur. La photo est un peu assombrie pour que le texte reste lisible ; les photos très claires paraissent donc plus ternes. Nécessite la photo du jour.",
     "Load a new photo": "Charger une nouvelle photo",
@@ -853,10 +869,26 @@ const I18N = {
     "Most connected": "Más conectadas",
     "No linked notes yet.": "Aún no hay notas enlazadas.",
     "Open a note that has links to see what it connects to.": "Abre una nota que tenga enlaces para ver con qué se conecta.",
-    "Graph of {notes} notes and {links} links. The most connected notes are listed below it.": "Grafo de {notes} notas y {links} enlaces. Las notas más conectadas aparecen debajo.",
-    "{notes} notes · {links} links": "{notes} notas · {links} enlaces",
     "{name} · {n} links": "{name} · {n} enlaces",
-    "A picture of how your notes link together: your most connected notes, or the notes around the one you have open. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Una imagen de cómo se enlazan tus notas: las más conectadas, o las que rodean la nota abierta. Haz clic en un punto para abrir esa nota. Se calcula en tu dispositivo a partir de tus enlaces; no se envía nada.",
+    "Drag to move, Ctrl or ⌘ + scroll to zoom": "Arrastra para mover, Ctrl o ⌘ + rueda para ampliar",
+    "Filter notes…": "Filtrar notas…",
+    "Filter notes": "Filtrar notas",
+    "Tags": "Etiquetas",
+    "Attachments": "Adjuntos",
+    "Orphans": "Huérfanas",
+    "Existing files only": "Solo archivos existentes",
+    "Colours come from the groups in your Graph view.": "Los colores vienen de los grupos de tu vista de grafo.",
+    "Filters": "Filtros",
+    "Zoom in": "Acercar",
+    "Zoom out": "Alejar",
+    "Fit": "Ajustar",
+    "Expand": "Ampliar",
+    "Collapse": "Reducir",
+    "{n} nodes · {links} links": "{n} nodos · {links} enlaces",
+    "Showing {shown} of {total}": "Mostrando {shown} de {total}",
+    "No notes match.": "Ninguna nota coincide.",
+    "Graph of {n} nodes and {links} links. The most connected notes are listed below it.": "Grafo de {n} nodos y {links} enlaces. Las notas más conectadas aparecen debajo.",
+    "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Dibuja cómo se enlazan tus notas, como la vista de grafo de Obsidian: arrastra los puntos, haz zoom, filtra y mira las notas alrededor de la abierta. Parte de los filtros de tu vista de grafo y usa sus grupos de color. Haz clic en un punto para abrir esa nota. Se calcula en tu dispositivo a partir de tus enlaces; no se envía nada.",
     "Clock and search over the photo": "Reloj y búsqueda sobre la foto",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Coloca el saludo, el reloj, la fecha y la búsqueda sobre la foto del día en lugar de encima, lo que ahorra espacio vertical. La foto se oscurece un poco para que el texto se lea bien, así que las fotos muy claras se ven más apagadas. Requiere la foto del día.",
     "Load a new photo": "Cargar una foto nueva",
@@ -1301,10 +1333,26 @@ const I18N = {
     "Most connected": "Am stärksten vernetzt",
     "No linked notes yet.": "Noch keine verlinkten Notizen.",
     "Open a note that has links to see what it connects to.": "Öffne eine Notiz mit Links, um zu sehen, womit sie verbunden ist.",
-    "Graph of {notes} notes and {links} links. The most connected notes are listed below it.": "Graph aus {notes} Notizen und {links} Links. Die am stärksten vernetzten Notizen stehen darunter.",
-    "{notes} notes · {links} links": "{notes} Notizen · {links} Links",
     "{name} · {n} links": "{name} · {n} Links",
-    "A picture of how your notes link together: your most connected notes, or the notes around the one you have open. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Ein Bild davon, wie deine Notizen verlinkt sind: die am stärksten vernetzten Notizen oder die um die geöffnete Notiz herum. Klicke auf einen Punkt, um die Notiz zu öffnen. Wird auf deinem Gerät aus deinen Links berechnet; nichts wird gesendet.",
+    "Drag to move, Ctrl or ⌘ + scroll to zoom": "Ziehen zum Verschieben, Strg oder ⌘ + Scrollen zum Zoomen",
+    "Filter notes…": "Notizen filtern…",
+    "Filter notes": "Notizen filtern",
+    "Tags": "Tags",
+    "Attachments": "Anhänge",
+    "Orphans": "Verwaiste",
+    "Existing files only": "Nur vorhandene Dateien",
+    "Colours come from the groups in your Graph view.": "Die Farben stammen aus den Gruppen deiner Graphansicht.",
+    "Filters": "Filter",
+    "Zoom in": "Vergrößern",
+    "Zoom out": "Verkleinern",
+    "Fit": "Einpassen",
+    "Expand": "Aufklappen",
+    "Collapse": "Zuklappen",
+    "{n} nodes · {links} links": "{n} Knoten · {links} Links",
+    "Showing {shown} of {total}": "{shown} von {total} angezeigt",
+    "No notes match.": "Keine passenden Notizen.",
+    "Graph of {n} nodes and {links} links. The most connected notes are listed below it.": "Graph aus {n} Knoten und {links} Links. Die am stärksten vernetzten Notizen stehen darunter.",
+    "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Zeichnet, wie deine Notizen verlinkt sind, wie die Graphansicht von Obsidian: Punkte ziehen, zoomen, filtern und die Notizen rund um die geöffnete sehen. Startet mit den Filtern deiner Graphansicht und nutzt deren Farbgruppen. Klicke auf einen Punkt, um die Notiz zu öffnen. Wird auf deinem Gerät aus deinen Links berechnet; nichts wird gesendet.",
     "Clock and search over the photo": "Uhr und Suche über dem Foto",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Legt Begrüßung, Uhr, Datum und Suche über das Foto des Tages statt darüber, was Platz in der Höhe spart. Das Foto wird leicht abgedunkelt, damit der Text lesbar bleibt; sehr helle Fotos wirken dadurch matter. Benötigt das Foto des Tages.",
     "Load a new photo": "Neues Foto laden",
@@ -1749,10 +1797,26 @@ const I18N = {
     "Most connected": "リンクの多いノート",
     "No linked notes yet.": "リンクされたノートはまだありません。",
     "Open a note that has links to see what it connects to.": "リンクのあるノートを開くと、つながり先が表示されます。",
-    "Graph of {notes} notes and {links} links. The most connected notes are listed below it.": "{notes} 件のノートと {links} 件のリンクのグラフ。リンクの多いノートは下に一覧があります。",
-    "{notes} notes · {links} links": "{notes} 件のノート · {links} 件のリンク",
     "{name} · {n} links": "{name} · {n} 件のリンク",
-    "A picture of how your notes link together: your most connected notes, or the notes around the one you have open. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "ノート同士のつながりを図で表示します。リンクの多いノート、または開いているノートの周りを表示できます。点をクリックするとそのノートが開きます。リンクからお使いのデバイス上で計算され、何も送信されません。",
+    "Drag to move, Ctrl or ⌘ + scroll to zoom": "ドラッグで移動、Ctrl または ⌘ + スクロールでズーム",
+    "Filter notes…": "ノートを絞り込む…",
+    "Filter notes": "ノートを絞り込む",
+    "Tags": "タグ",
+    "Attachments": "添付ファイル",
+    "Orphans": "孤立ノート",
+    "Existing files only": "既存のファイルのみ",
+    "Colours come from the groups in your Graph view.": "色はグラフビューのグループに従います。",
+    "Filters": "フィルター",
+    "Zoom in": "拡大",
+    "Zoom out": "縮小",
+    "Fit": "全体表示",
+    "Expand": "広げる",
+    "Collapse": "狭める",
+    "{n} nodes · {links} links": "{n} 個のノード · {links} 件のリンク",
+    "Showing {shown} of {total}": "{total} 件中 {shown} 件を表示",
+    "No notes match.": "一致するノートはありません。",
+    "Graph of {n} nodes and {links} links. The most connected notes are listed below it.": "{n} 個のノードと {links} 件のリンクのグラフ。リンクの多いノートは下に一覧があります。",
+    "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Obsidian のグラフビューのように、ノート同士のつながりを描きます。点のドラッグ、ズーム、絞り込み、開いているノートの周辺の表示ができます。グラフビューのフィルター設定を初期値とし、色のグループも使います。点をクリックするとそのノートが開きます。リンクからお使いのデバイス上で計算され、何も送信されません。",
     "Clock and search over the photo": "時計と検索を写真の上に表示",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "あいさつ、時計、日付、検索ボックスを今日の写真の上に重ねて表示し、縦のスペースを節約します。文字が読みやすいよう写真を少し暗くするため、とても明るい写真はやや地味に見えます。今日の写真が必要です。",
     "Load a new photo": "新しい写真を読み込む",
@@ -2988,104 +3052,175 @@ function heroPrefersDarkText(px) {
 }
 
 // ── Graph card ──
-const GRAPH_MAX = 80; // notes drawn at most, so the picture stays readable and quick
-const GRAPH_W = 400;
-const GRAPH_H = 250;
+const GRAPH_CAP = 300; // nodes drawn at most (150 on a phone), so it stays quick
+const GRAPH_DEFAULTS = { tags: false, attachments: false, orphans: true, existingOnly: false }; // Obsidian's own Graph view defaults
 
-// Which notes link to which, either direction, among the given note paths
-function graphAdjacency(resolved, paths) {
-  const adj = new Map();
-  const add = (a, b) => {
-    if (!adj.has(a)) adj.set(a, new Set());
-    adj.get(a).add(b);
+// Does a node satisfy a Graph-view style query? Plain words and path:, file: and tag: terms, all of which must
+// match; a leading - negates a term. Other parts of Obsidian's search syntax are not understood and match nothing.
+function graphMatch(query, node) {
+  const terms = String(query || "").match(/-?(?:\w+:)?(?:"[^"]*"|\S+)/g) || [];
+  for (let term of terms) {
+    if (term === "OR" || term === "AND") continue;
+    let neg = false;
+    if (term.startsWith("-") && term.length > 1) {
+      neg = true;
+      term = term.slice(1);
+    }
+    let key = "";
+    const m = term.match(/^(\w+):(.*)$/);
+    if (m) [, key, term] = m;
+    term = term.replace(/^"|"$/g, "").toLowerCase();
+    if (!term) continue;
+    const label = node.label.toLowerCase();
+    const path = node.path.toLowerCase();
+    let ok;
+    if (key === "") ok = label.includes(term) || path.includes(term);
+    else if (key.toLowerCase() === "path") ok = path.includes(term);
+    else if (key.toLowerCase() === "file") ok = label.includes(term);
+    else if (key.toLowerCase() === "tag") {
+      const want = `#${term.replace(/^#/, "")}`;
+      ok = node.tags.some((t) => t.toLowerCase() === want || t.toLowerCase().startsWith(`${want}/`));
+    } else ok = false;
+    if (ok === neg) return false;
+  }
+  return true;
+}
+
+// The nodes and links to draw. notes is [{ path, label, tags }]; resolved and unresolved are Obsidian's link maps.
+// local is null for the whole vault, or the path of the note to centre on. Past cap, the least connected nodes go first.
+function graphModel({ notes, resolved, unresolved, opts, query, local, cap }) {
+  const byPath = new Map(notes.map((n) => [n.path, n]));
+  const nodes = new Map();
+  const add = (n) => nodes.has(n.id) || nodes.set(n.id, { ...n, deg: 0 });
+  for (const n of notes) add({ id: n.path, type: "note", label: n.label, path: n.path, tags: n.tags });
+  const seen = new Set();
+  let links = [];
+  const link = (a, b) => {
+    const k = a < b ? `${a}\0${b}` : `${b}\0${a}`;
+    if (a === b || seen.has(k)) return;
+    seen.add(k);
+    links.push([a, b]);
   };
   for (const [src, dests] of Object.entries(resolved || {})) {
-    if (!paths.has(src)) continue;
+    if (!byPath.has(src)) continue;
     for (const dest of Object.keys(dests)) {
-      if (dest === src || !paths.has(dest)) continue;
-      add(src, dest);
-      add(dest, src);
-    }
-  }
-  return adj;
-}
-
-// The notes to draw: the most connected ones, or the open note and what it links to
-function graphPick(adj, centre, max = GRAPH_MAX) {
-  const byLinks = (a, b) => adj.get(b).size - adj.get(a).size || a.localeCompare(b);
-  let ids;
-  if (centre !== null) {
-    if (!adj.has(centre)) return { ids: [], edges: [], deg: new Map() };
-    ids = [centre, ...[...adj.get(centre)].sort(byLinks)].slice(0, max);
-  } else {
-    ids = [...adj.keys()].sort(byLinks).slice(0, max);
-  }
-  const keep = new Set(ids);
-  const edges = [];
-  for (const a of ids) for (const b of adj.get(a)) if (a < b && keep.has(b)) edges.push([a, b]);
-  return { ids, edges, deg: new Map(ids.map((id) => [id, adj.get(id).size])) };
-}
-
-// A force-directed layout (Fruchterman-Reingold), run to the end at once so the picture is still: no
-// animation to tire the eye or to fight reduced motion. Starts from a ring, so the same notes always land the same way.
-function graphLayout(ids, edges, W = GRAPH_W, H = GRAPH_H) {
-  const n = ids.length;
-  if (!n) return [];
-  const index = new Map(ids.map((id, i) => [id, i]));
-  const pos = ids.map((_, i) => {
-    const a = (i / n) * 2 * Math.PI;
-    return { x: W / 2 + Math.cos(a) * W * 0.3, y: H / 2 + Math.sin(a) * H * 0.3 };
-  });
-  if (n === 1) return [{ x: W / 2, y: H / 2 }];
-  const k = Math.sqrt((W * H) / n) * 0.6; // the length an edge likes to be
-  const pairs = edges.map(([a, b]) => [index.get(a), index.get(b)]);
-  const ROUNDS = 300;
-  for (let round = 0; round < ROUNDS; round++) {
-    const temp = (W / 8) * (1 - round / ROUNDS) + 0.5;
-    const d = pos.map(() => ({ x: 0, y: 0 }));
-    for (let i = 0; i < n; i++) {
-      for (let j = i + 1; j < n; j++) {
-        const dx = pos[i].x - pos[j].x;
-        const dy = pos[i].y - pos[j].y;
-        const dist = Math.hypot(dx, dy) || 0.1;
-        const f = (k * k) / dist / dist;
-        d[i].x += dx * f;
-        d[i].y += dy * f;
-        d[j].x -= dx * f;
-        d[j].y -= dy * f;
+      if (byPath.has(dest)) link(src, dest);
+      else if (opts.attachments && !/\.md$/i.test(dest)) {
+        add({ id: dest, type: "attachment", label: dest.replace(/^.*\//, ""), path: dest, tags: [] });
+        link(src, dest);
       }
     }
-    for (const [a, b] of pairs) {
-      const dx = pos[a].x - pos[b].x;
-      const dy = pos[a].y - pos[b].y;
-      const dist = Math.hypot(dx, dy) || 0.1;
-      const f = dist / k;
-      d[a].x -= dx * f;
-      d[a].y -= dy * f;
-      d[b].x += dx * f;
-      d[b].y += dy * f;
-    }
-    for (let i = 0; i < n; i++) {
-      d[i].x += (W / 2 - pos[i].x) * 0.08; // a weak pull to the middle keeps separate clusters in frame
-      d[i].y += (H / 2 - pos[i].y) * 0.08;
-      const len = Math.hypot(d[i].x, d[i].y) || 1;
-      const step = Math.min(len, temp);
-      pos[i].x += (d[i].x / len) * step;
-      pos[i].y += (d[i].y / len) * step;
+  }
+  if (!opts.existingOnly) {
+    for (const [src, targets] of Object.entries(unresolved || {})) {
+      if (!byPath.has(src)) continue;
+      for (const name of Object.keys(targets)) {
+        add({ id: `?${name}`, type: "unresolved", label: name, path: name, tags: [] });
+        link(src, `?${name}`);
+      }
     }
   }
-  // Scale the result to fill the frame, keeping its proportions
-  const pad = 14;
-  const xs = pos.map((p) => p.x);
-  const ys = pos.map((p) => p.y);
-  const minX = Math.min(...xs);
-  const minY = Math.min(...ys);
-  const spanX = Math.max(...xs) - minX || 1;
-  const spanY = Math.max(...ys) - minY || 1;
-  const scale = Math.min((W - 2 * pad) / spanX, (H - 2 * pad) / spanY);
-  const offX = (W - spanX * scale) / 2;
-  const offY = (H - spanY * scale) / 2;
-  return pos.map((p) => ({ x: offX + (p.x - minX) * scale, y: offY + (p.y - minY) * scale }));
+  if (opts.tags) {
+    for (const n of notes) {
+      for (const t of n.tags) {
+        const id = t.toLowerCase();
+        add({ id, type: "tag", label: t, path: t, tags: [t] });
+        link(n.path, id);
+      }
+    }
+  }
+  let keep = [...nodes.values()];
+  if (query) keep = keep.filter((n) => graphMatch(query, n));
+  let ids = new Set(keep.map((n) => n.id));
+  links = links.filter(([a, b]) => ids.has(a) && ids.has(b));
+  if (local !== null) {
+    if (!ids.has(local)) return { nodes: [], links: [], total: 0 };
+    const near = new Set([local]);
+    for (const [a, b] of links) {
+      if (a === local) near.add(b);
+      if (b === local) near.add(a);
+    }
+    keep = keep.filter((n) => near.has(n.id));
+    ids = new Set(keep.map((n) => n.id));
+    links = links.filter(([a, b]) => ids.has(a) && ids.has(b));
+  }
+  for (const [a, b] of links) {
+    nodes.get(a).deg++;
+    nodes.get(b).deg++;
+  }
+  if (!opts.orphans) keep = keep.filter((n) => n.deg > 0);
+  const total = keep.length;
+  if (keep.length > cap) keep = [...keep].sort((a, b) => b.deg - a.deg || a.id.localeCompare(b.id)).slice(0, cap);
+  const at = new Map(keep.map((n, i) => [n.id, i]));
+  return { nodes: keep, links: links.filter(([a, b]) => at.has(a) && at.has(b)).map(([a, b]) => [at.get(a), at.get(b)]), total };
+}
+
+// A small force simulation (repulsion between all nodes, springs along links, a pull to the middle).
+// New nodes start on a spiral, or where the same node already was, so a redraw does not scramble the picture.
+function graphSim(nodes, links, prev) {
+  nodes.forEach((n, i) => {
+    const p = prev?.get(n.id);
+    const r = 20 + 11 * Math.sqrt(nodes.length) * Math.sqrt((i + 0.5) / nodes.length);
+    n.x = p ? p.x : Math.cos(i * 2.399963) * r;
+    n.y = p ? p.y : Math.sin(i * 2.399963) * r;
+    n.vx = 0;
+    n.vy = 0;
+  });
+  return { nodes, links, alpha: prev?.size ? 0.35 : 1 }; // a redraw only settles a little; a first one builds up
+}
+
+function graphTick(sim) {
+  const { nodes, links } = sim;
+  const n = nodes.length;
+  const a = sim.alpha;
+  for (let i = 0; i < n; i++) {
+    const p = nodes[i];
+    for (let j = i + 1; j < n; j++) {
+      const q = nodes[j];
+      let dx = p.x - q.x;
+      let dy = p.y - q.y;
+      let d2 = dx * dx + dy * dy;
+      if (d2 < 1) {
+        dx = (i - j) * 0.1;
+        dy = (j - i) * 0.07 + 0.05;
+        d2 = dx * dx + dy * dy;
+      }
+      if (d2 > 90000) continue; // too far apart to matter
+      const f = (100 * a) / d2;
+      p.vx += dx * f;
+      p.vy += dy * f;
+      q.vx -= dx * f;
+      q.vy -= dy * f;
+    }
+  }
+  for (const [i, j] of links) {
+    const p = nodes[i];
+    const q = nodes[j];
+    const dx = q.x - p.x;
+    const dy = q.y - p.y;
+    const d = Math.hypot(dx, dy) || 0.1;
+    const f = ((d - 32) / d) * 0.12 * a;
+    p.vx += dx * f;
+    p.vy += dy * f;
+    q.vx -= dx * f;
+    q.vy -= dy * f;
+  }
+  for (const p of nodes) {
+    const g = 0.012 * (p.deg ? 1 : 10) * a; // notes with no links are pulled in harder, or they would ring the picture far out
+    p.vx -= p.x * g;
+    p.vy -= p.y * g;
+    p.vx *= 0.6;
+    p.vy *= 0.6;
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.fx != null) {
+      p.x = p.fx;
+      p.y = p.fy;
+      p.vx = p.vy = 0;
+    }
+  }
+  sim.alpha *= 0.986;
+  return sim.alpha > 0.02;
 }
 
 const VS_WEEKS = 12; // weeks shown in the Vault stats heatmap
@@ -5973,116 +6108,447 @@ class HomepageView extends ItemView {
 
   // ── Graph ──
 
-  // Links between notes, rebuilt at most every 30 seconds
-  graphLinks(force) {
+  // The Graph view's own settings (colour groups and its filter defaults), read from the vault's config folder
+  async graphConfig(force) {
     const now = Date.now();
-    if (!force && this.grLinks && now - this.grLinks.at < 30_000) return this.grLinks;
-    const files = this.app.vault.getMarkdownFiles().filter((f) => !this.isDataFile(f));
-    const paths = new Set(files.map((f) => f.path));
-    const adj = graphAdjacency(this.app.metadataCache.resolvedLinks, paths);
-    return (this.grLinks = { at: now, adj, titles: new Map(files.map((f) => [f.path, f.basename])) });
+    if (!force && this.grCfg && now - this.grCfg.at < 30_000) return this.grCfg;
+    let raw = {};
+    try {
+      raw = JSON.parse(await this.app.vault.adapter.read(`${this.app.vault.configDir}/graph.json`));
+    } catch {
+      /* no graph.json yet: Obsidian's defaults */
+    }
+    const hex = (c) => `#${(Number(c.rgb) >>> 0).toString(16).padStart(6, "0")}`;
+    const groups = (Array.isArray(raw.colorGroups) ? raw.colorGroups : [])
+      .filter((g) => g?.query && g.color)
+      .map((g) => ({ query: String(g.query), color: hex(g.color) }));
+    const defaults = { tags: raw.showTags ?? GRAPH_DEFAULTS.tags, attachments: raw.showAttachments ?? GRAPH_DEFAULTS.attachments, orphans: raw.showOrphans ?? GRAPH_DEFAULTS.orphans, existingOnly: raw.hideUnresolved ?? GRAPH_DEFAULTS.existingOnly };
+    return (this.grCfg = { at: now, groups, defaults });
   }
 
-  renderGraph(force) {
+  // Notes and their links, gathered at most every 30 seconds
+  graphInput(force) {
+    const now = Date.now();
+    if (!force && this.grInput && now - this.grInput.at < 30_000) return this.grInput;
+    const mc = this.app.metadataCache;
+    const notes = this.app.vault
+      .getMarkdownFiles()
+      .filter((f) => !this.isDataFile(f))
+      .map((f) => {
+        const c = mc.getFileCache?.(f);
+        const tags = new Set((c?.tags ?? []).map((t) => t.tag));
+        const fm = c?.frontmatter?.tags ?? c?.frontmatter?.tag;
+        for (const t of Array.isArray(fm) ? fm : typeof fm === "string" ? fm.split(/[,\s]+/) : []) if (t) tags.add(`#${String(t).replace(/^#/, "")}`);
+        return { path: f.path, label: f.basename, tags: [...tags] };
+      });
+    return (this.grInput = { at: now, notes, resolved: mc.resolvedLinks, unresolved: mc.unresolvedLinks });
+  }
+
+  stopGraph() {
+    if (this.gr?.raf) cancelAnimationFrame(this.gr.raf);
+    if (this.gr) this.gr.raf = 0;
+  }
+
+  // The card's controls and canvas are built once and then updated, so panning, zooming and the open filter panel survive a refresh
+  graphShell() {
+    if (this.gr) return this.gr;
+    const body = this.$("graph-body");
+    const gr = (this.gr = { nodes: [], links: [], sig: "", view: { x: 0, y: 0, k: 1 }, W: 300, H: 340, dpr: 1, hover: -1, raf: 0, pointers: new Map(), tall: false });
+    const iconBtn = (id, icon, label) => h("button", { type: "button", cls: "icon-btn sm", "data-gr": id, title: label, "aria-label": label }, iconNode(icon));
+    const check = (id, label) => h("label", { cls: "gr-check" }, h("input", { type: "checkbox", "data-gr-opt": id }), h("span", { text: label }));
+    const hasGraph = !!this.app.commands?.commands?.["graph:open"];
+    gr.canvas = h("canvas", { cls: "gr-canvas", title: T("Drag to move, Ctrl or ⌘ + scroll to zoom"), "aria-hidden": "true" });
+    gr.stage = h("div", { cls: "gr-stage" }, gr.canvas);
+    gr.status = h("div", { cls: "gr-hover" });
+    gr.empty = h("p", { cls: "vs-empty hidden" });
+    gr.chips = h("div", { cls: "vs-tags" });
+    gr.chipsHead = h("h3", { cls: "vs-sub", text: T("Most connected") });
+    gr.panel = h(
+      "div",
+      { cls: "gr-panel hidden", id: "gr-panel" },
+      h("input", { type: "search", cls: "gr-filter", "data-gr-query": "", placeholder: T("Filter notes…"), "aria-label": T("Filter notes"), spellcheck: "false" }),
+      h("div", { cls: "gr-checks" }, check("tags", T("Tags")), check("attachments", T("Attachments")), check("orphans", T("Orphans")), check("existingOnly", T("Existing files only"))),
+      h("p", { cls: "vs-empty", text: T("Colours come from the groups in your Graph view.") }),
+    );
+    gr.filterBtn = h("button", { type: "button", cls: "icon-btn sm", "data-gr": "filters", title: T("Filters"), "aria-label": T("Filters"), "aria-expanded": "false", "aria-controls": "gr-panel" }, iconNode("settings"));
+    const mode = (id, label) => h("button", { type: "button", cls: "gr-mode", "data-gr-mode": id }, label);
+    body.append(
+      h(
+        "div",
+        { cls: "gr-bar" },
+        mode("overview", T("Overview")),
+        mode("local", T("This note")),
+        h("span", { cls: "gr-gap" }),
+        iconBtn("out", "minus", T("Zoom out")),
+        iconBtn("in", "plus", T("Zoom in")),
+        h("button", { type: "button", cls: "gr-mode", "data-gr": "fit" }, T("Fit")),
+        h("button", { type: "button", cls: "gr-mode", "data-gr": "tall", "aria-pressed": "false" }, T("Expand")),
+        gr.filterBtn,
+        hasGraph ? h("button", { type: "button", cls: "vs-back", "data-gr": "open" }, T("Open graph view")) : null,
+      ),
+      gr.panel,
+      gr.stage,
+      gr.empty,
+      gr.status,
+      gr.chipsHead,
+      gr.chips,
+    );
+
+    const ctx = gr.canvas.getContext("2d");
+    gr.ctx = ctx;
+    const size = () => {
+      const w = Math.max(120, Math.round(gr.stage.clientWidth));
+      const hgt = Math.round(gr.stage.clientHeight) || 340;
+      const dpr = window.devicePixelRatio || 1;
+      if (w === gr.W && hgt === gr.H && dpr === gr.dpr && gr.canvas.width) return;
+      Object.assign(gr, { W: w, H: hgt, dpr });
+      gr.canvas.width = Math.round(w * dpr);
+      gr.canvas.height = Math.round(hgt * dpr);
+      this.drawGraph();
+    };
+    if (typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(size);
+      ro.observe(gr.stage);
+      this.register(() => ro.disconnect());
+    }
+    gr.size = size;
+    this.register(() => this.stopGraph());
+
+    const toGraph = (e) => {
+      const r = gr.canvas.getBoundingClientRect();
+      const { x, y, k } = gr.view;
+      return { x: (e.clientX - r.left - gr.W / 2 - x) / k, y: (e.clientY - r.top - gr.H / 2 - y) / k };
+    };
+    const hit = (e) => {
+      const p = toGraph(e);
+      let best = -1;
+      let bd = Infinity;
+      gr.nodes.forEach((n, i) => {
+        const d = Math.hypot(n.x - p.x, n.y - p.y);
+        const reach = this.graphRadius(n) / Math.sqrt(gr.view.k) + 4 / gr.view.k;
+        if (d <= reach && d < bd) [best, bd] = [i, d];
+      });
+      return best;
+    };
+    const zoomAt = (factor, cx = gr.W / 2, cy = gr.H / 2) => {
+      const v = gr.view;
+      const k = Math.min(6, Math.max(0.15, v.k * factor));
+      const f = k / v.k;
+      v.x = cx - gr.W / 2 - (cx - gr.W / 2 - v.x) * f;
+      v.y = cy - gr.H / 2 - (cy - gr.H / 2 - v.y) * f;
+      v.k = k;
+      this.drawGraph();
+    };
+    gr.zoomAt = zoomAt;
+    const setHover = (i) => {
+      if (i === gr.hover) return;
+      gr.hover = i;
+      gr.canvas.style.cursor = i >= 0 && gr.nodes[i].type !== "unresolved" ? "pointer" : "";
+      this.graphStatus();
+      this.drawGraph();
+    };
+    gr.canvas.addEventListener("pointerdown", (e) => {
+      gr.canvas.setPointerCapture?.(e.pointerId);
+      gr.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      gr.moved = 0;
+      if (gr.pointers.size === 2) {
+        const [a, b] = [...gr.pointers.values()];
+        gr.pinch = Math.hypot(a.x - b.x, a.y - b.y);
+        gr.drag = -1;
+        return;
+      }
+      gr.drag = hit(e);
+      if (gr.drag >= 0) {
+        const p = toGraph(e);
+        gr.nodes[gr.drag].fx = p.x;
+        gr.nodes[gr.drag].fy = p.y;
+      }
+    });
+    gr.canvas.addEventListener("pointermove", (e) => {
+      const last = gr.pointers.get(e.pointerId);
+      if (!last) return setHover(hit(e));
+      const dx = e.clientX - last.x;
+      const dy = e.clientY - last.y;
+      gr.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      gr.moved += Math.abs(dx) + Math.abs(dy);
+      if (gr.pointers.size === 2) {
+        const [a, b] = [...gr.pointers.values()];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (gr.pinch) {
+          const r = gr.canvas.getBoundingClientRect();
+          zoomAt(d / gr.pinch, (a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top);
+        }
+        gr.pinch = d;
+      } else if (gr.drag >= 0) {
+        const p = toGraph(e);
+        const n = gr.nodes[gr.drag];
+        n.fx = p.x;
+        n.fy = p.y;
+        if (gr.moved > 4) this.reheatGraph();
+      } else {
+        gr.view.x += dx;
+        gr.view.y += dy;
+        this.drawGraph();
+      }
+    });
+    const release = (e) => {
+      if (!gr.pointers.delete(e.pointerId)) return;
+      const n = gr.drag >= 0 ? gr.nodes[gr.drag] : null;
+      if (n) {
+        n.fx = n.fy = null;
+        if (e.type === "pointerup" && gr.moved <= 4) this.openGraphNode(n, e);
+      }
+      gr.drag = -1;
+      gr.pinch = 0;
+    };
+    gr.canvas.addEventListener("pointerup", release);
+    gr.canvas.addEventListener("pointercancel", release);
+    gr.canvas.addEventListener("pointerleave", (e) => {
+      if (!gr.pointers.has(e.pointerId)) setHover(-1);
+    });
+    gr.canvas.addEventListener(
+      "wheel",
+      (e) => {
+        if (!e.ctrlKey && !e.metaKey) return; // a plain scroll still scrolls the dashboard
+        e.preventDefault();
+        const r = gr.canvas.getBoundingClientRect();
+        zoomAt(Math.exp(-e.deltaY * (e.deltaMode === 1 ? 0.05 : 0.0025)), e.clientX - r.left, e.clientY - r.top);
+      },
+      { passive: false },
+    );
+
+    body.addEventListener("click", (e) => {
+      const mode = e.target.closest("[data-gr-mode]");
+      if (mode) {
+        this.plugin.settings.graphMode = mode.dataset.grMode;
+        this.plugin.saveSettings().catch(() => {});
+        this.renderGraph().then(() => body.querySelector(`[data-gr-mode="${mode.dataset.grMode}"]`)?.focus());
+        return;
+      }
+      const act = e.target.closest("[data-gr]")?.dataset.gr;
+      if (act === "in") zoomAt(1.4);
+      else if (act === "out") zoomAt(1 / 1.4);
+      else if (act === "fit") this.fitGraph();
+      else if (act === "open") this.app.commands.executeCommandById("graph:open");
+      else if (act === "filters") {
+        const open = gr.panel.classList.toggle("hidden") === false;
+        gr.filterBtn.setAttribute("aria-expanded", String(open));
+      } else if (act === "tall") {
+        gr.tall = !gr.tall;
+        gr.stage.classList.toggle("tall", gr.tall);
+        e.target.closest("[data-gr]").setAttribute("aria-pressed", String(gr.tall));
+        e.target.closest("[data-gr]").textContent = gr.tall ? T("Collapse") : T("Expand");
+        size();
+        this.fitGraph();
+      }
+    });
+    body.addEventListener("change", (e) => {
+      const opt = e.target.dataset?.grOpt;
+      if (!opt) return;
+      this.plugin.settings.graphOpts = { ...(this.plugin.settings.graphOpts ?? {}), [opt]: e.target.checked };
+      this.plugin.saveSettings().catch(() => {});
+      this.renderGraph();
+    });
+    body.addEventListener("input", (e) => {
+      if (e.target.dataset?.grQuery == null) return;
+      this.later("graphQuery", 250, () => {
+        this.grQuery = e.target.value.trim();
+        this.renderGraph();
+      });
+    });
+    return gr;
+  }
+
+  graphRadius(n) {
+    return 3 + Math.min(6, Math.log2(n.deg + 1) * 1.4) + (n.centre ? 2 : 0);
+  }
+
+  openGraphNode(n, evt) {
+    if (n.type === "tag") this.searchTag(n.label.replace(/^#/, ""));
+    else if (n.type !== "unresolved") this.openFile(n.path, evt);
+  }
+
+  graphStatus() {
+    const gr = this.gr;
+    if (!gr) return;
+    const n = gr.hover >= 0 ? gr.nodes[gr.hover] : null;
+    if (n) {
+      gr.status.textContent = T("{name} · {n} links", { name: n.label, n: fmtNum(n.deg) });
+      return;
+    }
+    const rest = T("{n} nodes · {links} links", { n: fmtNum(gr.nodes.length), links: fmtNum(gr.links.length) });
+    gr.status.textContent = gr.total > gr.nodes.length ? `${rest} · ${T("Showing {shown} of {total}", { shown: fmtNum(gr.nodes.length), total: fmtNum(gr.total) })}` : rest;
+  }
+
+  // Re-run the simulation: animated, unless the person has asked for reduced motion
+  reheatGraph(alpha = 0.3) {
+    const gr = this.gr;
+    if (!gr?.sim) return;
+    gr.sim.alpha = Math.max(gr.sim.alpha, alpha);
+    if (gr.raf) return;
+    const step = () => {
+      gr.raf = 0;
+      const more = graphTick(gr.sim);
+      this.drawGraph();
+      if (more) gr.raf = requestAnimationFrame(step);
+      else if (gr.fitAfter) {
+        gr.fitAfter = false;
+        this.fitGraph();
+      }
+    };
+    gr.raf = requestAnimationFrame(step);
+  }
+
+  fitGraph() {
+    const gr = this.gr;
+    if (!gr?.nodes.length) return;
+    const xs = gr.nodes.map((n) => n.x);
+    const ys = gr.nodes.map((n) => n.y);
+    const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+    const k = Math.min(2.5, Math.max(0.15, Math.min((gr.W - 50) / (x1 - x0 || 1), (gr.H - 50) / (y1 - y0 || 1))));
+    gr.view = { k, x: (-(x0 + x1) / 2) * k, y: (-(y0 + y1) / 2) * k };
+    this.drawGraph();
+  }
+
+  drawGraph() {
+    const gr = this.gr;
+    if (!gr?.ctx || !gr.canvas.width) return;
+    const { ctx, W, H, dpr, view, nodes, links } = gr;
+    const cs = getComputedStyle(this.$("graph-card"));
+    const col = (name, fallback) => cs.getPropertyValue(name).trim() || fallback;
+    const ink = col("--text", "#fff");
+    const faint = col("--text-3", "#888");
+    const base = { note: col("--accent", "#7c3aed"), tag: col("--warning", "#f59e0b"), attachment: faint, unresolved: faint };
+    const near = new Set();
+    if (gr.hover >= 0) {
+      near.add(gr.hover);
+      for (const [a, b] of links) {
+        if (a === gr.hover) near.add(b);
+        if (b === gr.hover) near.add(a);
+      }
+    }
+    const dim = gr.hover >= 0;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.setTransform(dpr * view.k, 0, 0, dpr * view.k, dpr * (W / 2 + view.x), dpr * (H / 2 + view.y));
+    ctx.lineWidth = 1 / view.k;
+    for (const [a, b] of links) {
+      const on = dim && (a === gr.hover || b === gr.hover);
+      ctx.globalAlpha = dim ? (on ? 0.9 : 0.07) : 0.4;
+      ctx.strokeStyle = on ? col("--accent-txt", ink) : faint;
+      ctx.beginPath();
+      ctx.moveTo(nodes[a].x, nodes[a].y);
+      ctx.lineTo(nodes[b].x, nodes[b].y);
+      ctx.stroke();
+    }
+    nodes.forEach((n, i) => {
+      const r = this.graphRadius(n) / Math.sqrt(view.k);
+      ctx.globalAlpha = dim && !near.has(i) ? 0.2 : 1;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      if (n.type === "unresolved") {
+        ctx.strokeStyle = n.color || faint;
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = n.color || base[n.type];
+        ctx.fill();
+      }
+      if (n.centre) {
+        ctx.strokeStyle = ink;
+        ctx.lineWidth = 1.5 / view.k;
+        ctx.stroke();
+        ctx.lineWidth = 1 / view.k;
+      }
+    });
+    // Names: the hovered note and its neighbours, or every note once you have zoomed in
+    const all = view.k >= 1.6;
+    if (all || dim) {
+      ctx.font = `${11 / view.k}px ${cs.fontFamily || "sans-serif"}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = 3 / view.k;
+      ctx.strokeStyle = col("--surface-2", "#222");
+      ctx.fillStyle = ink;
+      nodes.forEach((n, i) => {
+        if (!(dim ? near.has(i) : all)) return;
+        ctx.globalAlpha = 1;
+        const y = n.y + this.graphRadius(n) / Math.sqrt(view.k) + 2 / view.k;
+        ctx.strokeText(n.label, n.x, y);
+        ctx.fillText(n.label, n.x, y);
+      });
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  async renderGraph(force) {
     const card = this.$("graph-card");
     const enabled = !!this.settings.showGraph;
     card.classList.toggle("hidden", !enabled);
     if (!enabled) {
-      this.grLinks = null;
+      this.stopGraph();
+      this.grInput = null;
       return;
     }
-    const body = this.$("graph-body");
-    if (!body.dataset.wired) {
-      body.dataset.wired = "1";
-      body.addEventListener("click", (e) => {
-        const mode = e.target.closest("[data-gr-mode]");
-        if (mode) {
-          this.plugin.settings.graphMode = mode.dataset.grMode;
-          this.plugin.saveSettings().catch(() => {});
-          this.renderGraph();
-          body.querySelector(`[data-gr-mode="${mode.dataset.grMode}"]`)?.focus();
-          return;
-        }
-        if (e.target.closest("[data-gr-open]")) return void this.app.commands.executeCommandById("graph:open");
-        const node = e.target.closest("[data-path]"); // a dot in the picture; the chips below use data-open
-        if (node) this.openFile(node.dataset.path, e);
-      });
-    }
+    const token = (this.grToken = (this.grToken ?? 0) + 1);
+    const cfg = await this.graphConfig(force);
+    if (token !== this.grToken || !this.settings.showGraph) return; // a newer render has taken over
+    const gr = this.graphShell();
+    const opts = { ...cfg.defaults, ...(this.settings.graphOpts ?? {}) };
     const local = this.settings.graphMode === "local";
-    const { adj, titles } = this.graphLinks(force);
     const active = local ? this.app.workspace.getActiveFile() : null;
-    const g = graphPick(adj, local ? (active?.path ?? "") : null);
+    const model = graphModel({ ...this.graphInput(force), opts, query: this.grQuery ?? "", local: local ? (active?.path ?? "") : null, cap: document.body.classList.contains("is-mobile") ? 150 : GRAPH_CAP });
     this.$("graph-count").textContent = "";
-    body.empty();
-    this.drawGraph(body, g, adj, titles, local, active);
-  }
-
-  drawGraph(body, g, adj, titles, local, active) {
-    const mode = (id, label) => h("button", { type: "button", cls: "gr-mode", "data-gr-mode": id, "aria-pressed": String((id === "local") === local) }, label);
-    const hasGraph = !!this.app.commands?.commands?.["graph:open"];
-    body.append(
-      h("div", { cls: "gr-bar" }, mode("overview", T("Overview")), mode("local", T("This note")), h("span", { cls: "gr-gap" }), hasGraph ? h("button", { type: "button", cls: "vs-back", "data-gr-open": "" }, T("Open graph view")) : null),
-    );
-    if (!g.ids.length) {
-      body.append(h("p", { cls: "vs-empty", text: local ? T("Open a note that has links to see what it connects to.") : T("No linked notes yet.") }));
+    for (const b of gr.panel.querySelectorAll("[data-gr-opt]")) b.checked = !!opts[b.dataset.grOpt];
+    for (const b of this.$("graph-body").querySelectorAll("[data-gr-mode]")) b.setAttribute("aria-pressed", String((b.dataset.grMode === "local") === local));
+    // Colour groups from the Graph view: the first group a node matches decides its colour
+    for (const n of model.nodes) {
+      n.color = cfg.groups.find((g) => graphMatch(g.query, n))?.color;
+      n.centre = local && n.id === active?.path;
+    }
+    const sig = `${model.nodes.map((n) => n.id).join("|")}#${model.links.map((l) => l.join(">")).join("|")}`;
+    const empty = !model.nodes.length;
+    gr.stage.classList.toggle("hidden", empty);
+    gr.chipsHead.classList.toggle("hidden", empty);
+    gr.chips.classList.toggle("hidden", empty);
+    gr.empty.classList.toggle("hidden", !empty);
+    gr.empty.textContent = this.grQuery || opts.orphans === false ? T("No notes match.") : local ? T("Open a note that has links to see what it connects to.") : T("No linked notes yet.");
+    if (empty) {
+      this.stopGraph();
+      Object.assign(gr, { nodes: [], links: [], sig: "", total: 0, hover: -1 });
       return;
     }
-    const pos = graphLayout(g.ids, g.edges);
-    const at = new Map(g.ids.map((id, i) => [id, pos[i]]));
-    const NS = "http://www.w3.org/2000/svg";
-    const svgEl = (name, attrs) => {
-      const el = document.createElementNS(NS, name);
-      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
-      return el;
-    };
-    const svg = svgEl("svg", {
-      class: "gr-svg",
-      viewBox: `0 0 ${GRAPH_W} ${GRAPH_H}`,
-      role: "img",
-      "aria-label": T("Graph of {notes} notes and {links} links. The most connected notes are listed below it.", { notes: fmtNum(g.ids.length), links: fmtNum(g.edges.length) }),
-    });
-    const lines = new Map(); // note -> its edges, so hovering can light them up
-    for (const [a, b] of g.edges) {
-      const line = svgEl("line", { class: "gr-edge", x1: at.get(a).x, y1: at.get(a).y, x2: at.get(b).x, y2: at.get(b).y });
-      svg.append(line);
-      for (const id of [a, b]) (lines.get(id) ?? lines.set(id, []).get(id)).push([line, id === a ? b : a]);
-    }
-    const dots = new Map();
-    for (const id of g.ids) {
-      const centre = local && id === active?.path;
-      const r = 3 + Math.min(6, Math.log2(g.deg.get(id) + 1) * 1.4) + (centre ? 2 : 0);
-      const dot = svgEl("circle", { class: `gr-node${centre ? " centre" : ""}`, cx: at.get(id).x, cy: at.get(id).y, r, "data-path": id });
-      dots.set(id, dot);
-      svg.append(dot);
-    }
-    const status = h("div", { cls: "gr-hover" });
-    const rest = T("{notes} notes · {links} links", { notes: fmtNum(g.ids.length), links: fmtNum(g.edges.length) });
-    status.textContent = rest;
-    const clear = () => {
-      svg.classList.remove("dim");
-      for (const el of svg.querySelectorAll(".on")) el.classList.remove("on");
-      status.textContent = rest;
-    };
-    svg.addEventListener("pointerover", (e) => {
-      const id = e.target.dataset?.path;
-      if (!id) return;
-      clear();
-      svg.classList.add("dim");
-      dots.get(id).classList.add("on");
-      for (const [line, other] of lines.get(id) ?? []) {
-        line.classList.add("on");
-        dots.get(other).classList.add("on");
+    gr.total = model.total;
+    if (sig !== gr.sig) {
+      const prev = new Map(gr.nodes.map((n) => [n.id, { x: n.x, y: n.y }]));
+      gr.hover = -1;
+      gr.sig = sig;
+      gr.nodes = model.nodes;
+      gr.links = model.links;
+      gr.sim = graphSim(gr.nodes, gr.links, prev);
+      this.stopGraph();
+      gr.size();
+      gr.canvas.setAttribute("role", "img");
+      gr.canvas.removeAttribute("aria-hidden");
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+        while (graphTick(gr.sim));
+        this.fitGraph();
+      } else {
+        gr.sim.alpha = prev.size ? 0.35 : 1;
+        for (let i = 0; i < 40; i++) graphTick(gr.sim); // a rough shape first, so it does not start as a clump
+        if (!prev.size) this.fitGraph();
+        gr.fitAfter = true;
+        this.reheatGraph(gr.sim.alpha);
       }
-      status.textContent = T("{name} · {n} links", { name: titles.get(id) ?? id, n: fmtNum(g.deg.get(id)) });
-    });
-    svg.addEventListener("pointerleave", clear);
-    body.append(svg, status);
-    // The same notes as links, for the keyboard and screen readers (the dots are for the mouse and touch)
-    const top = [...g.ids].sort((a, b) => g.deg.get(b) - g.deg.get(a) || a.localeCompare(b)).filter((id) => !(local && id === active?.path)).slice(0, 5);
-    body.append(
-      h("h3", { cls: "vs-sub", text: T("Most connected") }),
-      h("div", { cls: "vs-tags" }, ...top.map((id) => h("a", { cls: "vs-tag", href: "#", "data-open": id, title: titles.get(id) }, titles.get(id) ?? id, h("em", { text: fmtNum(g.deg.get(id)) })))),
-    );
+    } else {
+      for (const [i, n] of model.nodes.entries()) gr.nodes[i].color = n.color; // same picture, maybe new colours
+    }
+    gr.canvas.setAttribute("aria-label", T("Graph of {n} nodes and {links} links. The most connected notes are listed below it.", { n: fmtNum(gr.nodes.length), links: fmtNum(gr.links.length) }));
+    this.graphStatus();
+    const top = gr.nodes.filter((n) => n.type === "note" && !n.centre).sort((a, b) => b.deg - a.deg || a.label.localeCompare(b.label)).slice(0, 5);
+    gr.chips.empty();
+    for (const n of top) gr.chips.append(h("a", { cls: "vs-tag", href: "#", "data-open": n.path, title: n.label }, n.label, h("em", { text: fmtNum(n.deg) })));
+    this.drawGraph();
   }
 
   scheduleLists() {
@@ -6127,6 +6593,7 @@ class HomepageView extends ItemView {
     const mode = dark ? T("Dark") : T("Light");
     const label = t === "system" ? T("System ({mode})", { mode }) : mode;
     btn.title = T("Appearance: {label} — click to change", { label });
+    this.drawGraph(); // the dots take their colours from the theme
   }
 
   initTheme() {
@@ -8708,7 +9175,7 @@ class HomepageSettingTab extends PluginSettingTab {
 
     add()
       .setName(T("Graph"))
-      .setDesc(T("A picture of how your notes link together: your most connected notes, or the notes around the one you have open. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere."))
+      .setDesc(T("Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere."))
       .addToggle((t) => t.setValue(s.showGraph).onChange((v) => save("showGraph", v)));
 
     add()

@@ -2791,49 +2791,52 @@
   color: var(--accent-txt);
 }
 
-.hp-root .gr-svg {
+.hp-root .gr-stage {
   background: var(--surface-2);
   border-radius: var(--radius-sm);
+  height: 340px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hp-root .gr-stage.tall {
+  height: 620px;
+}
+
+.hp-root .gr-canvas {
   display: block;
-  height: auto;
+  height: 100%;
+  touch-action: pan-y; /* a vertical swipe still scrolls the dashboard on a phone */
   width: 100%;
 }
 
-.hp-root .gr-edge {
-  stroke: var(--text-3);
-  stroke-opacity: 0.4;
-  stroke-width: 1;
+.hp-root .gr-panel {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  padding: 10px;
 }
 
-.hp-root .gr-node {
+#genkan-root .gr-filter {
+  box-sizing: border-box;
+  font-size: 12px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.hp-root .gr-checks {
+  display: grid;
+  gap: 6px 14px;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
+.hp-root .gr-check {
+  align-items: center;
+  color: var(--text-2);
   cursor: pointer;
-  fill: var(--accent);
-  fill-opacity: 0.9;
-  stroke: var(--surface-2);
-  stroke-width: 1;
-}
-
-.hp-root .gr-node.centre {
-  fill: var(--accent-txt);
-  stroke: var(--text);
-  stroke-width: 1.5;
-}
-
-.hp-root .gr-svg.dim .gr-edge {
-  stroke-opacity: 0.08;
-}
-
-.hp-root .gr-svg.dim .gr-node {
-  fill-opacity: 0.25;
-}
-
-.hp-root .gr-svg.dim .gr-edge.on {
-  stroke: var(--accent-txt);
-  stroke-opacity: 0.9;
-}
-
-.hp-root .gr-svg.dim .gr-node.on {
-  fill-opacity: 1;
+  display: flex;
+  font-size: 12px;
+  gap: 6px;
 }
 
 .hp-root .gr-hover {
