@@ -425,6 +425,9 @@ const I18N = {
     "No notes match.": "Aucune note ne correspond.",
     "Graph of {n} nodes and {links} links. The most connected notes are listed below it.": "Graphe de {n} nœuds et {links} liens. Les notes les plus liées sont listées en dessous.",
     "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Dessine les liens entre vos notes, comme la vue graphique d'Obsidian : déplacez les points, zoomez, filtrez et voyez les notes autour de celle qui est ouverte. Part des filtres de votre vue graphique et reprend ses groupes de couleurs. Cliquez sur un point pour ouvrir la note. Calculé sur votre appareil à partir de vos liens ; rien n'est envoyé.",
+    "Drag to move, scroll to zoom": "Glissez pour déplacer, molette pour zoomer",
+    "Scroll wheel zooms the graph": "La molette zoome sur le graphe",
+    "Like Obsidian's Graph view, scrolling over the Graph card zooms it. Turn this off to scroll the dashboard past it instead; Ctrl or ⌘ + scroll still zooms.": "Comme la vue graphique d'Obsidian, la molette sur la carte Graphe zoome. Désactivez-la pour faire défiler le tableau de bord à la place ; Ctrl ou ⌘ + molette zoome toujours.",
     "Clock and search over the photo": "Horloge et recherche sur la photo",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Place le message d'accueil, l'horloge, la date et la recherche sur la photo du jour au lieu de les mettre au-dessus, ce qui économise de la place en hauteur. La photo est un peu assombrie pour que le texte reste lisible ; les photos très claires paraissent donc plus ternes. Nécessite la photo du jour.",
     "Load a new photo": "Charger une nouvelle photo",
@@ -889,6 +892,9 @@ const I18N = {
     "No notes match.": "Ninguna nota coincide.",
     "Graph of {n} nodes and {links} links. The most connected notes are listed below it.": "Grafo de {n} nodos y {links} enlaces. Las notas más conectadas aparecen debajo.",
     "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Dibuja cómo se enlazan tus notas, como la vista de grafo de Obsidian: arrastra los puntos, haz zoom, filtra y mira las notas alrededor de la abierta. Parte de los filtros de tu vista de grafo y usa sus grupos de color. Haz clic en un punto para abrir esa nota. Se calcula en tu dispositivo a partir de tus enlaces; no se envía nada.",
+    "Drag to move, scroll to zoom": "Arrastra para mover, rueda para ampliar",
+    "Scroll wheel zooms the graph": "La rueda amplía el grafo",
+    "Like Obsidian's Graph view, scrolling over the Graph card zooms it. Turn this off to scroll the dashboard past it instead; Ctrl or ⌘ + scroll still zooms.": "Como en la vista de grafo de Obsidian, desplazarte sobre la tarjeta Grafo hace zoom. Desactívalo para desplazar el panel en su lugar; Ctrl o ⌘ + rueda sigue haciendo zoom.",
     "Clock and search over the photo": "Reloj y búsqueda sobre la foto",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Coloca el saludo, el reloj, la fecha y la búsqueda sobre la foto del día en lugar de encima, lo que ahorra espacio vertical. La foto se oscurece un poco para que el texto se lea bien, así que las fotos muy claras se ven más apagadas. Requiere la foto del día.",
     "Load a new photo": "Cargar una foto nueva",
@@ -1353,6 +1359,9 @@ const I18N = {
     "No notes match.": "Keine passenden Notizen.",
     "Graph of {n} nodes and {links} links. The most connected notes are listed below it.": "Graph aus {n} Knoten und {links} Links. Die am stärksten vernetzten Notizen stehen darunter.",
     "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Zeichnet, wie deine Notizen verlinkt sind, wie die Graphansicht von Obsidian: Punkte ziehen, zoomen, filtern und die Notizen rund um die geöffnete sehen. Startet mit den Filtern deiner Graphansicht und nutzt deren Farbgruppen. Klicke auf einen Punkt, um die Notiz zu öffnen. Wird auf deinem Gerät aus deinen Links berechnet; nichts wird gesendet.",
+    "Drag to move, scroll to zoom": "Ziehen zum Verschieben, Scrollen zum Zoomen",
+    "Scroll wheel zooms the graph": "Mausrad zoomt den Graphen",
+    "Like Obsidian's Graph view, scrolling over the Graph card zooms it. Turn this off to scroll the dashboard past it instead; Ctrl or ⌘ + scroll still zooms.": "Wie in Obsidians Graphansicht zoomt Scrollen über der Graph-Karte. Schalte es aus, um stattdessen das Dashboard zu scrollen; Strg oder ⌘ + Scrollen zoomt weiterhin.",
     "Clock and search over the photo": "Uhr und Suche über dem Foto",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Legt Begrüßung, Uhr, Datum und Suche über das Foto des Tages statt darüber, was Platz in der Höhe spart. Das Foto wird leicht abgedunkelt, damit der Text lesbar bleibt; sehr helle Fotos wirken dadurch matter. Benötigt das Foto des Tages.",
     "Load a new photo": "Neues Foto laden",
@@ -1817,6 +1826,9 @@ const I18N = {
     "No notes match.": "一致するノートはありません。",
     "Graph of {n} nodes and {links} links. The most connected notes are listed below it.": "{n} 個のノードと {links} 件のリンクのグラフ。リンクの多いノートは下に一覧があります。",
     "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Obsidian のグラフビューのように、ノート同士のつながりを描きます。点のドラッグ、ズーム、絞り込み、開いているノートの周辺の表示ができます。グラフビューのフィルター設定を初期値とし、色のグループも使います。点をクリックするとそのノートが開きます。リンクからお使いのデバイス上で計算され、何も送信されません。",
+    "Drag to move, scroll to zoom": "ドラッグで移動、スクロールでズーム",
+    "Scroll wheel zooms the graph": "スクロールでグラフをズーム",
+    "Like Obsidian's Graph view, scrolling over the Graph card zooms it. Turn this off to scroll the dashboard past it instead; Ctrl or ⌘ + scroll still zooms.": "Obsidian のグラフビューと同様に、グラフカード上でスクロールするとズームします。オフにするとダッシュボードがスクロールします。Ctrl または ⌘ + スクロールでは常にズームします。",
     "Clock and search over the photo": "時計と検索を写真の上に表示",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "あいさつ、時計、日付、検索ボックスを今日の写真の上に重ねて表示し、縦のスペースを節約します。文字が読みやすいよう写真を少し暗くするため、とても明るい写真はやや地味に見えます。今日の写真が必要です。",
     "Load a new photo": "新しい写真を読み込む",
@@ -2388,6 +2400,7 @@ const DEFAULT_SETTINGS = {
   showOnThisDay: false, // notes from this date a week, a month and a year ago (off unless enabled)
   showTimerStatus: true, // the running timer in the status bar (desktop; needs the Time tracker)
   showXkcd: false, // an xkcd comic of the day (off unless enabled)
+  graphWheel: true, // the scroll wheel zooms the Graph card (off: only Ctrl or ⌘ + scroll does, so scrolling the dashboard is never caught)
   showGraph: false, // a picture of how notes link together (off unless enabled)
   graphMode: "overview", // "overview" (most connected notes) or "local" (around the open note)
   showVaultStats: false, // a heatmap, streak, counts and top tags worked out from the vault (off unless enabled)
@@ -6309,7 +6322,7 @@ class HomepageView extends ItemView {
     gr.canvas.addEventListener(
       "wheel",
       (e) => {
-        if (!e.ctrlKey && !e.metaKey) return; // a plain scroll still scrolls the dashboard
+        if (!e.ctrlKey && !e.metaKey && this.settings.graphWheel === false) return; // then a plain scroll still scrolls the dashboard
         e.preventDefault();
         const r = gr.canvas.getBoundingClientRect();
         zoomAt(Math.exp(-e.deltaY * (e.deltaMode === 1 ? 0.05 : 0.0025)), e.clientX - r.left, e.clientY - r.top);
@@ -6499,6 +6512,7 @@ class HomepageView extends ItemView {
     const active = local ? this.app.workspace.getActiveFile() : null;
     const model = graphModel({ ...this.graphInput(force), opts, query: this.grQuery ?? "", local: local ? (active?.path ?? "") : null, cap: document.body.classList.contains("is-mobile") ? 150 : GRAPH_CAP });
     this.$("graph-count").textContent = "";
+    gr.canvas.title = this.settings.graphWheel === false ? T("Drag to move, Ctrl or ⌘ + scroll to zoom") : T("Drag to move, scroll to zoom");
     for (const b of gr.panel.querySelectorAll("[data-gr-opt]")) b.checked = !!opts[b.dataset.grOpt];
     for (const b of this.$("graph-body").querySelectorAll("[data-gr-mode]")) b.setAttribute("aria-pressed", String((b.dataset.grMode === "local") === local));
     // Colour groups from the Graph view: the first group a node matches decides its colour
@@ -9177,6 +9191,11 @@ class HomepageSettingTab extends PluginSettingTab {
       .setName(T("Graph"))
       .setDesc(T("Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere."))
       .addToggle((t) => t.setValue(s.showGraph).onChange((v) => save("showGraph", v)));
+
+    add()
+      .setName(T("Scroll wheel zooms the graph"))
+      .setDesc(T("Like Obsidian's Graph view, scrolling over the Graph card zooms it. Turn this off to scroll the dashboard past it instead; Ctrl or ⌘ + scroll still zooms."))
+      .addToggle((t) => t.setValue(s.graphWheel !== false).onChange((v) => save("graphWheel", v)));
 
     add()
       .setName(T("Pebble ring notes"))

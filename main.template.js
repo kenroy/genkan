@@ -172,6 +172,7 @@ const DEFAULT_SETTINGS = {
   showOnThisDay: false, // notes from this date a week, a month and a year ago (off unless enabled)
   showTimerStatus: true, // the running timer in the status bar (desktop; needs the Time tracker)
   showXkcd: false, // an xkcd comic of the day (off unless enabled)
+  graphWheel: true, // the scroll wheel zooms the Graph card (off: only Ctrl or ⌘ + scroll does, so scrolling the dashboard is never caught)
   showGraph: false, // a picture of how notes link together (off unless enabled)
   graphMode: "overview", // "overview" (most connected notes) or "local" (around the open note)
   showVaultStats: false, // a heatmap, streak, counts and top tags worked out from the vault (off unless enabled)
@@ -2372,7 +2373,7 @@ class HomepageView extends ItemView {
     gr.canvas.addEventListener(
       "wheel",
       (e) => {
-        if (!e.ctrlKey && !e.metaKey) return; // a plain scroll still scrolls the dashboard
+        if (!e.ctrlKey && !e.metaKey && this.settings.graphWheel === false) return; // then a plain scroll still scrolls the dashboard
         e.preventDefault();
         const r = gr.canvas.getBoundingClientRect();
         zoomAt(Math.exp(-e.deltaY * (e.deltaMode === 1 ? 0.05 : 0.0025)), e.clientX - r.left, e.clientY - r.top);
@@ -2562,6 +2563,7 @@ class HomepageView extends ItemView {
     const active = local ? this.app.workspace.getActiveFile() : null;
     const model = graphModel({ ...this.graphInput(force), opts, query: this.grQuery ?? "", local: local ? (active?.path ?? "") : null, cap: document.body.classList.contains("is-mobile") ? 150 : GRAPH_CAP });
     this.$("graph-count").textContent = "";
+    gr.canvas.title = this.settings.graphWheel === false ? T("Drag to move, Ctrl or ⌘ + scroll to zoom") : T("Drag to move, scroll to zoom");
     for (const b of gr.panel.querySelectorAll("[data-gr-opt]")) b.checked = !!opts[b.dataset.grOpt];
     for (const b of this.$("graph-body").querySelectorAll("[data-gr-mode]")) b.setAttribute("aria-pressed", String((b.dataset.grMode === "local") === local));
     // Colour groups from the Graph view: the first group a node matches decides its colour
@@ -5240,6 +5242,11 @@ class HomepageSettingTab extends PluginSettingTab {
       .setName(T("Graph"))
       .setDesc(T("Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter, and see the notes around the one you have open. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere."))
       .addToggle((t) => t.setValue(s.showGraph).onChange((v) => save("showGraph", v)));
+
+    add()
+      .setName(T("Scroll wheel zooms the graph"))
+      .setDesc(T("Like Obsidian's Graph view, scrolling over the Graph card zooms it. Turn this off to scroll the dashboard past it instead; Ctrl or ⌘ + scroll still zooms."))
+      .addToggle((t) => t.setValue(s.graphWheel !== false).onChange((v) => save("graphWheel", v)));
 
     add()
       .setName(T("Pebble ring notes"))
