@@ -2791,16 +2791,22 @@
   color: var(--accent-txt);
 }
 
+/* The picture's height follows the card's width, so a narrow column gets a compact picture, not a tall empty one */
 .hp-root .gr-stage {
+  aspect-ratio: 16 / 10;
   background: var(--surface-2);
   border-radius: var(--radius-sm);
-  height: 340px;
+  max-height: 340px;
+  min-height: 220px;
   overflow: hidden;
   position: relative;
+  width: 100%; /* without it, min-height and the ratio would stretch the width past the card */
 }
 
 .hp-root .gr-stage.tall {
-  height: 620px;
+  aspect-ratio: 1 / 1;
+  max-height: 620px;
+  min-height: 340px;
 }
 
 .hp-root .gr-canvas {
@@ -2910,4 +2916,20 @@
   align-items: center;
   display: inline-flex;
   text-decoration: none;
+}
+
+/* A long note name in the Most connected chips is cut with an ellipsis (the full name is in the tooltip), and the count stays put */
+#genkan-root a.vs-tag {
+  max-width: 100%;
+}
+
+.hp-root .gr-chip {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hp-root a.vs-tag em {
+  flex: none;
 }

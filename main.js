@@ -3197,7 +3197,7 @@ function graphSim(nodes, links, prev) {
 // Forces: how hard nodes push apart, how long a link likes to be, and how hard a note with no links is pulled to the middle
 const REPEL = 150;
 const LINK = 60;
-const ORPHAN_PULL = 3;
+const ORPHAN_PULL = 1;
 
 function graphTick(sim) {
   const { nodes, links } = sim;
@@ -6303,7 +6303,7 @@ class HomepageView extends ItemView {
         iconBtn("in", "plus", T("Zoom in")),
         h("button", { type: "button", cls: "gr-mode", "data-gr": "fit" }, T("Fit")),
         reduced ? null : (gr.animBtn = h("button", { type: "button", cls: "gr-mode", "data-gr": "animate" }, T("Animate"))),
-        h("button", { type: "button", cls: "gr-mode", "data-gr": "tall", "aria-pressed": "false" }, T("Expand")),
+        h("button", { type: "button", cls: "gr-mode", "data-gr": "tall" }, T("Expand")),
         gr.filterBtn,
         hasGraph ? h("button", { type: "button", cls: "vs-back", "data-gr": "open" }, T("Open graph view")) : null,
       ),
@@ -6462,7 +6462,6 @@ class HomepageView extends ItemView {
       } else if (act === "tall") {
         gr.tall = !gr.tall;
         gr.stage.classList.toggle("tall", gr.tall);
-        e.target.closest("[data-gr]").setAttribute("aria-pressed", String(gr.tall));
         e.target.closest("[data-gr]").textContent = gr.tall ? T("Collapse") : T("Expand");
         size();
         this.fitGraph();
@@ -6687,7 +6686,7 @@ class HomepageView extends ItemView {
     this.graphStatus();
     const top = gr.nodes.filter((n) => n.type === "note" && !n.centre).sort((a, b) => b.deg - a.deg || a.label.localeCompare(b.label)).slice(0, 5);
     gr.chips.empty();
-    for (const n of top) gr.chips.append(h("a", { cls: "vs-tag", href: "#", "data-open": n.path, title: n.label }, n.label, h("em", { text: fmtNum(n.deg) })));
+    for (const n of top) gr.chips.append(h("a", { cls: "vs-tag", href: "#", "data-open": n.path, title: n.label }, h("span", { cls: "gr-chip", text: n.label }), h("em", { text: fmtNum(n.deg) })));
     this.drawGraph();
   }
 
