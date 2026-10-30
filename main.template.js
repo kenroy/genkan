@@ -877,7 +877,7 @@ function graphModel({ notes, resolved, unresolved, opts, query, local, cap }) {
   const byPath = new Map(notes.map((n) => [n.path, n]));
   const nodes = new Map();
   const add = (n) => nodes.has(n.id) || nodes.set(n.id, { ...n, deg: 0 });
-  for (const n of notes) add({ id: n.path, type: "note", label: n.label, path: n.path, tags: n.tags });
+  for (const n of notes) add({ id: n.path, type: "note", label: n.label, path: n.path, tags: n.tags, ctime: n.ctime ?? 0 });
   const seen = new Set();
   let links = [];
   const link = (a, b) => {
@@ -960,8 +960,10 @@ function graphTick(sim) {
   const a = sim.alpha;
   for (let i = 0; i < n; i++) {
     const p = nodes[i];
+    if (p.hidden) continue;
     for (let j = i + 1; j < n; j++) {
       const q = nodes[j];
+      if (q.hidden) continue;
       let dx = p.x - q.x;
       let dy = p.y - q.y;
       let d2 = dx * dx + dy * dy;
@@ -981,6 +983,7 @@ function graphTick(sim) {
   for (const [i, j] of links) {
     const p = nodes[i];
     const q = nodes[j];
+    if (p.hidden || q.hidden) continue;
     const dx = q.x - p.x;
     const dy = q.y - p.y;
     const d = Math.hypot(dx, dy) || 0.1;
@@ -991,6 +994,7 @@ function graphTick(sim) {
     q.vy -= dy * f;
   }
   for (const p of nodes) {
+    if (p.hidden) continue;
     const g = 0.012 * (p.deg ? 1 : 10) * a; // notes with no links are pulled in harder, or they would ring the picture far out
     p.vx -= p.x * g;
     p.vy -= p.y * g;
@@ -2203,14 +2207,83 @@ class HomepageView extends ItemView {
         const tags = new Set((c?.tags ?? []).map((t) => t.tag));
         const fm = c?.frontmatter?.tags ?? c?.frontmatter?.tag;
         for (const t of Array.isArray(fm) ? fm : typeof fm === "string" ? fm.split(/[,\s]+/) : []) if (t) tags.add(`#${String(t).replace(/^#/, "")}`);
-        return { path: f.path, label: f.basename, tags: [...tags] };
+        return { path: f.path, label: f.basename, tags: [...tags], ctime: f.stat?.ctime ?? 0 };
       });
     return (this.grInput = { at: now, notes, resolved: mc.resolvedLinks, unresolved: mc.unresolvedLinks });
   }
 
   stopGraph() {
+    const gr = this.gr;
+    if (!gr) return;
+    if (gr.raf) cancelAnimationFrame(gr.raf);
+    gr.raf = 0;
+    if (gr.anim) {
+      gr.anim = null;
+      for (const n of gr.nodes) n.hidden = false;
+      if (gr.animBtn) gr.animBtn.textContent = T("Animate");
+    }
+  }
+
+  // Play the graph growing: each note appears in the order it was created, and the layout keeps moving as it does.
+  // A tag, attachment or missing note appears with the first note that links to it. Pressing the button again skips to the end.
+  animateGraph() {
+    const gr = this.gr;
+    if (!gr?.nodes.length) return;
+    if (gr.anim) return this.endGraphAnimation();
+    const { nodes, links } = gr;
+    const t = nodes.map((n) => (n.type === "note" ? n.ctime : Infinity));
+    for (const [a, b] of links) {
+      if (nodes[a].type !== "note") t[a] = Math.min(t[a], t[b]);
+      if (nodes[b].type !== "note") t[b] = Math.min(t[b], t[a]);
+    }
+    const order = nodes.map((_, i) => i).sort((a, b) => t[a] - t[b] || a - b);
+    for (const n of nodes) n.hidden = true;
+    gr.anim = { order, t, shown: 0, start: performance.now(), dur: Math.min(14_000, Math.max(5_000, nodes.length * 45)), manual: false, date: 0 };
+    this.stopGraphLoop();
+    gr.view = { x: 0, y: 0, k: 1.2 };
+    gr.animBtn.textContent = T("Stop");
+    gr.live.textContent = T("Playing how the graph grew");
+    const step = (now) => {
+      gr.raf = 0;
+      const a = gr.anim;
+      if (!a) return;
+      const p = Math.min(1, (now - a.start) / a.dur);
+      const want = Math.ceil(p * order.length);
+      while (a.shown < want) {
+        const i = order[a.shown++];
+        const n = nodes[i];
+        const nb = links.map(([x, y]) => (x === i ? y : y === i ? x : -1)).find((j) => j >= 0 && !nodes[j].hidden);
+        n.x = (nb != null ? nodes[nb].x : 0) + Math.cos(i * 2.4) * 16;
+        n.y = (nb != null ? nodes[nb].y : 0) + Math.sin(i * 2.4) * 16;
+        n.vx = n.vy = 0;
+        n.hidden = false;
+        a.date = t[i];
+      }
+      gr.sim.alpha = Math.max(gr.sim.alpha, 0.3);
+      graphTick(gr.sim);
+      if (!a.manual) this.fitGraph(0.08);
+      this.drawGraph();
+      if (p < 1) gr.raf = requestAnimationFrame(step);
+      else this.endGraphAnimation();
+    };
+    gr.raf = requestAnimationFrame(step);
+  }
+
+  stopGraphLoop() {
     if (this.gr?.raf) cancelAnimationFrame(this.gr.raf);
     if (this.gr) this.gr.raf = 0;
+  }
+
+  endGraphAnimation() {
+    const gr = this.gr;
+    if (!gr?.anim) return;
+    this.stopGraphLoop();
+    gr.anim = null;
+    for (const n of gr.nodes) n.hidden = false;
+    gr.animBtn.textContent = T("Animate");
+    gr.live.textContent = T("Finished playing");
+    gr.fitAfter = true;
+    this.reheatGraph(0.5);
   }
 
   // The card's controls and canvas are built once and then updated, so panning, zooming and the open filter panel survive a refresh
@@ -2221,10 +2294,12 @@ class HomepageView extends ItemView {
     const iconBtn = (id, icon, label) => h("button", { type: "button", cls: "icon-btn sm", "data-gr": id, title: label, "aria-label": label }, iconNode(icon));
     const check = (id, label) => h("label", { cls: "gr-check" }, h("input", { type: "checkbox", "data-gr-opt": id }), h("span", { text: label }));
     const hasGraph = !!this.app.commands?.commands?.["graph:open"];
+    const reduced = !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches; // a time-lapse is motion, so it is left out
     gr.canvas = h("canvas", { cls: "gr-canvas", title: T("Drag to move, Ctrl or ⌘ + scroll to zoom"), "aria-hidden": "true" });
     gr.stage = h("div", { cls: "gr-stage" }, gr.canvas);
     gr.status = h("div", { cls: "gr-hover" });
     gr.empty = h("p", { cls: "vs-empty hidden" });
+    gr.live = h("div", { cls: "sr-only", role: "status" });
     gr.chips = h("div", { cls: "vs-tags" });
     gr.chipsHead = h("h3", { cls: "vs-sub", text: T("Most connected") });
     gr.panel = h(
@@ -2246,6 +2321,7 @@ class HomepageView extends ItemView {
         iconBtn("out", "minus", T("Zoom out")),
         iconBtn("in", "plus", T("Zoom in")),
         h("button", { type: "button", cls: "gr-mode", "data-gr": "fit" }, T("Fit")),
+        reduced ? null : (gr.animBtn = h("button", { type: "button", cls: "gr-mode", "data-gr": "animate" }, T("Animate"))),
         h("button", { type: "button", cls: "gr-mode", "data-gr": "tall", "aria-pressed": "false" }, T("Expand")),
         gr.filterBtn,
         hasGraph ? h("button", { type: "button", cls: "vs-back", "data-gr": "open" }, T("Open graph view")) : null,
@@ -2254,6 +2330,7 @@ class HomepageView extends ItemView {
       gr.stage,
       gr.empty,
       gr.status,
+      gr.live,
       gr.chipsHead,
       gr.chips,
     );
@@ -2288,6 +2365,7 @@ class HomepageView extends ItemView {
       let best = -1;
       let bd = Infinity;
       gr.nodes.forEach((n, i) => {
+        if (n.hidden) return;
         const d = Math.hypot(n.x - p.x, n.y - p.y);
         const reach = this.graphRadius(n) / Math.sqrt(gr.view.k) + 4 / gr.view.k;
         if (d <= reach && d < bd) [best, bd] = [i, d];
@@ -2301,6 +2379,7 @@ class HomepageView extends ItemView {
       v.x = cx - gr.W / 2 - (cx - gr.W / 2 - v.x) * f;
       v.y = cy - gr.H / 2 - (cy - gr.H / 2 - v.y) * f;
       v.k = k;
+      if (gr.anim) gr.anim.manual = true;
       this.drawGraph();
     };
     gr.zoomAt = zoomAt;
@@ -2352,6 +2431,7 @@ class HomepageView extends ItemView {
       } else {
         gr.view.x += dx;
         gr.view.y += dy;
+        if (gr.anim) gr.anim.manual = true;
         this.drawGraph();
       }
     });
@@ -2393,6 +2473,7 @@ class HomepageView extends ItemView {
       if (act === "in") zoomAt(1.4);
       else if (act === "out") zoomAt(1 / 1.4);
       else if (act === "fit") this.fitGraph();
+      else if (act === "animate") this.animateGraph();
       else if (act === "open") this.app.commands.executeCommandById("graph:open");
       else if (act === "filters") {
         const open = gr.panel.classList.toggle("hidden") === false;
@@ -2463,14 +2544,16 @@ class HomepageView extends ItemView {
     gr.raf = requestAnimationFrame(step);
   }
 
-  fitGraph() {
+  fitGraph(ease = 1) {
     const gr = this.gr;
-    if (!gr?.nodes.length) return;
-    const xs = gr.nodes.map((n) => n.x);
-    const ys = gr.nodes.map((n) => n.y);
+    const shown = gr?.nodes.filter((n) => !n.hidden);
+    if (!shown?.length) return;
+    const xs = shown.map((n) => n.x);
+    const ys = shown.map((n) => n.y);
     const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
     const k = Math.min(2.5, Math.max(0.15, Math.min((gr.W - 50) / (x1 - x0 || 1), (gr.H - 50) / (y1 - y0 || 1))));
-    gr.view = { k, x: (-(x0 + x1) / 2) * k, y: (-(y0 + y1) / 2) * k };
+    const v = gr.view;
+    gr.view = { k: v.k + (k - v.k) * ease, x: v.x + ((-(x0 + x1) / 2) * k - v.x) * ease, y: v.y + ((-(y0 + y1) / 2) * k - v.y) * ease };
     this.drawGraph();
   }
 
@@ -2497,6 +2580,7 @@ class HomepageView extends ItemView {
     ctx.setTransform(dpr * view.k, 0, 0, dpr * view.k, dpr * (W / 2 + view.x), dpr * (H / 2 + view.y));
     ctx.lineWidth = 1 / view.k;
     for (const [a, b] of links) {
+      if (nodes[a].hidden || nodes[b].hidden) continue;
       const on = dim && (a === gr.hover || b === gr.hover);
       ctx.globalAlpha = dim ? (on ? 0.9 : 0.07) : 0.4;
       ctx.strokeStyle = on ? col("--accent-txt", ink) : faint;
@@ -2506,6 +2590,7 @@ class HomepageView extends ItemView {
       ctx.stroke();
     }
     nodes.forEach((n, i) => {
+      if (n.hidden) return;
       const r = this.graphRadius(n) / Math.sqrt(view.k);
       ctx.globalAlpha = dim && !near.has(i) ? 0.2 : 1;
       ctx.beginPath();
@@ -2535,7 +2620,7 @@ class HomepageView extends ItemView {
       ctx.strokeStyle = col("--surface-2", "#222");
       ctx.fillStyle = ink;
       nodes.forEach((n, i) => {
-        if (!(dim ? near.has(i) : all)) return;
+        if (n.hidden || !(dim ? near.has(i) : all)) return;
         ctx.globalAlpha = 1;
         const y = n.y + this.graphRadius(n) / Math.sqrt(view.k) + 2 / view.k;
         ctx.strokeText(n.label, n.x, y);
@@ -2543,6 +2628,14 @@ class HomepageView extends ItemView {
       });
     }
     ctx.globalAlpha = 1;
+    if (gr.anim?.date) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.font = `600 12px ${cs.fontFamily || "sans-serif"}`;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "bottom";
+      ctx.fillStyle = ink;
+      ctx.fillText(fmtDate(new Date(gr.anim.date)), 12, H - 10);
+    }
   }
 
   async renderGraph(force) {
