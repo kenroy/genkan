@@ -3077,7 +3077,7 @@ function heroPrefersDarkText(px) {
 }
 
 // ── Graph card ──
-const GRAPH_CAP = 300; // nodes drawn at most (150 on a phone), so it stays quick
+const GRAPH_CAP = 1000; // nodes drawn at most (300 on a phone), so it stays quick
 const GRAPH_DEFAULTS = { tags: false, attachments: false, orphans: true, existingOnly: false }; // Obsidian's own Graph view defaults
 
 // Does a node satisfy a Graph-view style query? Plain words and path:, file: and tag: terms, all of which must
@@ -3194,30 +3194,50 @@ function graphSim(nodes, links, prev) {
   return { nodes, links, alpha: prev?.size ? 0.35 : 1 }; // a redraw only settles a little; a first one builds up
 }
 
+// Forces: how hard nodes push apart, how long a link likes to be, and how hard a note with no links is pulled to the middle
+const REPEL = 150;
+const LINK = 60;
+const ORPHAN_PULL = 3;
+
 function graphTick(sim) {
   const { nodes, links } = sim;
   const n = nodes.length;
   const a = sim.alpha;
+  // Repulsion only reaches 300 units, so nodes are bucketed in a grid of that size and only neighbouring cells are compared
+  const CELL = 300;
+  const cells = new Map();
   for (let i = 0; i < n; i++) {
     const p = nodes[i];
     if (p.hidden) continue;
-    for (let j = i + 1; j < n; j++) {
-      const q = nodes[j];
-      if (q.hidden) continue;
-      let dx = p.x - q.x;
-      let dy = p.y - q.y;
-      let d2 = dx * dx + dy * dy;
-      if (d2 < 1) {
-        dx = (i - j) * 0.1;
-        dy = (j - i) * 0.07 + 0.05;
-        d2 = dx * dx + dy * dy;
-      }
-      if (d2 > 90000) continue; // too far apart to matter
-      const f = (100 * a) / d2;
-      p.vx += dx * f;
-      p.vy += dy * f;
-      q.vx -= dx * f;
-      q.vy -= dy * f;
+    const key = `${Math.floor(p.x / CELL)},${Math.floor(p.y / CELL)}`;
+    (cells.get(key) ?? cells.set(key, []).get(key)).push(i);
+  }
+  const push = (i, j) => {
+    const p = nodes[i];
+    const q = nodes[j];
+    let dx = p.x - q.x;
+    let dy = p.y - q.y;
+    let d2 = dx * dx + dy * dy;
+    if (d2 < 1) {
+      dx = (i - j) * 0.1;
+      dy = (j - i) * 0.07 + 0.05;
+      d2 = dx * dx + dy * dy;
+    }
+    if (d2 > CELL * CELL) return;
+    const f = (REPEL * a) / d2;
+    p.vx += dx * f;
+    p.vy += dy * f;
+    q.vx -= dx * f;
+    q.vy -= dy * f;
+  };
+  for (const [key, list] of cells) {
+    const [cx, cy] = key.split(",").map(Number);
+    for (let k = 0; k < list.length; k++) {
+      for (let m = k + 1; m < list.length; m++) push(list[k], list[m]);
+    }
+    for (const [ox, oy] of [[1, -1], [1, 0], [1, 1], [0, 1]]) {
+      const other = cells.get(`${cx + ox},${cy + oy}`);
+      if (other) for (const i of list) for (const j of other) push(i, j);
     }
   }
   for (const [i, j] of links) {
@@ -3227,7 +3247,7 @@ function graphTick(sim) {
     const dx = q.x - p.x;
     const dy = q.y - p.y;
     const d = Math.hypot(dx, dy) || 0.1;
-    const f = ((d - 32) / d) * 0.12 * a;
+    const f = ((d - LINK) / d) * 0.12 * a;
     p.vx += dx * f;
     p.vy += dy * f;
     q.vx -= dx * f;
@@ -3235,7 +3255,7 @@ function graphTick(sim) {
   }
   for (const p of nodes) {
     if (p.hidden) continue;
-    const g = 0.012 * (p.deg ? 1 : 10) * a; // notes with no links are pulled in harder, or they would ring the picture far out
+    const g = 0.012 * (p.deg ? 1 : ORPHAN_PULL) * a;
     p.vx -= p.x * g;
     p.vy -= p.y * g;
     p.vx *= 0.6;
@@ -6615,7 +6635,7 @@ class HomepageView extends ItemView {
     const opts = { ...cfg.defaults, ...(this.settings.graphOpts ?? {}) };
     const local = this.settings.graphMode === "local";
     const active = local ? this.app.workspace.getActiveFile() : null;
-    const model = graphModel({ ...this.graphInput(force), opts, query: this.grQuery ?? "", local: local ? (active?.path ?? "") : null, cap: document.body.classList.contains("is-mobile") ? 150 : GRAPH_CAP });
+    const model = graphModel({ ...this.graphInput(force), opts, query: this.grQuery ?? "", local: local ? (active?.path ?? "") : null, cap: document.body.classList.contains("is-mobile") ? 300 : GRAPH_CAP });
     this.$("graph-count").textContent = "";
     gr.canvas.title = this.settings.graphWheel === false ? T("Drag to move, Ctrl or ⌘ + scroll to zoom") : T("Drag to move, scroll to zoom");
     for (const b of gr.panel.querySelectorAll("[data-gr-opt]")) b.checked = !!opts[b.dataset.grOpt];
@@ -6650,11 +6670,12 @@ class HomepageView extends ItemView {
       gr.canvas.setAttribute("role", "img");
       gr.canvas.removeAttribute("aria-hidden");
       if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-        while (graphTick(gr.sim));
+        const t0 = Date.now();
+        while (graphTick(gr.sim) && Date.now() - t0 < 1500); // settle at once, but never freeze a big vault for long
         this.fitGraph();
       } else {
         gr.sim.alpha = prev.size ? 0.35 : 1;
-        for (let i = 0; i < 40; i++) graphTick(gr.sim); // a rough shape first, so it does not start as a clump
+        for (let i = 0, rough = Math.min(40, Math.ceil(20_000 / gr.nodes.length)); i < rough; i++) graphTick(gr.sim); // a rough shape first, so it does not start as a clump
         if (!prev.size) this.fitGraph();
         gr.fitAfter = true;
         this.reheatGraph(gr.sim.alpha);
