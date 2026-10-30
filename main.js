@@ -398,6 +398,17 @@ const I18N = {
     "Clear search": "Effacer la recherche",
     "Search results": "Résultats de la recherche",
     "Photo of the day": "Photo du jour",
+    "Graph": "Graphe",
+    "Overview": "Vue d'ensemble",
+    "This note": "Cette note",
+    "Open graph view": "Ouvrir la vue graphique",
+    "Most connected": "Les plus liées",
+    "No linked notes yet.": "Aucune note liée pour l'instant.",
+    "Open a note that has links to see what it connects to.": "Ouvrez une note qui contient des liens pour voir à quoi elle est reliée.",
+    "Graph of {notes} notes and {links} links. The most connected notes are listed below it.": "Graphe de {notes} notes et {links} liens. Les notes les plus liées sont listées en dessous.",
+    "{notes} notes · {links} links": "{notes} notes · {links} liens",
+    "{name} · {n} links": "{name} · {n} liens",
+    "A picture of how your notes link together: your most connected notes, or the notes around the one you have open. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Une image des liens entre vos notes : les notes les plus liées, ou celles qui entourent la note ouverte. Cliquez sur un point pour ouvrir la note. Calculé sur votre appareil à partir de vos liens ; rien n'est envoyé.",
     "Clock and search over the photo": "Horloge et recherche sur la photo",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Place le message d'accueil, l'horloge, la date et la recherche sur la photo du jour au lieu de les mettre au-dessus, ce qui économise de la place en hauteur. La photo est un peu assombrie pour que le texte reste lisible ; les photos très claires paraissent donc plus ternes. Nécessite la photo du jour.",
     "Load a new photo": "Charger une nouvelle photo",
@@ -835,6 +846,17 @@ const I18N = {
     "Clear search": "Borrar búsqueda",
     "Search results": "Resultados de la búsqueda",
     "Photo of the day": "Foto del día",
+    "Graph": "Grafo",
+    "Overview": "Resumen",
+    "This note": "Esta nota",
+    "Open graph view": "Abrir vista de grafo",
+    "Most connected": "Más conectadas",
+    "No linked notes yet.": "Aún no hay notas enlazadas.",
+    "Open a note that has links to see what it connects to.": "Abre una nota que tenga enlaces para ver con qué se conecta.",
+    "Graph of {notes} notes and {links} links. The most connected notes are listed below it.": "Grafo de {notes} notas y {links} enlaces. Las notas más conectadas aparecen debajo.",
+    "{notes} notes · {links} links": "{notes} notas · {links} enlaces",
+    "{name} · {n} links": "{name} · {n} enlaces",
+    "A picture of how your notes link together: your most connected notes, or the notes around the one you have open. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Una imagen de cómo se enlazan tus notas: las más conectadas, o las que rodean la nota abierta. Haz clic en un punto para abrir esa nota. Se calcula en tu dispositivo a partir de tus enlaces; no se envía nada.",
     "Clock and search over the photo": "Reloj y búsqueda sobre la foto",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Coloca el saludo, el reloj, la fecha y la búsqueda sobre la foto del día en lugar de encima, lo que ahorra espacio vertical. La foto se oscurece un poco para que el texto se lea bien, así que las fotos muy claras se ven más apagadas. Requiere la foto del día.",
     "Load a new photo": "Cargar una foto nueva",
@@ -1272,6 +1294,17 @@ const I18N = {
     "Clear search": "Suche löschen",
     "Search results": "Suchergebnisse",
     "Photo of the day": "Foto des Tages",
+    "Graph": "Graph",
+    "Overview": "Übersicht",
+    "This note": "Diese Notiz",
+    "Open graph view": "Graphansicht öffnen",
+    "Most connected": "Am stärksten vernetzt",
+    "No linked notes yet.": "Noch keine verlinkten Notizen.",
+    "Open a note that has links to see what it connects to.": "Öffne eine Notiz mit Links, um zu sehen, womit sie verbunden ist.",
+    "Graph of {notes} notes and {links} links. The most connected notes are listed below it.": "Graph aus {notes} Notizen und {links} Links. Die am stärksten vernetzten Notizen stehen darunter.",
+    "{notes} notes · {links} links": "{notes} Notizen · {links} Links",
+    "{name} · {n} links": "{name} · {n} Links",
+    "A picture of how your notes link together: your most connected notes, or the notes around the one you have open. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Ein Bild davon, wie deine Notizen verlinkt sind: die am stärksten vernetzten Notizen oder die um die geöffnete Notiz herum. Klicke auf einen Punkt, um die Notiz zu öffnen. Wird auf deinem Gerät aus deinen Links berechnet; nichts wird gesendet.",
     "Clock and search over the photo": "Uhr und Suche über dem Foto",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Legt Begrüßung, Uhr, Datum und Suche über das Foto des Tages statt darüber, was Platz in der Höhe spart. Das Foto wird leicht abgedunkelt, damit der Text lesbar bleibt; sehr helle Fotos wirken dadurch matter. Benötigt das Foto des Tages.",
     "Load a new photo": "Neues Foto laden",
@@ -1709,6 +1742,17 @@ const I18N = {
     "Clear search": "検索をクリア",
     "Search results": "検索結果",
     "Photo of the day": "今日の写真",
+    "Graph": "グラフ",
+    "Overview": "全体",
+    "This note": "このノート",
+    "Open graph view": "グラフビューを開く",
+    "Most connected": "リンクの多いノート",
+    "No linked notes yet.": "リンクされたノートはまだありません。",
+    "Open a note that has links to see what it connects to.": "リンクのあるノートを開くと、つながり先が表示されます。",
+    "Graph of {notes} notes and {links} links. The most connected notes are listed below it.": "{notes} 件のノートと {links} 件のリンクのグラフ。リンクの多いノートは下に一覧があります。",
+    "{notes} notes · {links} links": "{notes} 件のノート · {links} 件のリンク",
+    "{name} · {n} links": "{name} · {n} 件のリンク",
+    "A picture of how your notes link together: your most connected notes, or the notes around the one you have open. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "ノート同士のつながりを図で表示します。リンクの多いノート、または開いているノートの周りを表示できます。点をクリックするとそのノートが開きます。リンクからお使いのデバイス上で計算され、何も送信されません。",
     "Clock and search over the photo": "時計と検索を写真の上に表示",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "あいさつ、時計、日付、検索ボックスを今日の写真の上に重ねて表示し、縦のスペースを節約します。文字が読みやすいよう写真を少し暗くするため、とても明るい写真はやや地味に見えます。今日の写真が必要です。",
     "Load a new photo": "新しい写真を読み込む",
@@ -2280,6 +2324,8 @@ const DEFAULT_SETTINGS = {
   showOnThisDay: false, // notes from this date a week, a month and a year ago (off unless enabled)
   showTimerStatus: true, // the running timer in the status bar (desktop; needs the Time tracker)
   showXkcd: false, // an xkcd comic of the day (off unless enabled)
+  showGraph: false, // a picture of how notes link together (off unless enabled)
+  graphMode: "overview", // "overview" (most connected notes) or "local" (around the open note)
   showVaultStats: false, // a heatmap, streak, counts and top tags worked out from the vault (off unless enabled)
   showTimeTracker: false, // projects, tasks and timers (off unless enabled); the time lives in its own note
   // Where the ring saves notes: "main" = Pebble Index.md, "chosen" = a note you pick,
@@ -2941,6 +2987,107 @@ function heroPrefersDarkText(px) {
   return n > 0 && dark / n > white / n + 0.5;
 }
 
+// ── Graph card ──
+const GRAPH_MAX = 80; // notes drawn at most, so the picture stays readable and quick
+const GRAPH_W = 400;
+const GRAPH_H = 250;
+
+// Which notes link to which, either direction, among the given note paths
+function graphAdjacency(resolved, paths) {
+  const adj = new Map();
+  const add = (a, b) => {
+    if (!adj.has(a)) adj.set(a, new Set());
+    adj.get(a).add(b);
+  };
+  for (const [src, dests] of Object.entries(resolved || {})) {
+    if (!paths.has(src)) continue;
+    for (const dest of Object.keys(dests)) {
+      if (dest === src || !paths.has(dest)) continue;
+      add(src, dest);
+      add(dest, src);
+    }
+  }
+  return adj;
+}
+
+// The notes to draw: the most connected ones, or the open note and what it links to
+function graphPick(adj, centre, max = GRAPH_MAX) {
+  const byLinks = (a, b) => adj.get(b).size - adj.get(a).size || a.localeCompare(b);
+  let ids;
+  if (centre !== null) {
+    if (!adj.has(centre)) return { ids: [], edges: [], deg: new Map() };
+    ids = [centre, ...[...adj.get(centre)].sort(byLinks)].slice(0, max);
+  } else {
+    ids = [...adj.keys()].sort(byLinks).slice(0, max);
+  }
+  const keep = new Set(ids);
+  const edges = [];
+  for (const a of ids) for (const b of adj.get(a)) if (a < b && keep.has(b)) edges.push([a, b]);
+  return { ids, edges, deg: new Map(ids.map((id) => [id, adj.get(id).size])) };
+}
+
+// A force-directed layout (Fruchterman-Reingold), run to the end at once so the picture is still: no
+// animation to tire the eye or to fight reduced motion. Starts from a ring, so the same notes always land the same way.
+function graphLayout(ids, edges, W = GRAPH_W, H = GRAPH_H) {
+  const n = ids.length;
+  if (!n) return [];
+  const index = new Map(ids.map((id, i) => [id, i]));
+  const pos = ids.map((_, i) => {
+    const a = (i / n) * 2 * Math.PI;
+    return { x: W / 2 + Math.cos(a) * W * 0.3, y: H / 2 + Math.sin(a) * H * 0.3 };
+  });
+  if (n === 1) return [{ x: W / 2, y: H / 2 }];
+  const k = Math.sqrt((W * H) / n) * 0.6; // the length an edge likes to be
+  const pairs = edges.map(([a, b]) => [index.get(a), index.get(b)]);
+  const ROUNDS = 300;
+  for (let round = 0; round < ROUNDS; round++) {
+    const temp = (W / 8) * (1 - round / ROUNDS) + 0.5;
+    const d = pos.map(() => ({ x: 0, y: 0 }));
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const dx = pos[i].x - pos[j].x;
+        const dy = pos[i].y - pos[j].y;
+        const dist = Math.hypot(dx, dy) || 0.1;
+        const f = (k * k) / dist / dist;
+        d[i].x += dx * f;
+        d[i].y += dy * f;
+        d[j].x -= dx * f;
+        d[j].y -= dy * f;
+      }
+    }
+    for (const [a, b] of pairs) {
+      const dx = pos[a].x - pos[b].x;
+      const dy = pos[a].y - pos[b].y;
+      const dist = Math.hypot(dx, dy) || 0.1;
+      const f = dist / k;
+      d[a].x -= dx * f;
+      d[a].y -= dy * f;
+      d[b].x += dx * f;
+      d[b].y += dy * f;
+    }
+    for (let i = 0; i < n; i++) {
+      d[i].x += (W / 2 - pos[i].x) * 0.08; // a weak pull to the middle keeps separate clusters in frame
+      d[i].y += (H / 2 - pos[i].y) * 0.08;
+      const len = Math.hypot(d[i].x, d[i].y) || 1;
+      const step = Math.min(len, temp);
+      pos[i].x += (d[i].x / len) * step;
+      pos[i].y += (d[i].y / len) * step;
+    }
+  }
+  // Scale the result to fill the frame, keeping its proportions
+  const pad = 14;
+  const xs = pos.map((p) => p.x);
+  const ys = pos.map((p) => p.y);
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const spanX = Math.max(...xs) - minX || 1;
+  const spanY = Math.max(...ys) - minY || 1;
+  const scale = Math.min((W - 2 * pad) / spanX, (H - 2 * pad) / spanY);
+  const offX = (W - spanX * scale) / 2;
+  const offY = (H - spanY * scale) / 2;
+  return pos.map((p) => ({ x: offX + (p.x - minX) * scale, y: offY + (p.y - minY) * scale }));
+}
+
 const VS_WEEKS = 12; // weeks shown in the Vault stats heatmap
 const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
@@ -3036,7 +3183,7 @@ const ARRANGE_ZONES = ["top", "left", "center", "right"];
 const DEFAULT_LAYOUT = {
   top: ["favs-card"],
   left: ["calendar-card", "links-card"],
-  center: ["ring-card", "clips-card", "recent-card", "otd-card", "tt-card", "xkcd-card", "stats-card"],
+  center: ["ring-card", "clips-card", "recent-card", "otd-card", "tt-card", "xkcd-card", "stats-card", "graph-card"],
   right: ["tasks-card", "note-card"],
 };
 const CARD_NAMES = {
@@ -3050,6 +3197,7 @@ const CARD_NAMES = {
   "tt-card": "Time tracker",
   "xkcd-card": "xkcd",
   "stats-card": "Vault stats",
+  "graph-card": "Graph",
   "tasks-card": "Tasks",
   "note-card": "Quick notes",
 };
@@ -3439,6 +3587,10 @@ function buildDashboard() {
     h("section", { cls: "card hidden", id: "stats-card", "aria-labelledby": "stats-card-title" },
       h("div", { cls: "card-header" }, cardTitle("stats-card", "stats-body", T("Vault stats")), countRow("stats-count")),
       h("div", { id: "stats-body" }),
+    ),
+    h("section", { cls: "card hidden", id: "graph-card", "aria-labelledby": "graph-card-title" },
+      h("div", { cls: "card-header" }, cardTitle("graph-card", "graph-body", T("Graph")), countRow("graph-count")),
+      h("div", { id: "graph-body" }),
     ),
   );
 
@@ -5491,6 +5643,7 @@ class HomepageView extends ItemView {
       this.app.metadataCache.on("changed", () => this.scheduleLists()),
     );
     this.registerEvent(this.app.workspace.on("css-change", () => this.applyTheme()));
+    this.registerEvent(this.app.workspace.on("file-open", () => this.settings.graphMode === "local" && this.settings.showGraph && this.renderGraph()));
 
     this.registerInterval(window.setInterval(() => this.tickClock(), 1000));
     // Day rollover: refresh date-dependent content every 5 minutes
@@ -5499,6 +5652,7 @@ class HomepageView extends ItemView {
         this.renderCalendar();
         this.renderOnThisDay();
         this.renderVaultStats(true);
+        this.renderGraph(true);
         this.loadHero(false);
         this.loadQuote();
         this.syncSharedLayout(true);
@@ -5538,6 +5692,7 @@ class HomepageView extends ItemView {
     this.renderOnThisDay();
     this.renderXkcd();
     this.renderVaultStats(true);
+    this.renderGraph(true);
     this.tt?.render();
     this.$("hero").classList.toggle("hidden", !this.settings.showHero);
     this.$("app").classList.toggle("hero-over", !!this.settings.showHero && !!this.settings.heroOverlay);
@@ -5816,6 +5971,120 @@ class HomepageView extends ItemView {
     if (items.length > max) body.append(h("div", { cls: "otd-more", text: T("+ {n} more", { n: fmtNum(items.length - max) }) }));
   }
 
+  // ── Graph ──
+
+  // Links between notes, rebuilt at most every 30 seconds
+  graphLinks(force) {
+    const now = Date.now();
+    if (!force && this.grLinks && now - this.grLinks.at < 30_000) return this.grLinks;
+    const files = this.app.vault.getMarkdownFiles().filter((f) => !this.isDataFile(f));
+    const paths = new Set(files.map((f) => f.path));
+    const adj = graphAdjacency(this.app.metadataCache.resolvedLinks, paths);
+    return (this.grLinks = { at: now, adj, titles: new Map(files.map((f) => [f.path, f.basename])) });
+  }
+
+  renderGraph(force) {
+    const card = this.$("graph-card");
+    const enabled = !!this.settings.showGraph;
+    card.classList.toggle("hidden", !enabled);
+    if (!enabled) {
+      this.grLinks = null;
+      return;
+    }
+    const body = this.$("graph-body");
+    if (!body.dataset.wired) {
+      body.dataset.wired = "1";
+      body.addEventListener("click", (e) => {
+        const mode = e.target.closest("[data-gr-mode]");
+        if (mode) {
+          this.plugin.settings.graphMode = mode.dataset.grMode;
+          this.plugin.saveSettings().catch(() => {});
+          this.renderGraph();
+          body.querySelector(`[data-gr-mode="${mode.dataset.grMode}"]`)?.focus();
+          return;
+        }
+        if (e.target.closest("[data-gr-open]")) return void this.app.commands.executeCommandById("graph:open");
+        const node = e.target.closest("[data-path]"); // a dot in the picture; the chips below use data-open
+        if (node) this.openFile(node.dataset.path, e);
+      });
+    }
+    const local = this.settings.graphMode === "local";
+    const { adj, titles } = this.graphLinks(force);
+    const active = local ? this.app.workspace.getActiveFile() : null;
+    const g = graphPick(adj, local ? (active?.path ?? "") : null);
+    this.$("graph-count").textContent = "";
+    body.empty();
+    this.drawGraph(body, g, adj, titles, local, active);
+  }
+
+  drawGraph(body, g, adj, titles, local, active) {
+    const mode = (id, label) => h("button", { type: "button", cls: "gr-mode", "data-gr-mode": id, "aria-pressed": String((id === "local") === local) }, label);
+    const hasGraph = !!this.app.commands?.commands?.["graph:open"];
+    body.append(
+      h("div", { cls: "gr-bar" }, mode("overview", T("Overview")), mode("local", T("This note")), h("span", { cls: "gr-gap" }), hasGraph ? h("button", { type: "button", cls: "vs-back", "data-gr-open": "" }, T("Open graph view")) : null),
+    );
+    if (!g.ids.length) {
+      body.append(h("p", { cls: "vs-empty", text: local ? T("Open a note that has links to see what it connects to.") : T("No linked notes yet.") }));
+      return;
+    }
+    const pos = graphLayout(g.ids, g.edges);
+    const at = new Map(g.ids.map((id, i) => [id, pos[i]]));
+    const NS = "http://www.w3.org/2000/svg";
+    const svgEl = (name, attrs) => {
+      const el = document.createElementNS(NS, name);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+      return el;
+    };
+    const svg = svgEl("svg", {
+      class: "gr-svg",
+      viewBox: `0 0 ${GRAPH_W} ${GRAPH_H}`,
+      role: "img",
+      "aria-label": T("Graph of {notes} notes and {links} links. The most connected notes are listed below it.", { notes: fmtNum(g.ids.length), links: fmtNum(g.edges.length) }),
+    });
+    const lines = new Map(); // note -> its edges, so hovering can light them up
+    for (const [a, b] of g.edges) {
+      const line = svgEl("line", { class: "gr-edge", x1: at.get(a).x, y1: at.get(a).y, x2: at.get(b).x, y2: at.get(b).y });
+      svg.append(line);
+      for (const id of [a, b]) (lines.get(id) ?? lines.set(id, []).get(id)).push([line, id === a ? b : a]);
+    }
+    const dots = new Map();
+    for (const id of g.ids) {
+      const centre = local && id === active?.path;
+      const r = 3 + Math.min(6, Math.log2(g.deg.get(id) + 1) * 1.4) + (centre ? 2 : 0);
+      const dot = svgEl("circle", { class: `gr-node${centre ? " centre" : ""}`, cx: at.get(id).x, cy: at.get(id).y, r, "data-path": id });
+      dots.set(id, dot);
+      svg.append(dot);
+    }
+    const status = h("div", { cls: "gr-hover" });
+    const rest = T("{notes} notes · {links} links", { notes: fmtNum(g.ids.length), links: fmtNum(g.edges.length) });
+    status.textContent = rest;
+    const clear = () => {
+      svg.classList.remove("dim");
+      for (const el of svg.querySelectorAll(".on")) el.classList.remove("on");
+      status.textContent = rest;
+    };
+    svg.addEventListener("pointerover", (e) => {
+      const id = e.target.dataset?.path;
+      if (!id) return;
+      clear();
+      svg.classList.add("dim");
+      dots.get(id).classList.add("on");
+      for (const [line, other] of lines.get(id) ?? []) {
+        line.classList.add("on");
+        dots.get(other).classList.add("on");
+      }
+      status.textContent = T("{name} · {n} links", { name: titles.get(id) ?? id, n: fmtNum(g.deg.get(id)) });
+    });
+    svg.addEventListener("pointerleave", clear);
+    body.append(svg, status);
+    // The same notes as links, for the keyboard and screen readers (the dots are for the mouse and touch)
+    const top = [...g.ids].sort((a, b) => g.deg.get(b) - g.deg.get(a) || a.localeCompare(b)).filter((id) => !(local && id === active?.path)).slice(0, 5);
+    body.append(
+      h("h3", { cls: "vs-sub", text: T("Most connected") }),
+      h("div", { cls: "vs-tags" }, ...top.map((id) => h("a", { cls: "vs-tag", href: "#", "data-open": id, title: titles.get(id) }, titles.get(id) ?? id, h("em", { text: fmtNum(g.deg.get(id)) })))),
+    );
+  }
+
   scheduleLists() {
     this.later("lists", 1500, () => {
       if (this.ringMode === "files") this.renderRingNotes(); // frontmatter may have changed
@@ -5825,6 +6094,7 @@ class HomepageView extends ItemView {
       this.renderOnThisDay();
       this.renderCalendar();
       this.later("vaultStats", 5000, () => this.renderVaultStats(true)); // a full pass over the vault, so less often
+      this.later("graph", 5000, () => this.renderGraph(true));
     });
   }
 
@@ -8435,6 +8705,11 @@ class HomepageSettingTab extends PluginSettingTab {
       .setName(T("Vault stats"))
       .setDesc(T("A summary of your vault: a 12-week heatmap of the days you wrote, your streak, counts of notes, orphan notes, unresolved links and open tasks, and your top tags. Worked out on your device from file dates and links; nothing is sent anywhere."))
       .addToggle((t) => t.setValue(s.showVaultStats).onChange((v) => save("showVaultStats", v)));
+
+    add()
+      .setName(T("Graph"))
+      .setDesc(T("A picture of how your notes link together: your most connected notes, or the notes around the one you have open. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere."))
+      .addToggle((t) => t.setValue(s.showGraph).onChange((v) => save("showGraph", v)));
 
     add()
       .setName(T("Pebble ring notes"))

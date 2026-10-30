@@ -15,6 +15,7 @@ Genkan (玄関) is the entryway of a Japanese home: the place you step in. This 
 - **Time tracker**: an optional card for timing work on projects and tasks, with time allocations, a weekly summary, a running timer in the status bar or at the top of the dashboard on a phone, and CSV, Excel or PDF reports
 - **xkcd**: an optional card with one [xkcd](https://xkcd.com/) comic a day, the same one on all your devices
 - **Vault stats**: an optional card with a 12-week heatmap of the days you wrote, your streak, counts of notes, orphan notes, unresolved links and open tasks, and your top tags
+- **Graph**: an optional card that draws how your notes link together, either your most connected notes or the notes around the one you have open
 - **Ring notes**: an optional card for voice notes from a Pebble Index ring
 - A photo of the day and a daily quote (both optional), with an option to lay the clock and search over the photo to save vertical space
 
@@ -82,7 +83,7 @@ By default these live in `genkan/data/`. Change the **Data folder** setting to p
 Click a link in a quick note to open it: in Surfing if that plugin is installed (on desktop), otherwise in your default browser. Right-click a link to choose where it opens: **Open in Obsidian (Surfing)** (when Surfing is installed), **Open in the default browser**, or **Copy link**. With the cursor inside a link, Ctrl or Cmd+Enter opens it. Selecting text across a link does not open it, and to edit a link's text, move into it with the arrow keys. On a phone or tablet, a tap opens the link with the system.
 
 ### Collapsing cards
-Click the − beside **Ring notes**, **Web clips**, **Recent notes**, **On this day**, **Vault stats** or **xkcd** to fold a card down to its title (the count stays visible), and the + to open it again. Each device remembers what you collapsed.
+Click the − beside **Ring notes**, **Web clips**, **Recent notes**, **On this day**, **Vault stats**, **Graph** or **xkcd** to fold a card down to its title (the count stays visible), and the + to open it again. Each device remembers what you collapsed.
 
 ### Arranging cards
 Click the **Arrange cards** button (the four-squares icon at the top right, between the theme and settings buttons) to enter arrange mode. Handles only appear in this mode, so you never drag a card by accident. Every card gets a bar with a handle, its name and four arrow buttons.
@@ -93,7 +94,7 @@ Click the **Arrange cards** button (the four-squares icon at the top right, betw
 
 Press **Done** to leave arrange mode, or **Reset layout** to go back to the default on this device.
 
-Each device remembers its own layout, so a phone and a laptop can differ. On a phone the columns stack, so a card's column decides its order (the right column comes first by default). Cards you have switched off, such as Ring notes, On this day, Vault stats or xkcd, keep their place and come back where you left them.
+Each device remembers its own layout, so a phone and a laptop can differ. On a phone the columns stack, so a card's column decides its order (the right column comes first by default). Cards you have switched off, such as Ring notes, On this day, Vault stats, Graph or xkcd, keep their place and come back where you left them.
 
 **Sharing a layout between devices.** While arranging, press **Use on all my devices** to save the current layout as a shared one.
 
@@ -141,6 +142,16 @@ Off by default. Turn on **Vault stats** in settings to add a card that summarise
 
 Genkan's own data folder is left out. The vault is scanned when the dashboard opens and again a few seconds after notes change, so a very large vault is not rescanned on every keystroke.
 
+### Graph
+Off by default. Turn on **Graph** in settings to add a card that draws how your notes link to each other, worked out on your device from the links Obsidian already knows, with no network request:
+
+- **Overview:** the 80 notes with the most links (in and out), with the links between them. Bigger dots have more links.
+- **This note:** the note you have open, in the middle, with the notes it links to and the notes that link to it. It follows the note you open. If that note has no links, the card says so.
+- **Hover and click:** hover a dot to light up its links and see its name and link count; click it to open the note. **Open graph view** opens Obsidian's own Graph view when that core plugin is on.
+- **Most connected:** the five notes with the most links in the picture, as buttons, so the picture's notes are reachable without a mouse.
+
+It is a small picture for glancing at, not a replacement for Obsidian's Graph view: it has no filters, groups or animation, and the layout is calculated once each time it redraws, so it holds still. The same notes always land in the same arrangement for the same links. Genkan's own data folder is left out.
+
 ### Time tracker
 Off by default. Turn on **Time tracker** in settings to add a card for timing your work. It has three views, chosen with the buttons at the top: **Projects**, **Week** and **Report**.
 
@@ -174,6 +185,7 @@ Genkan aims to meet WCAG 2.2 level AA and is used with a keyboard and screen rea
 - **Controls:** everything works from the keyboard and shows a visible focus ring. The calendar is a grid with one Tab stop and arrow-key movement, the quick-note toolbar is one Tab stop, and search announces how many results it found. Tasks are checkboxes named for the task, the Tasks filter and the quick-note dots are tab lists, favourites are two real buttons (open and remove), and the clock is read once a minute rather than every second.
 - **Text and targets:** text meets the 4.5:1 contrast minimum in both themes, and controls are at least 24 by 24 pixels (larger on phones and tablets).
 - **Over the photo:** the clock, date and search are real page content next to the photo, not inside it, so screen readers read them as before; their text is white on a darkened photo, or dark on a lightened one when the photo is bright, so contrast still depends on the photo.
+- **Graph:** the picture is read as one image that says how many notes and links it shows; the dots are for the mouse and touch, and the **Most connected** notes below it are real links, so everything can be reached from the keyboard. **Overview** and **This note** are toggle buttons. Hover is never the only way to learn a note's name.
 - **Vault stats:** the heatmap is read as one image with your streak (its squares are for sighted hover only), the Orphan notes and Unresolved links tiles and the tags are real buttons, and Back returns focus to the tile you opened.
 - **Announcements:** switching quick notes with Cmd/Ctrl+1 to 7 says which note you are on, "Saved" is announced when you leave a note you changed, and moving a card or sharing a layout is announced.
 - **No drag required:** arranging cards also works with buttons and the keyboard, and each step is announced.
@@ -216,7 +228,7 @@ Notes:
 
 ## Settings
 
-Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker (and its running timer display), Vault stats, xkcd comic of the day, the Pebble ring options, photo of the day (and whether the clock and search sit over it) and Unsplash key, daily quote, site icons, and quick links.
+Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker (and its running timer display), Vault stats, Graph, xkcd comic of the day, the Pebble ring options, photo of the day (and whether the clock and search sit over it) and Unsplash key, daily quote, site icons, and quick links.
 
 ## Development
 
