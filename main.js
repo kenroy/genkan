@@ -6201,8 +6201,16 @@ class HomepageView extends ItemView {
     if (gr.anim) {
       gr.anim = null;
       for (const n of gr.nodes) n.hidden = false;
-      if (gr.animBtn) gr.animBtn.textContent = T("Animate");
+      this.graphPlayIcon(false);
     }
+  }
+
+  graphPlayIcon(playing, gr = this.gr) {
+    if (!gr?.animBtn) return;
+    setIconSvg(gr.animBtn, playing ? "stop" : "play");
+    const label = playing ? T("Stop") : T("Animate");
+    gr.animBtn.title = label;
+    gr.animBtn.setAttribute("aria-label", label);
   }
 
   // Play the graph growing: each note appears in the order it was created, and the layout keeps moving as it does.
@@ -6222,7 +6230,7 @@ class HomepageView extends ItemView {
     gr.anim = { order, t, shown: 0, start: performance.now(), dur: Math.min(14_000, Math.max(5_000, nodes.length * 45)), manual: false, date: 0 };
     this.stopGraphLoop();
     gr.view = { x: 0, y: 0, k: 1.2 };
-    gr.animBtn.textContent = T("Stop");
+    this.graphPlayIcon(true);
     gr.live.textContent = T("Playing how the graph grew");
     const step = (now) => {
       gr.raf = 0;
@@ -6261,7 +6269,7 @@ class HomepageView extends ItemView {
     this.stopGraphLoop();
     gr.anim = null;
     for (const n of gr.nodes) n.hidden = false;
-    gr.animBtn.textContent = T("Animate");
+    this.graphPlayIcon(false);
     gr.live.textContent = T("Finished playing");
     gr.fitAfter = true;
     this.reheatGraph(0.5);
@@ -6292,6 +6300,9 @@ class HomepageView extends ItemView {
     );
     // The everyday view is just the two modes and the picture; the tools and filters sit behind one button
     gr.optBtn = h("button", { type: "button", cls: "icon-btn sm", "data-gr": "options", title: T("Graph options"), "aria-label": T("Graph options"), "aria-expanded": "false", "aria-controls": "gr-tools" }, iconNode("settings"));
+    // A play button for the time-lapse (left out when the device asks for reduced motion); it becomes a stop button while it plays
+    gr.animBtn = reduced ? null : h("button", { type: "button", cls: "icon-btn sm", "data-gr": "animate" });
+    if (gr.animBtn) this.graphPlayIcon(false, gr);
     gr.tools = h(
       "div",
       { cls: "gr-tools hidden", id: "gr-tools" },
@@ -6301,7 +6312,6 @@ class HomepageView extends ItemView {
         iconBtn("out", "minus", T("Zoom out")),
         iconBtn("in", "plus", T("Zoom in")),
         h("button", { type: "button", cls: "gr-mode", "data-gr": "fit" }, T("Fit")),
-        reduced ? null : (gr.animBtn = h("button", { type: "button", cls: "gr-mode", "data-gr": "animate" }, T("Animate"))),
         h("button", { type: "button", cls: "gr-mode", "data-gr": "tall" }, T("Larger")),
         h("span", { cls: "gr-gap" }),
         hasGraph ? h("button", { type: "button", cls: "vs-back", "data-gr": "open" }, T("Open graph view")) : null,
@@ -6315,6 +6325,7 @@ class HomepageView extends ItemView {
         { cls: "gr-bar" },
         mode("overview", T("Overview")),
         mode("local", T("This note")),
+        gr.animBtn,
         h("span", { cls: "gr-gap" }),
         gr.optBtn,
       ),
