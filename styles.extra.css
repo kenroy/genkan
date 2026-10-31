@@ -2937,3 +2937,60 @@
 .hp-root .gr-tools {
   margin-bottom: 8px;
 }
+
+/* ============================================================
+   Weather over the photo (setting: Weather over the photo)
+   ============================================================ */
+#genkan-root .hero-weather {
+  align-items: center;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 999px;
+  color: #fff;
+  display: flex;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px 0 10px;
+  position: absolute;
+  right: 14px;
+  top: 10px;
+  z-index: 1;
+}
+
+#genkan-root .hero-weather.hidden {
+  display: none;
+}
+
+#genkan-root .hero-weather svg {
+  flex-shrink: 0;
+}
+
+/* The credit sits beside the refresh button and never shrinks away */
+#genkan-root .hero-wx-credit {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+#genkan-root .hero-wx-credit.hidden {
+  display: none;
+}
+
+#genkan-root #hero-credit {
+  min-width: 0;
+}
+
+/* Over the photo, the top-right corner holds the header buttons, so the pill sits just below them */
+#genkan-root #app.hero-over .hero-weather {
+  right: 22px;
+  top: 64px;
+}
+
+#genkan-root #app.hero-over.hero-light .hero-wx-credit,
+#genkan-root #app.hero-over.hero-light .hero-wx-credit a {
+  color: #111;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.7);
+}

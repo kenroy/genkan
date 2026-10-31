@@ -118,6 +118,8 @@ Edit them in settings, one per line: `icon | label | action`, where the action i
 ### Photo of the day
 By default the greeting, clock, date and search box sit above the photo. Turn on **Clock and search over the photo** in settings (it needs **Photo of the day**) to lay them over the photo instead, which saves roughly a quarter of the screen's height at the top. Genkan checks how bright the photo is behind the header: on most photos the text is white and the photo is darkened a little, and on a bright photo the text turns dark and the photo is lightened instead. A bright or dark patch right behind the text can still make part of it harder to read, and if the photo can't be measured the text stays white. If you don't like it, turn the setting off; with the photo off, the header looks as it always did. On a phone the photo grows to fit the header, and the search results open over the photo.
 
+**Weather over the photo** (off by default) puts a small pill with an icon and the temperature in the photo's top-right corner; hover it for the conditions and the place it found. Type a city in settings, such as `Toronto`, or `Toronto, Ontario` to pick the right one when several share a name; the part after the comma is matched against the region or country, and if nothing matches it, Genkan uses the top result. Choose Celsius or Fahrenheit. The reading is kept for 15 minutes, so it is not fetched on every refresh, and if a refresh fails (offline, say) the last reading stays. If the city can't be found you get a notice and no pill. It needs **Photo of the day**, and a "Weather by Open-Meteo" credit appears beside the photo credit while it's on.
+
 ### On this day
 Off by default. Turn on **On this day** in settings to add a card that looks back at this date a week, a month and a year ago, with a section for each (a section with nothing shows "Nothing from this date"). Each shows up to three notes with a one-line preview, then "+ N more". Click one to open it.
 
@@ -219,6 +221,7 @@ Genkan does not collect analytics or telemetry, does not require an account, sho
 | [Echoes API](https://echoes.soferity.com/) (`echoes.soferity.com/api/quotes/random`) | Once a day, only when **Quote source** is Echoes | The language code (such as `fr`); nothing from your vault. The server sees your IP address | Settings → **Daily quote**, or choose another **Quote source** |
 | [Unsplash](https://unsplash.com/) (`api.unsplash.com`) | At most once a day (and when you press the photo's refresh button), only if you enter an Unsplash access key | Your access key and fixed nature search terms. The photo itself loads from Unsplash's image servers whenever the dashboard opens, with credit links back to the photographer and Unsplash | Remove the key, or turn off **Photo of the day** |
 | [xkcd](https://xkcd.com/) (`xkcd.com/info.0.json`, `xkcd.com/<number>/info.0.json`, and the image from `imgs.xkcd.com`) | Two small requests a day for today's comic, only when **xkcd comic of the day** is on, plus one for each comic you browse to; the comic's image loads from xkcd's image server whenever the dashboard opens or you browse | Nothing from your vault; the server sees your IP address, and no referrer is sent with the image | Settings → **xkcd comic of the day** |
+| [Open-Meteo](https://open-meteo.com/) (`geocoding-api.open-meteo.com`, `api.open-meteo.com`) | Only when **Weather over the photo** is on and a city is set: one place lookup when the city changes, then a forecast request at most every 15 minutes while the dashboard is open | The city name you typed, then its coordinates. No key and nothing from your vault; the server sees your IP address | Settings → **Weather over the photo** |
 | [Picsum Photos](https://picsum.photos/) | Whenever the dashboard opens, for the photo, when you have no Unsplash key | An image address seeded with today's date; nothing from your vault | Settings → **Photo of the day** |
 | Google favicon service (`www.google.com/s2/favicons`) | When web clips are shown | The **domain** (not the full address, title or contents) of each clipped page, to fetch a small site icon | Settings → **Site icons on web clips** |
 
@@ -232,7 +235,7 @@ Notes:
 
 ## Settings
 
-Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker (and its running timer display), Vault stats, Graph, xkcd comic of the day, the Pebble ring options, photo of the day (and whether the clock and search sit over it) and Unsplash key, daily quote, site icons, and quick links.
+Settings → Genkan: your name, open on startup, appearance (follows Obsidian's light or dark theme by default), clock format and clock font (your Obsidian theme's interface, text or monospace font, the system serif, or the name of any font installed on the device; it never downloads fonts), Web Clipper, daily notes and data folders, how many clips and recent notes to show, On this day, Time tracker (and its running timer display), Vault stats, Graph, xkcd comic of the day, the Pebble ring options, photo of the day (and whether the clock and search sit over it), weather over the photo (city and units) and Unsplash key, daily quote, site icons, and quick links.
 
 ## Development
 
@@ -254,6 +257,6 @@ To release, set `version` in `manifest.json` (and add it to `versions.json`), ru
 
 Genkan is released under the [MIT licence](LICENSE).
 
-Quotes by [ZenQuotes](https://zenquotes.io/) and the [Echoes API](https://echoes.soferity.com/). Photos from [Unsplash](https://unsplash.com/) and [Picsum Photos](https://picsum.photos/). Comics from [xkcd](https://xkcd.com/) by Randall Munroe, used under [CC BY-NC 2.5](https://creativecommons.org/licenses/by-nc/2.5/). Site icons from Google's favicon service.
+Quotes by [ZenQuotes](https://zenquotes.io/) and the [Echoes API](https://echoes.soferity.com/). Photos from [Unsplash](https://unsplash.com/) and [Picsum Photos](https://picsum.photos/). Weather by [Open-Meteo](https://open-meteo.com/). Comics from [xkcd](https://xkcd.com/) by Randall Munroe, used under [CC BY-NC 2.5](https://creativecommons.org/licenses/by-nc/2.5/). Site icons from Google's favicon service.
 
 Genkan is an independent project. It is not affiliated with or endorsed by Obsidian, Pebble or Core Devices. "Pebble" and "Pebble Index" belong to their owners and are used only to describe compatibility.

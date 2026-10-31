@@ -165,6 +165,9 @@ const DEFAULT_SETTINGS = {
   clockFontCustom: "", // font name(s) typed in settings when clockFont is "custom"
   showHero: true,
   heroOverlay: false, // lay the greeting, clock and search over the photo instead of above it
+  showWeather: false, // the temperature and conditions over the photo (Open-Meteo; off unless enabled)
+  weatherCity: "", // "Toronto" or "Toronto, Ontario"
+  weatherUnits: "celsius", // celsius | fahrenheit
   showQuote: true, // a daily quote
   quoteSource: undefined, // zenquotes | echoes | bundled (unset: ZenQuotes in English, else bundled)
   showFavicons: true, // site icons on web clips (Google's favicon service)
@@ -186,6 +189,35 @@ const DEFAULT_SETTINGS = {
   openOnStartup: false,
   quickLinks: DEFAULT_QUICK_LINKS,
 };
+
+// WMO weather codes (Open-Meteo) → [condition, icon]; clear and partly cloudy have a night icon too
+const WEATHER_TTL = 15 * 60 * 1000;
+function weatherLook(code, isDay) {
+  const day = (a, b) => (isDay ? a : b);
+  if (code === 0) return [T("Clear sky"), day("wx-clear-day", "wx-clear-night")];
+  if (code === 1) return [T("Mainly clear"), day("wx-clear-day", "wx-clear-night")];
+  if (code === 2) return [T("Partly cloudy"), day("wx-partly-day", "wx-partly-night")];
+  if (code === 3) return [T("Overcast"), "wx-cloud"];
+  if (code === 45 || code === 48) return [T("Fog"), "wx-fog"];
+  if (code >= 51 && code <= 57) return [T("Drizzle"), "wx-rain"];
+  if (code === 66 || code === 67) return [T("Freezing rain"), "wx-rain"];
+  if (code >= 61 && code <= 65) return [T("Rain"), "wx-rain"];
+  if (code >= 80 && code <= 82) return [T("Rain showers"), "wx-rain"];
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return [code >= 85 ? T("Snow showers") : T("Snow"), "wx-snow"];
+  if (code >= 95) return [T("Thunderstorm"), "wx-storm"];
+  return [T("Cloudy"), "wx-cloud"];
+}
+
+// "Toronto, Ontario": search on the first part, then prefer the result whose region or country matches the rest
+function pickPlace(results, input) {
+  if (!results?.length) return null;
+  const rest = input.split(",").slice(1).map((p) => p.trim().toLowerCase()).filter(Boolean);
+  if (!rest.length) return results[0];
+  const hit = results.find((r) =>
+    rest.every((p) => [r.admin1, r.admin2, r.country, r.country_code].some((f) => f && String(f).toLowerCase() === p)),
+  );
+  return hit ?? results[0];
+}
 
 const HERO_TOPICS = "nature,landscape,mountains,forest,ocean,wilderness";
 
@@ -1420,10 +1452,12 @@ function buildDashboard() {
     { cls: "hero", id: "hero", role: "img", "aria-label": T("Photo of the day") },
     h("img", { cls: "hero-img", id: "hero-img", alt: T("Photo of the day") }),
     h("div", { cls: "hero-overlay", "aria-hidden": "true" }),
+    h("div", { cls: "hero-weather hidden", id: "hero-weather", role: "img" }),
     h(
       "div",
       { cls: "hero-footer" },
       h("span", { cls: "hero-credit", id: "hero-credit" }),
+      h("span", { cls: "hero-credit hero-wx-credit hidden", id: "weather-credit" }),
       h("button", { cls: "icon-btn", id: "hero-refresh", title: T("Load a new photo"), "aria-label": T("Load new photo") }),
     ),
   );
@@ -1865,8 +1899,9 @@ class HomepageView extends ItemView {
         this.renderGraph(true);
         this.loadHero(false);
         this.loadQuote();
+        this.loadWeather();
         this.syncSharedLayout(true);
-      }, 5 * 60 * 1000), // both loaders return early when switched off in settings
+      }, 5 * 60 * 1000), // all three loaders return early when switched off in settings
     );
 
     this.refreshAll(false);
@@ -1910,6 +1945,7 @@ class HomepageView extends ItemView {
     if (this.settings.showHero) this.loadHero(false);
     this.measureHeroTone();
     this.loadQuote();
+    this.loadWeather();
   }
 
   onFileChange(f) {
@@ -4823,6 +4859,89 @@ class HomepageView extends ItemView {
     this.displayHero(photo);
   }
 
+  // ── Weather over the photo (Open-Meteo, no key) ──
+
+  hideWeather() {
+    this.$("hero-weather").classList.add("hidden");
+    this.$("weather-credit").classList.add("hidden");
+  }
+
+  displayWeather(w) {
+    const [condition, icon] = weatherLook(w.code, w.isDay);
+    const unit = w.units === "fahrenheit" ? "°F" : "°C";
+    const temp = `${Math.round(w.temp)}${unit}`;
+    const label = `${condition}, ${temp}, ${w.name}`;
+    const pill = this.$("hero-weather");
+    pill.empty();
+    pill.append(iconNode(icon), h("span", { cls: "hero-wx-temp", text: temp }));
+    pill.title = `${condition} · ${w.name}`;
+    pill.setAttribute("aria-label", label);
+    pill.classList.remove("hidden");
+    const credit = this.$("weather-credit");
+    credit.empty();
+    appendTemplate(credit, T("Weather by {site}"), { site: h("a", { href: "https://open-meteo.com/", text: "Open-Meteo" }) });
+    credit.classList.remove("hidden");
+  }
+
+  async loadWeather() {
+    const city = (this.settings.weatherCity || "").trim();
+    const units = this.settings.weatherUnits === "fahrenheit" ? "fahrenheit" : "celsius";
+    if (!this.settings.showWeather || !this.settings.showHero || !city) {
+      this.weatherMiss = null;
+      this.hideWeather(); // off, or nothing to put it on: no network request
+      return;
+    }
+    const cached = this.cacheGet("weather");
+    const sameCity = cached?.city === city;
+    const fresh = sameCity && cached.units === units && cached.temp != null && Date.now() - cached.at < WEATHER_TTL;
+    if (fresh) return this.displayWeather(cached);
+    if (this.weatherMiss === city) return this.hideWeather(); // this name was not found; wait for a change
+    // Another city or unit makes the old reading wrong; the same one is only stale, so show it until the new one arrives
+    if (sameCity && cached.units === units && cached.temp != null) this.displayWeather(cached);
+    else this.hideWeather();
+
+    const stillWanted = () =>
+      this.settings.showWeather &&
+      (this.settings.weatherCity || "").trim() === city &&
+      (this.settings.weatherUnits === "fahrenheit" ? "fahrenheit" : "celsius") === units;
+    const flight = `${city}|${units}`;
+    if (this.weatherFlight === flight) return;
+    this.weatherFlight = flight;
+    try {
+      let geo = sameCity ? cached.geo : null;
+      if (!geo) {
+        const res = await requestUrl({
+          url: `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city.split(",")[0].trim())}&count=10`,
+        });
+        const place = pickPlace(res.json?.results, city);
+        if (!place) {
+          this.weatherMiss = city;
+          if (stillWanted()) new Notice(T("Couldn't find “{city}” for the weather.", { city }));
+          return;
+        }
+        geo = {
+          lat: place.latitude,
+          lon: place.longitude,
+          name: [place.name, place.admin1, place.country].filter((v, i, a) => v && a.indexOf(v) === i).join(", "),
+        };
+      }
+      const res = await requestUrl({
+        url: `https://api.open-meteo.com/v1/forecast?latitude=${geo.lat}&longitude=${geo.lon}&current=temperature_2m,weather_code,is_day&temperature_unit=${units}&timezone=auto`,
+      });
+      const cur = res.json?.current;
+      if (typeof cur?.temperature_2m !== "number") throw new Error("no reading");
+      const reading = { city, units, geo, name: geo.name, at: Date.now(), temp: cur.temperature_2m, code: cur.weather_code, isDay: cur.is_day === 1 };
+      if (!stillWanted()) return; // the city or units changed while this was in flight
+      this.weatherMiss = null;
+      this.cacheSet("weather", reading);
+      this.displayWeather(reading);
+    } catch {
+      /* offline or a failed request: whatever is showing stays */
+    } finally {
+      if (this.weatherFlight === flight) this.weatherFlight = null;
+    }
+  }
+
   // Over-the-photo header: dark text on a pale scrim when the photo is bright, white on a dark one otherwise
   applyHeroTone() {
     const over = !!this.settings.showHero && !!this.settings.heroOverlay;
@@ -5400,6 +5519,43 @@ class HomepageSettingTab extends PluginSettingTab {
       .setName(T("Clock and search over the photo"))
       .setDesc(T("Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day."))
       .addToggle((t) => t.setValue(s.heroOverlay).onChange((v) => save("heroOverlay", v)));
+    const weatherRows = [];
+    const showWeatherRows = () => weatherRows.forEach((r) => r.settingEl.toggleClass("genkan-hidden", !s.showWeather));
+    add()
+      .setName(T("Weather over the photo"))
+      .setDesc(T("Shows the temperature and conditions in the corner of the photo of the day, from Open-Meteo (no key needed). Needs the photo of the day. Off means no weather is requested."))
+      .addToggle((t) =>
+        t.setValue(s.showWeather).onChange(async (v) => {
+          s.showWeather = v;
+          showWeatherRows();
+          await save("showWeather", v);
+        }),
+      );
+    let cityTimer;
+    weatherRows.push(
+      add()
+        .setName(T("Weather city"))
+        .setDesc(T("A city name, such as Toronto. Add a region or country after a comma, such as Toronto, Ontario, to pick the right one."))
+        .addText((t) =>
+          t
+            .setPlaceholder("Toronto, Ontario")
+            .setValue(s.weatherCity ?? "")
+            .onChange((v) => {
+              // Wait for a pause in typing, so each letter is not a lookup
+              window.clearTimeout(cityTimer);
+              cityTimer = window.setTimeout(() => save("weatherCity", v.trim()), 800);
+            }),
+        ),
+      add()
+        .setName(T("Weather units"))
+        .addDropdown((d) =>
+          d
+            .addOptions({ celsius: T("Celsius (°C)"), fahrenheit: T("Fahrenheit (°F)") })
+            .setValue(s.weatherUnits === "fahrenheit" ? "fahrenheit" : "celsius")
+            .onChange((v) => save("weatherUnits", v)),
+        ),
+    );
+    showWeatherRows();
     text(
       T("Unsplash access key"), T("Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault."),
       "unsplashKey",

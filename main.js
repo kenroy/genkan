@@ -51,6 +51,15 @@ const ICONS = {
   check: `<svg width="10" height="8" viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 3.5 6.5 9 1"/></svg>`,
   trash: `<svg width="12" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`,
   monitor: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`,
+  "wx-clear-day": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.1" y2="19.1"/><line x1="4.9" y1="19.1" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.1" y2="4.9"/></svg>`,
+  "wx-clear-night": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.7 6.7 0 0 0 10.5 10.5z"/></svg>`,
+  "wx-partly-day": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3"/><line x1="8" y1="2" x2="8" y2="3"/><line x1="2" y1="8" x2="3" y2="8"/><line x1="3.8" y1="3.8" x2="4.5" y2="4.5"/><line x1="12.2" y1="3.8" x2="11.5" y2="4.5"/><path d="M9 20a4 4 0 0 1-.4-7.98A5.2 5.2 0 0 1 18.7 13a3.5 3.5 0 0 1-.7 7z"/></svg>`,
+  "wx-partly-night": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3.5a5 5 0 1 0 5.5 7.2A5 5 0 0 1 11 3.5z"/><path d="M9 20a4 4 0 0 1-.4-7.98A5.2 5.2 0 0 1 18.7 13a3.5 3.5 0 0 1-.7 7z"/></svg>`,
+  "wx-cloud": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 0 1-.5-8.97A6 6 0 0 1 18 10.5a3.75 3.75 0 0 1-.5 7.5z"/></svg>`,
+  "wx-fog": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13a4.5 4.5 0 0 1-.5-8.97A6 6 0 0 1 18 5.5a3.75 3.75 0 0 1-.5 7.5z"/><line x1="3" y1="17" x2="21" y2="17"/><line x1="6" y1="21" x2="18" y2="21"/></svg>`,
+  "wx-rain": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14a4.5 4.5 0 0 1-.5-8.97A6 6 0 0 1 18 6.5a3.75 3.75 0 0 1-.5 7.5z"/><line x1="8" y1="17" x2="7" y2="20"/><line x1="12" y1="17" x2="11" y2="21"/><line x1="16" y1="17" x2="15" y2="20"/></svg>`,
+  "wx-snow": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14a4.5 4.5 0 0 1-.5-8.97A6 6 0 0 1 18 6.5a3.75 3.75 0 0 1-.5 7.5z"/><line x1="8" y1="18" x2="8" y2="18.01" stroke-width="2.8"/><line x1="12" y1="20" x2="12" y2="20.01" stroke-width="2.8"/><line x1="16" y1="18" x2="16" y2="18.01" stroke-width="2.8"/></svg>`,
+  "wx-storm": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14a4.5 4.5 0 0 1-.5-8.97A6 6 0 0 1 18 6.5a3.75 3.75 0 0 1-.5 7.5z"/><polyline points="12.5 13 10 17.5 14 17.5 11.5 22"/></svg>`,
 };
 
 // Built-in daily quotes, used when the ZenQuotes request is off or fails.
@@ -428,6 +437,28 @@ const I18N = {
     "Larger": "Agrandir",
     "Smaller": "Réduire",
     "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter and play how your vault grew. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Dessine les liens entre vos notes, comme la vue graphique d'Obsidian : déplacez les points, zoomez, filtrez et rejouez la croissance de votre coffre. Part des filtres de votre vue graphique et reprend ses groupes de couleurs. Cliquez sur un point pour ouvrir la note. Calculé sur votre appareil à partir de vos liens ; rien n'est envoyé.",
+    "Clear sky": "Ciel dégagé",
+    "Mainly clear": "Plutôt dégagé",
+    "Partly cloudy": "Partiellement nuageux",
+    "Overcast": "Couvert",
+    "Cloudy": "Nuageux",
+    "Fog": "Brouillard",
+    "Drizzle": "Bruine",
+    "Freezing rain": "Pluie verglaçante",
+    "Rain": "Pluie",
+    "Rain showers": "Averses de pluie",
+    "Snow": "Neige",
+    "Snow showers": "Averses de neige",
+    "Thunderstorm": "Orage",
+    "Weather by {site}": "Météo par {site}",
+    "Couldn't find “{city}” for the weather.": "Impossible de trouver « {city} » pour la météo.",
+    "Weather over the photo": "Météo sur la photo",
+    "Shows the temperature and conditions in the corner of the photo of the day, from Open-Meteo (no key needed). Needs the photo of the day. Off means no weather is requested.": "Affiche la température et le temps dans le coin de la photo du jour, depuis Open-Meteo (aucune clé requise). Nécessite la photo du jour. Désactivé, aucune météo n'est demandée.",
+    "Weather city": "Ville pour la météo",
+    "A city name, such as Toronto. Add a region or country after a comma, such as Toronto, Ontario, to pick the right one.": "Un nom de ville, comme Toronto. Ajoutez une région ou un pays après une virgule, comme Toronto, Ontario, pour choisir la bonne.",
+    "Weather units": "Unités de température",
+    "Celsius (°C)": "Celsius (°C)",
+    "Fahrenheit (°F)": "Fahrenheit (°F)",
     "Clock and search over the photo": "Horloge et recherche sur la photo",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Place le message d'accueil, l'horloge, la date et la recherche sur la photo du jour au lieu de les mettre au-dessus, ce qui économise de la place en hauteur. La photo est un peu assombrie pour que le texte reste lisible ; les photos très claires paraissent donc plus ternes. Nécessite la photo du jour.",
     "Load a new photo": "Charger une nouvelle photo",
@@ -895,6 +926,28 @@ const I18N = {
     "Larger": "Ampliar",
     "Smaller": "Reducir",
     "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter and play how your vault grew. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Dibuja cómo se enlazan tus notas, como la vista de grafo de Obsidian: arrastra los puntos, haz zoom, filtra y reproduce cómo creció tu bóveda. Parte de los filtros de tu vista de grafo y usa sus grupos de color. Haz clic en un punto para abrir esa nota. Se calcula en tu dispositivo a partir de tus enlaces; no se envía nada.",
+    "Clear sky": "Cielo despejado",
+    "Mainly clear": "Mayormente despejado",
+    "Partly cloudy": "Parcialmente nublado",
+    "Overcast": "Cubierto",
+    "Cloudy": "Nublado",
+    "Fog": "Niebla",
+    "Drizzle": "Llovizna",
+    "Freezing rain": "Lluvia helada",
+    "Rain": "Lluvia",
+    "Rain showers": "Chubascos",
+    "Snow": "Nieve",
+    "Snow showers": "Chubascos de nieve",
+    "Thunderstorm": "Tormenta",
+    "Weather by {site}": "Tiempo por {site}",
+    "Couldn't find “{city}” for the weather.": "No se encontró «{city}» para el tiempo.",
+    "Weather over the photo": "Tiempo sobre la foto",
+    "Shows the temperature and conditions in the corner of the photo of the day, from Open-Meteo (no key needed). Needs the photo of the day. Off means no weather is requested.": "Muestra la temperatura y el estado del tiempo en la esquina de la foto del día, desde Open-Meteo (no necesita clave). Requiere la foto del día. Desactivado, no se solicita el tiempo.",
+    "Weather city": "Ciudad del tiempo",
+    "A city name, such as Toronto. Add a region or country after a comma, such as Toronto, Ontario, to pick the right one.": "El nombre de una ciudad, como Toronto. Añade una región o un país tras una coma, como Toronto, Ontario, para elegir la correcta.",
+    "Weather units": "Unidades de temperatura",
+    "Celsius (°C)": "Celsius (°C)",
+    "Fahrenheit (°F)": "Fahrenheit (°F)",
     "Clock and search over the photo": "Reloj y búsqueda sobre la foto",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Coloca el saludo, el reloj, la fecha y la búsqueda sobre la foto del día en lugar de encima, lo que ahorra espacio vertical. La foto se oscurece un poco para que el texto se lea bien, así que las fotos muy claras se ven más apagadas. Requiere la foto del día.",
     "Load a new photo": "Cargar una foto nueva",
@@ -1362,6 +1415,28 @@ const I18N = {
     "Larger": "Größer",
     "Smaller": "Kleiner",
     "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter and play how your vault grew. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Zeichnet, wie deine Notizen verlinkt sind, wie die Graphansicht von Obsidian: Punkte ziehen, zoomen, filtern und abspielen, wie dein Tresor gewachsen ist. Startet mit den Filtern deiner Graphansicht und nutzt deren Farbgruppen. Klicke auf einen Punkt, um die Notiz zu öffnen. Wird auf deinem Gerät aus deinen Links berechnet; nichts wird gesendet.",
+    "Clear sky": "Klarer Himmel",
+    "Mainly clear": "Überwiegend klar",
+    "Partly cloudy": "Teilweise bewölkt",
+    "Overcast": "Bedeckt",
+    "Cloudy": "Bewölkt",
+    "Fog": "Nebel",
+    "Drizzle": "Nieselregen",
+    "Freezing rain": "Gefrierender Regen",
+    "Rain": "Regen",
+    "Rain showers": "Regenschauer",
+    "Snow": "Schnee",
+    "Snow showers": "Schneeschauer",
+    "Thunderstorm": "Gewitter",
+    "Weather by {site}": "Wetter von {site}",
+    "Couldn't find “{city}” for the weather.": "„{city}“ wurde für das Wetter nicht gefunden.",
+    "Weather over the photo": "Wetter über dem Foto",
+    "Shows the temperature and conditions in the corner of the photo of the day, from Open-Meteo (no key needed). Needs the photo of the day. Off means no weather is requested.": "Zeigt Temperatur und Wetterlage in der Ecke des Fotos des Tages, von Open-Meteo (kein Schlüssel nötig). Benötigt das Foto des Tages. Aus bedeutet: Es wird kein Wetter abgerufen.",
+    "Weather city": "Stadt für das Wetter",
+    "A city name, such as Toronto. Add a region or country after a comma, such as Toronto, Ontario, to pick the right one.": "Ein Stadtname, etwa Toronto. Füge nach einem Komma eine Region oder ein Land hinzu, etwa Toronto, Ontario, um die richtige zu wählen.",
+    "Weather units": "Temperatureinheit",
+    "Celsius (°C)": "Celsius (°C)",
+    "Fahrenheit (°F)": "Fahrenheit (°F)",
     "Clock and search over the photo": "Uhr und Suche über dem Foto",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "Legt Begrüßung, Uhr, Datum und Suche über das Foto des Tages statt darüber, was Platz in der Höhe spart. Das Foto wird leicht abgedunkelt, damit der Text lesbar bleibt; sehr helle Fotos wirken dadurch matter. Benötigt das Foto des Tages.",
     "Load a new photo": "Neues Foto laden",
@@ -1829,6 +1904,28 @@ const I18N = {
     "Larger": "大きく",
     "Smaller": "小さく",
     "Draws how your notes link together, like Obsidian's Graph view: drag the dots, zoom, filter and play how your vault grew. It starts from your Graph view's filter settings and uses its colour groups. Click a dot to open that note. Worked out on your device from your links; nothing is sent anywhere.": "Obsidian のグラフビューのように、ノート同士のつながりを描きます。点のドラッグ、ズーム、絞り込み、ボールトの成長の再生ができます。グラフビューのフィルター設定を初期値とし、色のグループも使います。点をクリックするとそのノートが開きます。リンクからお使いのデバイス上で計算され、何も送信されません。",
+    "Clear sky": "快晴",
+    "Mainly clear": "晴れ",
+    "Partly cloudy": "晴れ時々くもり",
+    "Overcast": "くもり",
+    "Cloudy": "くもり",
+    "Fog": "霧",
+    "Drizzle": "霧雨",
+    "Freezing rain": "着氷性の雨",
+    "Rain": "雨",
+    "Rain showers": "にわか雨",
+    "Snow": "雪",
+    "Snow showers": "にわか雪",
+    "Thunderstorm": "雷雨",
+    "Weather by {site}": "天気: {site}",
+    "Couldn't find “{city}” for the weather.": "天気を表示する「{city}」が見つかりませんでした。",
+    "Weather over the photo": "写真に天気を表示",
+    "Shows the temperature and conditions in the corner of the photo of the day, from Open-Meteo (no key needed). Needs the photo of the day. Off means no weather is requested.": "今日の写真の隅に、Open-Meteoから取得した気温と天気を表示します(キーは不要)。今日の写真が必要です。オフの場合、天気は取得されません。",
+    "Weather city": "天気の都市",
+    "A city name, such as Toronto. Add a region or country after a comma, such as Toronto, Ontario, to pick the right one.": "Toronto のような都市名。同名の都市がある場合は、Toronto, Ontario のようにカンマの後に地域か国を付けてください。",
+    "Weather units": "気温の単位",
+    "Celsius (°C)": "摂氏 (°C)",
+    "Fahrenheit (°F)": "華氏 (°F)",
     "Clock and search over the photo": "時計と検索を写真の上に表示",
     "Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day.": "あいさつ、時計、日付、検索ボックスを今日の写真の上に重ねて表示し、縦のスペースを節約します。文字が読みやすいよう写真を少し暗くするため、とても明るい写真はやや地味に見えます。今日の写真が必要です。",
     "Load a new photo": "新しい写真を読み込む",
@@ -2393,6 +2490,9 @@ const DEFAULT_SETTINGS = {
   clockFontCustom: "", // font name(s) typed in settings when clockFont is "custom"
   showHero: true,
   heroOverlay: false, // lay the greeting, clock and search over the photo instead of above it
+  showWeather: false, // the temperature and conditions over the photo (Open-Meteo; off unless enabled)
+  weatherCity: "", // "Toronto" or "Toronto, Ontario"
+  weatherUnits: "celsius", // celsius | fahrenheit
   showQuote: true, // a daily quote
   quoteSource: undefined, // zenquotes | echoes | bundled (unset: ZenQuotes in English, else bundled)
   showFavicons: true, // site icons on web clips (Google's favicon service)
@@ -2414,6 +2514,35 @@ const DEFAULT_SETTINGS = {
   openOnStartup: false,
   quickLinks: DEFAULT_QUICK_LINKS,
 };
+
+// WMO weather codes (Open-Meteo) → [condition, icon]; clear and partly cloudy have a night icon too
+const WEATHER_TTL = 15 * 60 * 1000;
+function weatherLook(code, isDay) {
+  const day = (a, b) => (isDay ? a : b);
+  if (code === 0) return [T("Clear sky"), day("wx-clear-day", "wx-clear-night")];
+  if (code === 1) return [T("Mainly clear"), day("wx-clear-day", "wx-clear-night")];
+  if (code === 2) return [T("Partly cloudy"), day("wx-partly-day", "wx-partly-night")];
+  if (code === 3) return [T("Overcast"), "wx-cloud"];
+  if (code === 45 || code === 48) return [T("Fog"), "wx-fog"];
+  if (code >= 51 && code <= 57) return [T("Drizzle"), "wx-rain"];
+  if (code === 66 || code === 67) return [T("Freezing rain"), "wx-rain"];
+  if (code >= 61 && code <= 65) return [T("Rain"), "wx-rain"];
+  if (code >= 80 && code <= 82) return [T("Rain showers"), "wx-rain"];
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return [code >= 85 ? T("Snow showers") : T("Snow"), "wx-snow"];
+  if (code >= 95) return [T("Thunderstorm"), "wx-storm"];
+  return [T("Cloudy"), "wx-cloud"];
+}
+
+// "Toronto, Ontario": search on the first part, then prefer the result whose region or country matches the rest
+function pickPlace(results, input) {
+  if (!results?.length) return null;
+  const rest = input.split(",").slice(1).map((p) => p.trim().toLowerCase()).filter(Boolean);
+  if (!rest.length) return results[0];
+  const hit = results.find((r) =>
+    rest.every((p) => [r.admin1, r.admin2, r.country, r.country_code].some((f) => f && String(f).toLowerCase() === p)),
+  );
+  return hit ?? results[0];
+}
 
 const HERO_TOPICS = "nature,landscape,mountains,forest,ocean,wilderness";
 
@@ -3648,10 +3777,12 @@ function buildDashboard() {
     { cls: "hero", id: "hero", role: "img", "aria-label": T("Photo of the day") },
     h("img", { cls: "hero-img", id: "hero-img", alt: T("Photo of the day") }),
     h("div", { cls: "hero-overlay", "aria-hidden": "true" }),
+    h("div", { cls: "hero-weather hidden", id: "hero-weather", role: "img" }),
     h(
       "div",
       { cls: "hero-footer" },
       h("span", { cls: "hero-credit", id: "hero-credit" }),
+      h("span", { cls: "hero-credit hero-wx-credit hidden", id: "weather-credit" }),
       h("button", { cls: "icon-btn", id: "hero-refresh", title: T("Load a new photo"), "aria-label": T("Load new photo") }),
     ),
   );
@@ -5814,8 +5945,9 @@ class HomepageView extends ItemView {
         this.renderGraph(true);
         this.loadHero(false);
         this.loadQuote();
+        this.loadWeather();
         this.syncSharedLayout(true);
-      }, 5 * 60 * 1000), // both loaders return early when switched off in settings
+      }, 5 * 60 * 1000), // all three loaders return early when switched off in settings
     );
 
     this.refreshAll(false);
@@ -5859,6 +5991,7 @@ class HomepageView extends ItemView {
     if (this.settings.showHero) this.loadHero(false);
     this.measureHeroTone();
     this.loadQuote();
+    this.loadWeather();
   }
 
   onFileChange(f) {
@@ -8772,6 +8905,89 @@ class HomepageView extends ItemView {
     this.displayHero(photo);
   }
 
+  // ── Weather over the photo (Open-Meteo, no key) ──
+
+  hideWeather() {
+    this.$("hero-weather").classList.add("hidden");
+    this.$("weather-credit").classList.add("hidden");
+  }
+
+  displayWeather(w) {
+    const [condition, icon] = weatherLook(w.code, w.isDay);
+    const unit = w.units === "fahrenheit" ? "°F" : "°C";
+    const temp = `${Math.round(w.temp)}${unit}`;
+    const label = `${condition}, ${temp}, ${w.name}`;
+    const pill = this.$("hero-weather");
+    pill.empty();
+    pill.append(iconNode(icon), h("span", { cls: "hero-wx-temp", text: temp }));
+    pill.title = `${condition} · ${w.name}`;
+    pill.setAttribute("aria-label", label);
+    pill.classList.remove("hidden");
+    const credit = this.$("weather-credit");
+    credit.empty();
+    appendTemplate(credit, T("Weather by {site}"), { site: h("a", { href: "https://open-meteo.com/", text: "Open-Meteo" }) });
+    credit.classList.remove("hidden");
+  }
+
+  async loadWeather() {
+    const city = (this.settings.weatherCity || "").trim();
+    const units = this.settings.weatherUnits === "fahrenheit" ? "fahrenheit" : "celsius";
+    if (!this.settings.showWeather || !this.settings.showHero || !city) {
+      this.weatherMiss = null;
+      this.hideWeather(); // off, or nothing to put it on: no network request
+      return;
+    }
+    const cached = this.cacheGet("weather");
+    const sameCity = cached?.city === city;
+    const fresh = sameCity && cached.units === units && cached.temp != null && Date.now() - cached.at < WEATHER_TTL;
+    if (fresh) return this.displayWeather(cached);
+    if (this.weatherMiss === city) return this.hideWeather(); // this name was not found; wait for a change
+    // Another city or unit makes the old reading wrong; the same one is only stale, so show it until the new one arrives
+    if (sameCity && cached.units === units && cached.temp != null) this.displayWeather(cached);
+    else this.hideWeather();
+
+    const stillWanted = () =>
+      this.settings.showWeather &&
+      (this.settings.weatherCity || "").trim() === city &&
+      (this.settings.weatherUnits === "fahrenheit" ? "fahrenheit" : "celsius") === units;
+    const flight = `${city}|${units}`;
+    if (this.weatherFlight === flight) return;
+    this.weatherFlight = flight;
+    try {
+      let geo = sameCity ? cached.geo : null;
+      if (!geo) {
+        const res = await requestUrl({
+          url: `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city.split(",")[0].trim())}&count=10`,
+        });
+        const place = pickPlace(res.json?.results, city);
+        if (!place) {
+          this.weatherMiss = city;
+          if (stillWanted()) new Notice(T("Couldn't find “{city}” for the weather.", { city }));
+          return;
+        }
+        geo = {
+          lat: place.latitude,
+          lon: place.longitude,
+          name: [place.name, place.admin1, place.country].filter((v, i, a) => v && a.indexOf(v) === i).join(", "),
+        };
+      }
+      const res = await requestUrl({
+        url: `https://api.open-meteo.com/v1/forecast?latitude=${geo.lat}&longitude=${geo.lon}&current=temperature_2m,weather_code,is_day&temperature_unit=${units}&timezone=auto`,
+      });
+      const cur = res.json?.current;
+      if (typeof cur?.temperature_2m !== "number") throw new Error("no reading");
+      const reading = { city, units, geo, name: geo.name, at: Date.now(), temp: cur.temperature_2m, code: cur.weather_code, isDay: cur.is_day === 1 };
+      if (!stillWanted()) return; // the city or units changed while this was in flight
+      this.weatherMiss = null;
+      this.cacheSet("weather", reading);
+      this.displayWeather(reading);
+    } catch {
+      /* offline or a failed request: whatever is showing stays */
+    } finally {
+      if (this.weatherFlight === flight) this.weatherFlight = null;
+    }
+  }
+
   // Over-the-photo header: dark text on a pale scrim when the photo is bright, white on a dark one otherwise
   applyHeroTone() {
     const over = !!this.settings.showHero && !!this.settings.heroOverlay;
@@ -9349,6 +9565,43 @@ class HomepageSettingTab extends PluginSettingTab {
       .setName(T("Clock and search over the photo"))
       .setDesc(T("Lays the greeting, clock, date and search box over the photo of the day instead of above it, which saves vertical space. The photo is darkened a little so the text stays readable, so very bright photos look duller. Needs the photo of the day."))
       .addToggle((t) => t.setValue(s.heroOverlay).onChange((v) => save("heroOverlay", v)));
+    const weatherRows = [];
+    const showWeatherRows = () => weatherRows.forEach((r) => r.settingEl.toggleClass("genkan-hidden", !s.showWeather));
+    add()
+      .setName(T("Weather over the photo"))
+      .setDesc(T("Shows the temperature and conditions in the corner of the photo of the day, from Open-Meteo (no key needed). Needs the photo of the day. Off means no weather is requested."))
+      .addToggle((t) =>
+        t.setValue(s.showWeather).onChange(async (v) => {
+          s.showWeather = v;
+          showWeatherRows();
+          await save("showWeather", v);
+        }),
+      );
+    let cityTimer;
+    weatherRows.push(
+      add()
+        .setName(T("Weather city"))
+        .setDesc(T("A city name, such as Toronto. Add a region or country after a comma, such as Toronto, Ontario, to pick the right one."))
+        .addText((t) =>
+          t
+            .setPlaceholder("Toronto, Ontario")
+            .setValue(s.weatherCity ?? "")
+            .onChange((v) => {
+              // Wait for a pause in typing, so each letter is not a lookup
+              window.clearTimeout(cityTimer);
+              cityTimer = window.setTimeout(() => save("weatherCity", v.trim()), 800);
+            }),
+        ),
+      add()
+        .setName(T("Weather units"))
+        .addDropdown((d) =>
+          d
+            .addOptions({ celsius: T("Celsius (°C)"), fahrenheit: T("Fahrenheit (°F)") })
+            .setValue(s.weatherUnits === "fahrenheit" ? "fahrenheit" : "celsius")
+            .onChange((v) => save("weatherUnits", v)),
+        ),
+    );
+    showWeatherRows();
     text(
       T("Unsplash access key"), T("Optional. Enables nature photos from Unsplash with attribution. The key is stored in this plugin's settings file in your vault."),
       "unsplashKey",
