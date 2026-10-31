@@ -1,4 +1,4 @@
-GENKAN for Obsidian  (v0.17.0)
+GENKAN for Obsidian  (v0.18.0)
 =============================
 
 Genkan (玄関) is the entryway of a Japanese home: the place you step in. This plugin is the
