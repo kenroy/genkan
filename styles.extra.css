@@ -2955,8 +2955,8 @@
   gap: 6px;
   height: 36px;
   padding: 0 14px 0 10px;
+  left: 14px;
   position: absolute;
-  right: 14px;
   top: 10px;
   z-index: 1;
 }
@@ -2969,10 +2969,9 @@
   flex-shrink: 0;
 }
 
-/* The credit sits beside the refresh button and never shrinks away */
+/* The weather credit is at the left, never shrinking away; the photo credit sits beside the refresh button */
 #genkan-root .hero-wx-credit {
   flex-shrink: 0;
-  margin-left: auto;
 }
 
 #genkan-root .hero-wx-credit.hidden {
@@ -2980,13 +2979,14 @@
 }
 
 #genkan-root #hero-credit {
+  margin-left: auto;
   min-width: 0;
 }
 
-/* Over the photo, the top-right corner holds the header buttons, so the pill sits just below them */
+/* Over the photo, the pill sits just under the greeting */
 #genkan-root #app.hero-over .hero-weather {
-  right: 22px;
-  top: 64px;
+  left: 22px;
+  top: 56px;
 }
 
 #genkan-root #app.hero-over.hero-light .hero-wx-credit,

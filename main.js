@@ -3781,8 +3781,8 @@ function buildDashboard() {
     h(
       "div",
       { cls: "hero-footer" },
-      h("span", { cls: "hero-credit", id: "hero-credit" }),
       h("span", { cls: "hero-credit hero-wx-credit hidden", id: "weather-credit" }),
+      h("span", { cls: "hero-credit", id: "hero-credit" }),
       h("button", { cls: "icon-btn", id: "hero-refresh", title: T("Load a new photo"), "aria-label": T("Load new photo") }),
     ),
   );
