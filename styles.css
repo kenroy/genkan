@@ -4023,8 +4023,9 @@
 }
 
 /* When the pane is narrow the search box is nearly full width, so leave room for the credits and refresh button below it
-   (a pane can be narrow in a wide window, so this follows the pane's width) */
-@container hp (max-width: 720px) {
+   (a pane can be narrow in a wide window, so this follows the pane's width). The search box is up to 480px wide and each credit
+   can run to about 200px, so below roughly 920px the credits would reach under it. */
+@container hp (max-width: 920px) {
   #genkan-root #app.hero-over > .header {
     padding-bottom: 56px;
   }
