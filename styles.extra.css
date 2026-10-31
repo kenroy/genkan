@@ -2741,8 +2741,9 @@
   color: #111;
 }
 
-/* On a narrow screen the search box is full width, so leave room for the photo credit and refresh button below it */
-@media (max-width: 560px) {
+/* When the pane is narrow the search box is nearly full width, so leave room for the credits and refresh button below it
+   (a pane can be narrow in a wide window, so this follows the pane's width) */
+@container hp (max-width: 720px) {
   #genkan-root #app.hero-over > .header {
     padding-bottom: 56px;
   }
