@@ -192,6 +192,7 @@ const DEFAULT_SETTINGS = {
 
 // WMO weather codes (Open-Meteo) → [condition, icon]; clear and partly cloudy have a night icon too
 const WEATHER_TTL = 15 * 60 * 1000;
+const WEATHER_MAX_AGE = 3 * 60 * 60 * 1000; // an older reading is hidden rather than shown as current
 function weatherLook(code, isDay) {
   const day = (a, b) => (isDay ? a : b);
   if (code === 0) return [T("Clear sky"), day("wx-clear-day", "wx-clear-night")];
@@ -4896,8 +4897,8 @@ class HomepageView extends ItemView {
     const fresh = sameCity && cached.units === units && cached.temp != null && Date.now() - cached.at < WEATHER_TTL;
     if (fresh) return this.displayWeather(cached);
     if (this.weatherMiss === city) return this.hideWeather(); // this name was not found; wait for a change
-    // Another city or unit makes the old reading wrong; the same one is only stale, so show it until the new one arrives
-    if (sameCity && cached.units === units && cached.temp != null) this.displayWeather(cached);
+    // Another city or unit makes the old reading wrong; the same one is only stale, so show it (for up to 3 hours) until the new one arrives
+    if (sameCity && cached.units === units && cached.temp != null && Date.now() - cached.at < WEATHER_MAX_AGE) this.displayWeather(cached);
     else this.hideWeather();
 
     const stillWanted = () =>
